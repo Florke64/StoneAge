@@ -6,9 +6,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-import win.flrque.g2p.stoneage.item.StoneMachine;
+import win.flrque.g2p.stoneage.StoneAge;
 
 public class StoneMachinePlaceListener implements Listener {
+
+    private final StoneAge plugin;
+
+    public StoneMachinePlaceListener() {
+        plugin = StoneAge.getPlugin(StoneAge.class);
+    }
 
     @EventHandler
     public void onStoneMachinePlace(BlockPlaceEvent event) {
@@ -17,7 +23,7 @@ public class StoneMachinePlaceListener implements Listener {
 
         final Player player = event.getPlayer();
 
-        final ItemStack stoneMachine = StoneMachine.getExampleStoneMachine();
+        final ItemStack stoneMachine = plugin.getStoneMachine().getExample();
 
         //Better safe than sorry :P
         if(stoneMachine.getItemMeta() == null)

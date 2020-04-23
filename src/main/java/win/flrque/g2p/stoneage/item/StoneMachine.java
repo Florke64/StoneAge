@@ -12,34 +12,64 @@ public class StoneMachine {
 
     public static final Material STONE_MACHINE_MATERIAL = Material.DISPENSER;
 
-    private static final ItemStack stoneMachineParent = getStoneMachineItem(STONE_MACHINE_MATERIAL);
+    private final String machineName;
+    private final List<String> machineLore = new ArrayList<>();
 
-    public static ItemStack getStoneMachineItem() {
+    private final ItemStack stoneMachineParent;
+
+    public StoneMachine(String machineName, List<String> lore) {
+        this.machineName = ChatColor.translateAlternateColorCodes('&', machineName);
+
+        for(String line : lore) {
+            this.machineLore.add(ChatColor.translateAlternateColorCodes('&', line));
+        }
+
+        this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
+    }
+
+    public ItemStack createStoneMachineItem() {
         return stoneMachineParent.clone();
     }
 
-    private static ItemStack getStoneMachineItem(Material material) {
+    private ItemStack createStoneMachineItem(Material material) {
         final ItemStack item = new ItemStack(material);
         final ItemMeta meta = item.getItemMeta();
 
         //TODO: Add appropriate configuration sections
-        meta.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "Stoniarka");
-
-        final List<String> lore = new ArrayList<>();
-        lore.add(ChatColor.GRAY + "Postaw stoniarke w kierunku,");
-        lore.add(ChatColor.GRAY + "gdzie ma generowac stone!");
-        lore.add(" ");
-        lore.add(ChatColor.DARK_RED + "Uwaga! " + ChatColor.YELLOW + "Stoniarki mozna niszczyc");
-        lore.add(ChatColor.YELLOW + "tylko zlotym kilofem.");
-        meta.setLore(lore);
+        meta.setDisplayName(machineName);
+        meta.setLore(machineLore);
 
         item.setItemMeta(meta);
 
         return item;
     }
 
-    public static ItemStack getExampleStoneMachine() {
+    public ItemStack getExample() {
         return stoneMachineParent;
+    }
+
+    public String getMachineName() {
+        return machineName;
+    }
+
+    public List<String> getMachineLore() {
+        if(machineLore == null || machineLore.isEmpty()) {
+            createDefaultMachineLore();
+        }
+
+        return machineLore;
+    }
+
+    public static List<String> createDefaultMachineLore() {
+        final List<String> machineLore = new ArrayList<>();
+
+        machineLore.add(ChatColor.GRAY + "Postaw stoniarke w kierunku,");
+        machineLore.add(ChatColor.GRAY + "gdzie ma generowac stone!");
+        machineLore.add(" ");
+        machineLore.add(ChatColor.DARK_RED + "Uwaga! " + ChatColor.YELLOW + "Stoniarki mozna niszczyc");
+        machineLore.add("tylko zlotym kilofem.");
+
+        return machineLore;
     }
 
 }

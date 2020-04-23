@@ -4,9 +4,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import win.flrque.g2p.stoneage.item.StoneMachine;
+import win.flrque.g2p.stoneage.StoneAge;
 
 public class DebugGameJoin implements Listener {
+
+    private final StoneAge plugin;
+
+    public DebugGameJoin() {
+        plugin = StoneAge.getPlugin(StoneAge.class);
+    }
 
     @EventHandler
     public void onOperatorJoin(PlayerJoinEvent event) {
@@ -16,7 +22,7 @@ public class DebugGameJoin implements Listener {
 
         player.sendMessage("<Edward> Jako admin, dostajesz stoniarke do EQ!");
         player.sendMessage("<Edward> P.S. to tylko tymczasowe działanie do celów debugowania.");
-        player.getInventory().addItem(StoneMachine.getStoneMachineItem());
+        player.getInventory().addItem(plugin.getStoneMachine().createStoneMachineItem());
     }
 
 }
