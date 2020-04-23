@@ -14,8 +14,8 @@ public class DebugGameJoin implements Listener {
         if(player == null || !player.isOp())
             return;
 
-        player.sendMessage("<FlrQue> Jako admin, dostajesz stoniarke do EQ!");
-        player.sendMessage("<FlrQue> P.S. to tylko tymczasowe działanie do celów debugowania.");
+        player.sendMessage("<Edward> Jako admin, dostajesz stoniarke do EQ!");
+        player.sendMessage("<Edward> P.S. to tylko tymczasowe działanie do celów debugowania.");
         player.getInventory().addItem(StoneMachine.getStoneMachineItem());
     }
 
