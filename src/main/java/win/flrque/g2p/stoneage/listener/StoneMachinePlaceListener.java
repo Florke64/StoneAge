@@ -26,18 +26,15 @@ public class StoneMachinePlaceListener implements Listener {
         final ItemStack stoneMachine = plugin.getStoneMachine().getExample();
 
         //Better safe than sorry :P
-        if(stoneMachine.getItemMeta() == null)
-            return;
+        if(stoneMachine.getItemMeta() == null) return;
 
         //Check if it's Dispenser.
-        if(!(event.getBlockPlaced().getState() instanceof Dispenser))
-            return;
+        if(!(event.getBlockPlaced().getState() instanceof Dispenser)) return;
 
         final Dispenser stoneMachineBlock = (Dispenser) event.getBlockPlaced().getState();
 
         //This isn't Stone Machine >:(
-        if(stoneMachineBlock.getCustomName() == null)
-            return;
+        if(stoneMachineBlock.getCustomName() == null) return;
 
         //Bloop! Checking custom names for match.
         if(stoneMachineBlock.getCustomName().equals(stoneMachine.getItemMeta().getDisplayName())) {
