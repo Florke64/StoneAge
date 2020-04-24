@@ -19,6 +19,16 @@ public class StoneMachine {
 
     private final ItemStack stoneMachineParent;
 
+    public StoneMachine(String machineName, List<String> lore) {
+        this.machineName = ChatColor.translateAlternateColorCodes('&', machineName);
+
+        for(String line : lore) {
+            this.machineLore.add(ChatColor.translateAlternateColorCodes('&', line));
+        }
+
+        this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
+    }
+
     public boolean isStoneMachine(Block block) {
         if(block.getState() instanceof Dispenser) {
             return isStoneMachine((Dispenser) block.getState());
@@ -32,16 +42,6 @@ public class StoneMachine {
             return false;
 
         return dispenserBlock.getCustomName().equals(this.machineName);
-    }
-
-    public StoneMachine(String machineName, List<String> lore) {
-        this.machineName = ChatColor.translateAlternateColorCodes('&', machineName);
-
-        for(String line : lore) {
-            this.machineLore.add(ChatColor.translateAlternateColorCodes('&', line));
-        }
-
-        this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
     }
 
     public ItemStack createStoneMachineItem() {
