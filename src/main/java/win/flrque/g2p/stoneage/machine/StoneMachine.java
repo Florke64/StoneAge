@@ -3,9 +3,12 @@ package win.flrque.g2p.stoneage.machine;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dispenser;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.Directional;
+import win.flrque.g2p.stoneage.StoneAge;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +17,17 @@ public class StoneMachine {
 
     public static final Material STONE_MACHINE_MATERIAL = Material.DISPENSER;
 
+    private final StoneAge plugin;
+
     private final String machineName;
     private final List<String> machineLore = new ArrayList<>();
 
     private final ItemStack stoneMachineParent;
+    private final BlockFace[] cubeDirections = new BlockFace[6];
 
     public StoneMachine(String machineName, List<String> lore) {
+        this.plugin = StoneAge.getPlugin(StoneAge.class);
+
         this.machineName = ChatColor.translateAlternateColorCodes('&', machineName);
 
         for(String line : lore) {
@@ -42,6 +50,23 @@ public class StoneMachine {
             return false;
 
         return dispenserBlock.getCustomName().equals(this.machineName);
+    }
+
+    public boolean isConnectedToStoneMachine(Block block) {
+        for(int i=0; i<6; i++) {
+            final Block relativeBlock = block.getRelative(BlockFace.values()[i], 1);
+
+            if(isStoneMachine(relativeBlock)) {
+                final Dispenser stoneMachine = (Dispenser) relativeBlock.getState();
+                final Directional direction = (Directional) stoneMachine.getData();
+
+                if(direction.getFacing().getOppositeFace().equals(BlockFace.values()[i])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public ItemStack createStoneMachineItem() {
