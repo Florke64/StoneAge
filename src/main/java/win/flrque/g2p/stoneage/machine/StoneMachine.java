@@ -2,6 +2,8 @@ package win.flrque.g2p.stoneage.machine;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Dispenser;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -16,6 +18,21 @@ public class StoneMachine {
     private final List<String> machineLore = new ArrayList<>();
 
     private final ItemStack stoneMachineParent;
+
+    public boolean isStoneMachine(Block block) {
+        if(block.getState() instanceof Dispenser) {
+            return isStoneMachine((Dispenser) block.getState());
+        }
+
+        return false;
+    }
+
+    public boolean isStoneMachine(Dispenser dispenserBlock) {
+        if(dispenserBlock.getCustomName() == null)
+            return false;
+
+        return dispenserBlock.getCustomName().equals(this.machineName);
+    }
 
     public StoneMachine(String machineName, List<String> lore) {
         this.machineName = ChatColor.translateAlternateColorCodes('&', machineName);
