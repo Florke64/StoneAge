@@ -1,6 +1,7 @@
 package win.flrque.g2p.stoneage.machine;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -8,6 +9,7 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Directional;
+import org.bukkit.scheduler.BukkitRunnable;
 import win.flrque.g2p.stoneage.StoneAge;
 
 import java.util.ArrayList;
@@ -23,7 +25,6 @@ public class StoneMachine {
     private final List<String> machineLore = new ArrayList<>();
 
     private final ItemStack stoneMachineParent;
-    private final BlockFace[] cubeDirections = new BlockFace[6];
 
     public StoneMachine(String machineName, List<String> lore) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
@@ -67,6 +68,34 @@ public class StoneMachine {
         }
 
         return false;
+    }
+
+    public void generateStone(final Location location) {
+        generateStone(location, 40l);
+    }
+
+    public void generateStone(final Location location, final long delay) {
+        final Block block = location.getWorld().getBlockAt(location);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+
+                //Returning to the Main thread
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if(!isConnectedToStoneMachine(block))
+                            return;
+
+                        if(!block.getType().equals(Material.AIR))
+                            return;
+
+                        block.setType(Material.STONE);
+                    }
+                }.runTask(plugin);
+            }
+        }.runTaskLaterAsynchronously(plugin, 20*1);
     }
 
     public ItemStack createStoneMachineItem() {

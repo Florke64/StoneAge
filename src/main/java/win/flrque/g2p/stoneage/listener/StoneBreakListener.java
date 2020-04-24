@@ -37,10 +37,13 @@ public class StoneBreakListener implements Listener {
         if(stoneType != ((byte) 0)) return;
 
         if(plugin.getStoneMachine().isConnectedToStoneMachine(brokenBlock)){
+            //Cancelling default drops
+            event.setDropItems(false);
+
+            //Replacing broken stone with new one
+            plugin.getStoneMachine().generateStone(brokenBlock.getLocation());
 
             //TODO: Proceed with Stone Machine's drops
-            //TODO: Setup sheduler to replace broken stone
-            event.setDropItems(false);
         }
     }
 
