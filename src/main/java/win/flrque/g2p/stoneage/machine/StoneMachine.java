@@ -1,4 +1,4 @@
-package win.flrque.g2p.stoneage.item;
+package win.flrque.g2p.stoneage.machine;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

@@ -37,6 +37,7 @@ public class StoneMachinePlaceListener implements Listener {
         if(stoneMachineBlock.getCustomName() == null) return;
 
         //Bloop! Checking custom names for match.
+        //TODO: Block#getData().toItemStack(#).
         if(stoneMachineBlock.getCustomName().equals(stoneMachine.getItemMeta().getDisplayName())) {
             player.sendMessage("<Edward> Twoja stoniarka postawiona, gz buddy!");
         }

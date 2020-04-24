@@ -1,10 +1,10 @@
 package win.flrque.g2p.stoneage;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import win.flrque.g2p.stoneage.item.StoneMachine;
 import win.flrque.g2p.stoneage.listener.DebugGameJoin;
 import win.flrque.g2p.stoneage.listener.StoneBreakListener;
 import win.flrque.g2p.stoneage.listener.StoneMachinePlaceListener;
+import win.flrque.g2p.stoneage.machine.StoneMachine;
 
 import java.util.List;
 
