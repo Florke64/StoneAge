@@ -59,6 +59,8 @@ public class StoneBreakListener implements Listener {
                     event.setDropItems(false);
 
                     //TODO: Proceed with Stone Machine's drops
+                    //TODO: Setup sheduler to replace broken stone
+                    break;
                 }
             }
         }
