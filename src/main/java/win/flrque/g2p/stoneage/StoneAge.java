@@ -3,6 +3,7 @@ package win.flrque.g2p.stoneage;
 import org.bukkit.plugin.java.JavaPlugin;
 import win.flrque.g2p.stoneage.item.StoneMachine;
 import win.flrque.g2p.stoneage.listener.DebugGameJoin;
+import win.flrque.g2p.stoneage.listener.StoneBreakListener;
 import win.flrque.g2p.stoneage.listener.StoneMachinePlaceListener;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public final class StoneAge extends JavaPlugin {
         initStoneMachines();
 
         getServer().getPluginManager().registerEvents(new StoneMachinePlaceListener(), this);
+        getServer().getPluginManager().registerEvents(new StoneBreakListener(), this);
         getServer().getPluginManager().registerEvents(new DebugGameJoin(), this);
 
     }
