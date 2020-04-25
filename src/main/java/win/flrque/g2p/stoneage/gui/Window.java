@@ -3,6 +3,7 @@ package win.flrque.g2p.stoneage.gui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.scheduler.BukkitRunnable;
 import win.flrque.g2p.stoneage.StoneAge;
 
 import java.util.ArrayList;
@@ -27,6 +28,13 @@ public abstract class Window {
 
         plugin.getWindowManager().cacheWindow(player, this);
         users.add(player);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                updateInventoryContent();
+            }
+        }.runTaskAsynchronously(plugin);
 
         return true;
     }
