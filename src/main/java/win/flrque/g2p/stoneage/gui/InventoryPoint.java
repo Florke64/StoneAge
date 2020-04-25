@@ -86,8 +86,8 @@ public class InventoryPoint {
     @Override
     public String toString() {
         final StringBuilder text = new StringBuilder();
-        text.append("Slot: ").append(slotNumber);
-        text.append("[").append(point[0]).append("; ").append(point[1]);
+        text.append("InventoryPoint#toString(): ").append(slotNumber).append(", ");
+        text.append(" [").append(point[0]).append("; ").append(point[1]).append("]");
 
         return text.toString();
     }
