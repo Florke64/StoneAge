@@ -60,6 +60,8 @@ public class StoneBreakListener implements Listener {
             orb.setExperience(drop.getExp());
 
             location.getWorld().dropItemNaturally(location, drop.getItemStack());
+
+            player.sendMessage("Udalo ci sie wykopac " + drop.getItemStack().getType() + " x" + drop.getItemStack().getAmount());
         }
     }
 
