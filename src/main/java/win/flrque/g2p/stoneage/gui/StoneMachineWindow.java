@@ -2,11 +2,13 @@ package win.flrque.g2p.stoneage.gui;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 public class StoneMachineWindow extends Window {
 
@@ -47,7 +49,11 @@ public class StoneMachineWindow extends Window {
 
     @Override
     public void updateInventoryContent() {
+        final ItemStack dummy = new ItemStack(Material.VINE);
 
+        for(int i=0; i<inventory.getSize(); i++) {
+            inventory.setItem(i, dummy);
+        }
     }
 
     @Override
