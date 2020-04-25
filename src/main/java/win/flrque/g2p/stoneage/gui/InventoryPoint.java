@@ -82,4 +82,13 @@ public class InventoryPoint {
     public int[] getPoint() {
         return this.point;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder text = new StringBuilder();
+        text.append("Slot: ").append(slotNumber);
+        text.append("[").append(point[0]).append("; ").append(point[1]);
+
+        return text.toString();
+    }
 }

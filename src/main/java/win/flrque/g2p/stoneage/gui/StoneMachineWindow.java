@@ -57,7 +57,11 @@ public class StoneMachineWindow extends Window {
 
     @Override
     public void onClick(ClickType clickType, Player player, InventoryPoint clickedPoint) {
-
+        if(clickType.equals(ClickType.LEFT)) {
+            player.sendMessage(clickedPoint.toString());
+        }
     }
+
+
 
 }
