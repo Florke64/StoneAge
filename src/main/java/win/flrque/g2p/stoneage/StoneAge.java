@@ -1,6 +1,7 @@
 package win.flrque.g2p.stoneage;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import win.flrque.g2p.stoneage.command.DropCommand;
 import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
@@ -19,6 +20,7 @@ public final class StoneAge extends JavaPlugin {
 
         initStoneMachines();
 
+        //Registering Event Listeners for the Plugin
         getServer().getPluginManager().registerEvents(new StoneMachinePlaceListener(), this);
         getServer().getPluginManager().registerEvents(new StoneMachineBreakListener(), this);
         getServer().getPluginManager().registerEvents(new StoneMachineInteractListener(), this);
@@ -27,6 +29,9 @@ public final class StoneAge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new WindowClickListener(), this);
 
         getServer().getPluginManager().registerEvents(new DebugGameJoin(), this);
+
+        //Registering Plugin Commands
+        getCommand("drop").setExecutor(new DropCommand());
 
         windowManager = new WindowManager();
 
