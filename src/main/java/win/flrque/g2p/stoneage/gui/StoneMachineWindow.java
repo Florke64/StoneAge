@@ -2,6 +2,7 @@ package win.flrque.g2p.stoneage.gui;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
@@ -15,10 +16,17 @@ public class StoneMachineWindow extends Window {
     private final Player windowOwner;
     private final Inventory inventory;
 
-    public StoneMachineWindow(Player owner) {
-        windowOwner = owner;
+    private final Dispenser stoneMachine;
 
+    public StoneMachineWindow(Player owner, Dispenser stoneMachine) {
+        windowOwner = owner;
         inventory = Bukkit.createInventory(null, InventoryType.CHEST, WINDOW_TITLE);
+
+        this.stoneMachine = stoneMachine;
+    }
+
+    public Dispenser getStoneMachine() {
+        return stoneMachine;
     }
 
     public Player getWindowOwner() {
@@ -28,7 +36,7 @@ public class StoneMachineWindow extends Window {
     @Override
     public boolean open(Player player) {
         if(!super.open(player)) {
-            player.sendMessage("Nie udało się otworzyć okienka!");
+            player.sendMessage("Nie udało się otworzyć okna stoniarki!");
             return false;
         }
 
