@@ -1,5 +1,6 @@
 package win.flrque.g2p.stoneage.listener;
 
+import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,7 +33,7 @@ public class StoneMachineInteractListener implements Listener {
 
         event.setCancelled(true);
 
-        final Window window = new StoneMachineWindow(player);
+        final Window window = new StoneMachineWindow(player, (Dispenser) event.getClickedBlock().getState());
         window.open(player);
 
     }

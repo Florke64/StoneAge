@@ -20,6 +20,7 @@ public final class StoneAge extends JavaPlugin {
         initStoneMachines();
 
         getServer().getPluginManager().registerEvents(new StoneMachinePlaceListener(), this);
+        getServer().getPluginManager().registerEvents(new StoneMachineBreakListener(), this);
         getServer().getPluginManager().registerEvents(new StoneMachineInteractListener(), this);
         getServer().getPluginManager().registerEvents(new StoneBreakListener(), this);
 
