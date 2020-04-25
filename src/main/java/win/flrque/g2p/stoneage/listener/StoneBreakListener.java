@@ -26,10 +26,6 @@ public class StoneBreakListener implements Listener {
         final Player player = event.getPlayer();
         if(player == null) return;
 
-        final GameMode playerGameMode = player.getGameMode();
-        if(playerGameMode.equals(GameMode.CREATIVE) || playerGameMode.equals(GameMode.SPECTATOR))
-            return;
-
         final Block brokenBlock = event.getBlock();
         if(!brokenBlock.getType().equals(Material.STONE)) return;
 
@@ -37,12 +33,16 @@ public class StoneBreakListener implements Listener {
         if(stoneType != ((byte) 0)) return;
 
         if(plugin.getStoneMachine().isConnectedToStoneMachine(brokenBlock)){
+
             //Cancelling default drops
             event.setDropItems(false);
 
             //Replacing broken stone with new one
             plugin.getStoneMachine().generateStone(brokenBlock.getLocation());
 
+            final GameMode playerGameMode = player.getGameMode();
+            if(playerGameMode.equals(GameMode.CREATIVE) || playerGameMode.equals(GameMode.SPECTATOR))
+                return;
             //TODO: Proceed with Stone Machine's drops
         }
     }
