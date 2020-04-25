@@ -88,7 +88,7 @@ public class DropCalculator {
             }
         }
 
-        finalDrop = randomizedDropEntry.getDrop(hasSilkTouch, fortuneLevel);
+        finalDrop = randomizedDropEntry.getDrop(hasSilkTouch, (randomizedDropEntry.equals(primitiveDrop))? 0 : fortuneLevel);
 
         return new DropLoot(finalDrop, randomizedDropEntry.calculateFinalExpValue());
     }
