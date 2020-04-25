@@ -1,9 +1,12 @@
 package win.flrque.g2p.stoneage;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import win.flrque.g2p.stoneage.command.DropCommand;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
+import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
@@ -23,6 +26,8 @@ public final class StoneAge extends JavaPlugin {
 
         //Setting-up Stone Generator machines
         dropCalculator = new DropCalculator();
+        dropCalculator.addDrop(new DropEntry(new ItemStack(Material.DIAMOND), 1.0f));
+
         initStoneMachines();
 
         //Saving and reloading config
