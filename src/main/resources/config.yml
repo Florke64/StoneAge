@@ -12,9 +12,10 @@ machines:
   stone_frequency: 40 # number in ticks (20 = 1 second)
 
   drop_exp_to_feet: true # drops exp orbs under player
+  drop_items_to_feet: true # drops exp orbs under player
   multiple_drops: false # if false - stone will only drop 1 item at the time
   always_drop_primitive: false # if true - primitive_drop.chance has no power
-  allways_use_custom_drops: false # will use custom drops list even when breaking stone block not connected to the machine
+  always_use_custom_stone_drops: false # will use custom drops list even when breaking stone block not connected to the machine
 
   allow_hopper_output: true # pass stone machine drops to hopper under it
   allow_hopper_input: true # allow upgrading stone machines with hopper input (Coal & Redstone Blocks)
