@@ -93,7 +93,7 @@ public class DropEntry {
 
         for(int i = 0; i<fortuneLevel; i++) {
             if(random.nextFloat() <= 0.35f)
-                amount = (minAmount < maxAmount)? (amount+1) : amount + 1;
+                amount += 1;
         }
 
         return amount;
