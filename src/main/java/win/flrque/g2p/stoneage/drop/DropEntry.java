@@ -99,6 +99,14 @@ public class DropEntry {
         return amount;
     }
 
+    public void setMinimalExp(int exp) {
+        minExp = exp;
+    }
+
+    public void setMaximalExp(int exp) {
+        maxExp = exp;
+    }
+
     public int calculateFinalExpValue() {
         final Random random = new Random();
 

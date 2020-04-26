@@ -20,7 +20,8 @@ machines:
   allow_hopper_input: true # allow upgrading stone machines with hopper input (Coal & Redstone Blocks)
 
 primitive_drop:
-  chance: 50.0
+  weight: 50.0
+  ignore_fortune: true
   default_tool:
     material: 'COBBLESTONE'
     magic_data: 0
@@ -31,6 +32,8 @@ primitive_drop:
 custom_drops:
   diamond:
     weight: 5.0 # float value
+    minimal_exp: 1
+    maximal_exp: 5
     default_tool:
       material: 'DIAMOND' # Bukkit Material
       magic_data: 0
