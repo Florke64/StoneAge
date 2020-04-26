@@ -7,7 +7,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import win.flrque.g2p.stoneage.StoneAge;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,15 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class ConfigSectionItemStack {
-
-    private final StoneAge plugin;
-    private final ConfigurationSection rootSection;
+public class ConfigSectionItemStack extends ConfigSectionReader{
 
     public ConfigSectionItemStack(ConfigurationSection section) {
-        plugin = StoneAge.getPlugin(StoneAge.class);
-
-        rootSection = section;
+        super(section);
     }
 
     @SuppressWarnings("deprecation")
@@ -92,8 +86,8 @@ public class ConfigSectionItemStack {
         final List<String> enchantmentList = rootSection.getStringList("enchantments");
         final Map<Enchantment, Integer> enchantments = new HashMap<>();
 
-        for(String ench : enchantmentList) {
-            final String[] enchantmentData = ench.split(" ", 2);
+        for(String enchant : enchantmentList) {
+            final String[] enchantmentData = enchant.split(" ", 2);
 
             final Enchantment enchantment;
             final int enchantmentLevel;
