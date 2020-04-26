@@ -1,0 +1,74 @@
+config_version: 1
+
+database:
+  ip: 'localhost'
+  port: 3306
+  user: 'flrque'
+  password: ''
+
+machines:
+  commands_cooldown: 3 # in seconds
+  repair_cooldown: 5 # in seconds
+  stone_frequency: 40 # number in ticks (20 = 1 second)
+
+  drop_exp_to_feet: true # drops exp orbs under player
+  multiple_drops: false # if false - stone will only drop 1 item at the time
+  always_drop_primitive: false # if true - primitive_drop.chance has no power
+  allways_use_custom_drops: false # will use custom drops list even when breaking stone block not connected to the machine
+
+  allow_hopper_output: true # pass stone machine drops to hopper under it
+  allow_hopper_input: true # allow upgrading stone machines with hopper input (Coal & Redstone Blocks)
+
+primitive_drop:
+  chance: 50.0
+  default_tool:
+    material: 'COBBLESTONE'
+    magic_data: 0
+  silk_touch_tool:
+    material: 'STONE'
+    magic_data: 0
+
+custom_drops:
+  diamond:
+    weight: 5.0 # float value
+    default_tool:
+      material: 'DIAMOND' # Bukkit Material
+      magic_data: 0
+      custom_name: '' # for default item name leave empty: '' or don't include in config section
+      lore: # for no lore don't include this config section
+        - '&7Default Drop'
+      minimal_amount: 1
+    silk_touch_tool:
+      material: 'DIAMOND_ORE'
+      magic_data: 0
+      custom_name: ''
+      lore:
+        - '&7Drop Silktouch'
+
+  redstone:
+    weight: 15.0 # float value
+    default_tool:
+      material: 'REDSTONE' # Bukkit Material
+      magic_data: 0
+      custom_name: '' # for default item name leave empty: '' or don't include in config section
+      lore: # for no lore don't include this config section
+        - '&7Default Drop'
+      minimal_amount: 4
+      maximal_amount: 5
+    silk_touch_tool:
+      material: 'REDSTONE_ORE'
+      magic_data: 0
+      custom_name: ''
+      lore:
+        - '&7Drop Silktouch'
+
+  iron:
+    weight: 20.0
+    ignore_fortune: true
+    drop_exp: false
+    default_tool:
+      material: 'IRON_ORE'
+      magic_data: 0
+      custom_name: ''
+      lore:
+        - '&7Default Silktouch'

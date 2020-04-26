@@ -53,7 +53,7 @@ public class StoneMachine {
         return dispenserBlock.getCustomName().equals(this.machineName);
     }
 
-    public boolean isConnectedToStoneMachine(Block block) {
+    public Block getConnectedStoneMachine(Block block) {
         for(int i=0; i<6; i++) {
             final Block relativeBlock = block.getRelative(BlockFace.values()[i], 1);
 
@@ -62,12 +62,16 @@ public class StoneMachine {
                 final Directional direction = (Directional) stoneMachine.getData();
 
                 if(direction.getFacing().getOppositeFace().equals(BlockFace.values()[i])) {
-                    return true;
+                    return relativeBlock;
                 }
             }
         }
 
-        return false;
+        return null;
+    }
+
+    public boolean isConnectedToStoneMachine(Block block) {
+        return getConnectedStoneMachine(block) != null;
     }
 
     public void generateStone(final Location location) {
