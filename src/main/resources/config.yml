@@ -21,6 +21,8 @@ machines:
 
 primitive_drop:
   weight: 50.0
+  minimal_exp: 0
+  maximal_exp: 0
   ignore_fortune: true
   default_tool:
     material: 'COBBLESTONE'
