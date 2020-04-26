@@ -16,8 +16,22 @@ import java.util.logging.Level;
 
 public class ConfigSectionItemStack extends ConfigSectionReader{
 
+    private ItemStack cachedItemStack;
+
     public ConfigSectionItemStack(ConfigurationSection section) {
         super(section);
+    }
+
+    public ItemStack getItemStack() {
+        if(cachedItemStack == null) {
+            try {
+                cachedItemStack = compileItemStack();
+            } catch (InvalidConfigurationException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return cachedItemStack;
     }
 
     @SuppressWarnings("deprecation")
