@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dispenser;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Directional;
@@ -51,6 +52,24 @@ public class StoneMachine {
             return false;
 
         return dispenserBlock.getCustomName().equals(this.machineName);
+    }
+
+    public boolean isStoneMachine(Inventory inventory) {
+        if(inventory.getName() == null) {
+            return false;
+        }
+
+        return inventory.getName().equals(getExample().getItemMeta().getDisplayName());
+    }
+
+    //This method will be required for stone generation on redstone input into the machine
+    public Location getGeneratedStoneLocation(Dispenser stoneMachine) {
+        if(!isStoneMachine(stoneMachine))
+            return null;
+
+        final Directional machine = (Directional) stoneMachine.getData();
+
+        return stoneMachine.getBlock().getRelative(machine.getFacing()).getLocation();
     }
 
     public Block getConnectedStoneMachine(Block block) {
@@ -99,7 +118,7 @@ public class StoneMachine {
                     }
                 }.runTask(plugin);
             }
-        }.runTaskLaterAsynchronously(plugin, 20*1);
+        }.runTaskLaterAsynchronously(plugin, delay);
     }
 
     public ItemStack createStoneMachineItem() {
