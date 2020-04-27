@@ -74,6 +74,8 @@ public final class StoneAge extends JavaPlugin {
         }
 
         final ConfigSectionGeneral generalConfig = new ConfigSectionGeneral(getConfig().getConfigurationSection("machines"));
+        generalConfig.compile();
+
         getStoneMachine().setStoneRespawnFrequency(generalConfig.getStoneFrequency());
         //TODO: Apply general config fully
 
