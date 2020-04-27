@@ -52,6 +52,10 @@ public class DropEntry {
         return itemStack;
     }
 
+    public ItemStack getDropEntryIcon() {
+        return defaultItemStack.clone();
+    }
+
     public void setIgnoreFortuneEnchant(boolean ignoreFortuneEnchant) {
         this.ignoreFortuneEnchant = ignoreFortuneEnchant;
     }

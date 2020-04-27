@@ -3,7 +3,9 @@ package win.flrque.g2p.stoneage.command;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.gui.window.DropInfoWindow;
 
 public class DropCommand implements CommandExecutor {
 
@@ -24,7 +26,17 @@ public class DropCommand implements CommandExecutor {
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return false;
+        if(!(sender instanceof Player)) {
+            sender.sendMessage("Tylko Gracz moze wykonac te komende!");
+            return true;
+        }
+
+        final Player player = (Player) sender;
+        final DropInfoWindow window = new DropInfoWindow(player);
+        window.updateInventoryContent();
+        window.open(player);
+
+        return true;
     }
 
 }

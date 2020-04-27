@@ -51,6 +51,10 @@ public class DropCalculator {
         return weight;
     }
 
+    public float getTotalWeight() {
+        return totalWeight;
+    }
+
     public DropLoot calculateDrop(Player player, ItemStack tool, Dispenser stoneMachine) {
         //TODO: Check StoneMachine's configuration book inside its Inventory
 
@@ -93,6 +97,11 @@ public class DropCalculator {
         return new DropLoot(randomizedDropEntry, finalDrop);
     }
 
+    public DropEntry getPrimitiveDrop() {
+        return primitiveDrop;
+    }
 
-
+    public List<DropEntry> getDropEntries() {
+        return dropEntries;
+    }
 }
