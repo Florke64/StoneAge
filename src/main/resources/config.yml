@@ -28,9 +28,13 @@ primitive_drop:
   default_tool:
     material: 'COBBLESTONE'
     magic_data: 0
+    lore:
+      - '&7Default Drop'
   silk_touch_tool:
     material: 'STONE'
     magic_data: 0
+    lore:
+      - '&7Drop Silktouch'
 
 custom_drops:
   diamond:
@@ -53,6 +57,8 @@ custom_drops:
 
   redstone:
     weight: 15.0 # float value
+    minimal_exp: 1
+    maximal_exp: 5
     default_tool:
       material: 'REDSTONE' # Bukkit Material
       magic_data: 0
@@ -71,10 +77,9 @@ custom_drops:
   iron:
     weight: 20.0
     ignore_fortune: true
-    drop_exp: false
     default_tool:
       material: 'IRON_ORE'
       magic_data: 0
       custom_name: ''
       lore:
-        - '&7Default Silktouch'
+        - '&7Default drop only'
