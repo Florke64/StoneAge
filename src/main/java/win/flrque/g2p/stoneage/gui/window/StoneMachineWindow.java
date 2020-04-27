@@ -1,4 +1,4 @@
-package win.flrque.g2p.stoneage.gui;
+package win.flrque.g2p.stoneage.gui.window;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -9,6 +9,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import win.flrque.g2p.stoneage.gui.InventoryPoint;
+import win.flrque.g2p.stoneage.gui.Window;
 
 public class StoneMachineWindow extends Window {
 

@@ -7,8 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import win.flrque.g2p.stoneage.StoneAge;
-import win.flrque.g2p.stoneage.gui.StoneMachineWindow;
 import win.flrque.g2p.stoneage.gui.Window;
+import win.flrque.g2p.stoneage.gui.window.StoneMachineWindow;
 
 public class StoneMachineInteractListener implements Listener {
 
