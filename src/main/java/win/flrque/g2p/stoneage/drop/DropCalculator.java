@@ -24,7 +24,7 @@ public class DropCalculator {
     public DropCalculator() {
         plugin = StoneAge.getPlugin(StoneAge.class);
 
-        this.primitiveDrop = new DropEntry(new ItemStack(Material.WOOL), 1.0f);
+        this.primitiveDrop = new DropEntry(new ItemStack(Material.COBBLESTONE), 1.0f);
 
         calculateTotalWeight();
     }
@@ -90,7 +90,7 @@ public class DropCalculator {
 
         finalDrop = randomizedDropEntry.getDrop(hasSilkTouch, (randomizedDropEntry.equals(primitiveDrop))? 0 : fortuneLevel);
 
-        return new DropLoot(finalDrop, randomizedDropEntry.calculateFinalExpValue());
+        return new DropLoot(randomizedDropEntry, finalDrop);
     }
 
 

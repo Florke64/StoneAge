@@ -61,7 +61,7 @@ public class DropEntry {
     }
 
     public void setMinAmount(int amount) {
-        minAmount = (amount < maxAmount)? amount : (maxAmount < 1)? 1 : maxAmount;
+        minAmount = (amount < 1)? 1 : minAmount;
     }
 
     public int getMinAmount() {
@@ -69,7 +69,7 @@ public class DropEntry {
     }
 
     public void setMaxAmount(int amount) {
-        maxAmount = (amount > minAmount)? amount : (minAmount < 1)? 1 : maxAmount;
+        maxAmount = (amount > minAmount)? amount : minAmount;
     }
 
     public int getMaxAmount() {
@@ -97,6 +97,22 @@ public class DropEntry {
         }
 
         return amount;
+    }
+
+    public int getMinimalExp() {
+        return minExp;
+    }
+
+    public int getMaximalExp() {
+        return maxExp;
+    }
+
+    public void setMinimalExp(int exp) {
+        minExp = (exp<0)? 0 : exp;
+    }
+
+    public void setMaximalExp(int exp) {
+        maxExp = (exp<minExp)? minExp : exp;
     }
 
     public int calculateFinalExpValue() {

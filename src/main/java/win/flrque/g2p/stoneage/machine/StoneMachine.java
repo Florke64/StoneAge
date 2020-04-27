@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dispenser;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Directional;
@@ -23,6 +24,8 @@ public class StoneMachine {
 
     private final String machineName;
     private final List<String> machineLore = new ArrayList<>();
+
+    private long stoneRespawnFrequency = 40l;
 
     private final ItemStack stoneMachineParent;
 
@@ -53,6 +56,24 @@ public class StoneMachine {
         return dispenserBlock.getCustomName().equals(this.machineName);
     }
 
+    public boolean isStoneMachine(Inventory inventory) {
+        if(inventory.getName() == null) {
+            return false;
+        }
+
+        return inventory.getName().equals(getExample().getItemMeta().getDisplayName());
+    }
+
+    //This method will be required for stone generation on redstone input into the machine
+    public Location getGeneratedStoneLocation(Dispenser stoneMachine) {
+        if(!isStoneMachine(stoneMachine))
+            return null;
+
+        final Directional machine = (Directional) stoneMachine.getData();
+
+        return stoneMachine.getBlock().getRelative(machine.getFacing()).getLocation();
+    }
+
     public Block getConnectedStoneMachine(Block block) {
         for(int i=0; i<6; i++) {
             final Block relativeBlock = block.getRelative(BlockFace.values()[i], 1);
@@ -75,7 +96,7 @@ public class StoneMachine {
     }
 
     public void generateStone(final Location location) {
-        generateStone(location, 40l);
+        generateStone(location, stoneRespawnFrequency);
     }
 
     public void generateStone(final Location location, final long delay) {
@@ -99,7 +120,7 @@ public class StoneMachine {
                     }
                 }.runTask(plugin);
             }
-        }.runTaskLaterAsynchronously(plugin, 20*1);
+        }.runTaskLaterAsynchronously(plugin, delay);
     }
 
     public ItemStack createStoneMachineItem() {
@@ -147,4 +168,7 @@ public class StoneMachine {
         return machineLore;
     }
 
+    public void setStoneRespawnFrequency(long stoneRespawnFrequency) {
+        this.stoneRespawnFrequency = stoneRespawnFrequency;
+    }
 }
