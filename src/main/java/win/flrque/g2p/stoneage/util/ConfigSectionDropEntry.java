@@ -22,7 +22,7 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
 
         //Reading drops for default tool
         final ConfigurationSection defaultToolSection = rootSection.getConfigurationSection("default_tool");
-        if(defaultToolItem != null) {
+        if(defaultToolSection != null) {
             final ConfigSectionItemStack defaultToolConfig = new ConfigSectionItemStack(defaultToolSection);
 
             defaultToolItem = defaultToolConfig.getItemStack();
@@ -38,7 +38,7 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
 
         //If there was an error while reading those sections
         if(defaultToolItem == null && silkToolItem == null) {
-            plugin.getLogger().log(Level.SEVERE, "Error while reading DropEntry. Please double check the config!");
+            plugin.getLogger().log(Level.SEVERE, "Error while reading DropEntry: \""+ rootSection.getName() +"\".");
             return null;
         }
 

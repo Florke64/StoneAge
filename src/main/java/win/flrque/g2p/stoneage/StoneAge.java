@@ -102,6 +102,8 @@ public final class StoneAge extends JavaPlugin {
             final ConfigSectionDropEntry customDropEntry = new ConfigSectionDropEntry(customDropsSection.getConfigurationSection(entryName));
             dropCalculator.addDrop(customDropEntry.compileDropEntry());
 
+            getLogger().log(Level.INFO, "Loaded custom drop: "+ entryName);
+
             customDropsCount ++;
         }
 
