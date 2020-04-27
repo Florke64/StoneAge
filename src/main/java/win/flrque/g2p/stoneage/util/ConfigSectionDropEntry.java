@@ -53,14 +53,14 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
         dropEntry.setIgnoreFortuneEnchant(ignoreFortune);
 
         //Minimal and Maximal drop count
-        final int minAmount = defaultToolSection.getInt("minimal_amount", 1);
-        final int maxAmount = defaultToolSection.getInt("maximal_amount", 1);
+        final int minAmount = defaultToolSection.getInt("minimal_amount", -1);
+        final int maxAmount = defaultToolSection.getInt("maximal_amount", -1);
         dropEntry.setMinAmount(minAmount);
         dropEntry.setMaxAmount(maxAmount);
 
         //Experience Drops
-        final int minExp = rootSection.getInt("minimal_exp", 1);
-        final int maxExp = rootSection.getInt("maximal_exp", 1);
+        final int minExp = rootSection.getInt("minimal_exp", -1);
+        final int maxExp = rootSection.getInt("maximal_exp", -1);
         dropEntry.setMinimalExp(minExp);
         dropEntry.setMaximalExp(maxExp);
 

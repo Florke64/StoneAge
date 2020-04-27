@@ -4,7 +4,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
@@ -19,7 +18,6 @@ import win.flrque.g2p.stoneage.drop.DropLoot;
 public class StoneBreakListener implements Listener {
 
     private final StoneAge plugin;
-    private final BlockFace[] machineDirections = new BlockFace[6];
 
     public StoneBreakListener() {
         plugin = StoneAge.getPlugin(StoneAge.class);
@@ -56,8 +54,15 @@ public class StoneBreakListener implements Listener {
             DropLoot drop = plugin.getDropCalculator().calculateDrop(player, tool, (Dispenser) machineBlock.getState());
 
             final Location location = brokenBlock.getLocation();
-            final ExperienceOrb orb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
-            orb.setExperience(drop.getExp());
+
+            final int expDropAmount = drop.getExp();
+
+            if(expDropAmount > 0) {
+                final ExperienceOrb orb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
+                orb.setExperience(expDropAmount);
+            }
+
+            //TODO: Reorganise this spaghetti x_x
 
             location.getWorld().dropItemNaturally(location, drop.getItemStack());
 
