@@ -25,6 +25,8 @@ public class StoneMachine {
     private final String machineName;
     private final List<String> machineLore = new ArrayList<>();
 
+    private long stoneRespawnFrequency = 40l;
+
     private final ItemStack stoneMachineParent;
 
     public StoneMachine(String machineName, List<String> lore) {
@@ -94,7 +96,7 @@ public class StoneMachine {
     }
 
     public void generateStone(final Location location) {
-        generateStone(location, 40l);
+        generateStone(location, stoneRespawnFrequency);
     }
 
     public void generateStone(final Location location, final long delay) {
@@ -166,4 +168,7 @@ public class StoneMachine {
         return machineLore;
     }
 
+    public void setStoneRespawnFrequency(long stoneRespawnFrequency) {
+        this.stoneRespawnFrequency = stoneRespawnFrequency;
+    }
 }
