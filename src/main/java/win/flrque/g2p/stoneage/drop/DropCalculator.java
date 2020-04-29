@@ -1,3 +1,9 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.drop;
 
 import org.bukkit.Material;
@@ -18,8 +24,10 @@ public class DropCalculator {
     private final List<DropEntry> dropEntries = new ArrayList<>();
 
     private DropEntry primitiveDrop;
+    private DropMultiplier dropMultiplier;
 
     private float totalWeight = 0;
+    private float totalWeightWithMultiplier = 0;
 
     public DropCalculator() {
         plugin = StoneAge.getPlugin(StoneAge.class);
@@ -27,6 +35,15 @@ public class DropCalculator {
         this.primitiveDrop = new DropEntry(new ItemStack(Material.COBBLESTONE), 1.0f);
 
         calculateTotalWeight();
+        calculateTotalWeightWithMultiplier(1.0f);
+    }
+
+    public void setDropMultiplier(DropMultiplier dropMultiplier) {
+        this.dropMultiplier = dropMultiplier;
+    }
+
+    public DropMultiplier getDropMultiplier() {
+        return dropMultiplier == null ? new DropMultiplier(1.0f, 2.0f) : dropMultiplier;
     }
 
     public void setPrimitiveDrop(DropEntry dropEntry) {
@@ -49,6 +66,24 @@ public class DropCalculator {
         totalWeight = weight + primitiveDrop.getChanceWeight();
 
         return weight;
+    }
+
+    private float calculateTotalWeightWithMultiplier(float multiplier) {
+        float weight = 0.0f;
+        for(DropEntry drop : dropEntries) {
+            if(drop.isMultipliable())
+                weight += drop.getChanceWeight() * multiplier;
+            else
+                weight += drop.getChanceWeight();
+        }
+
+        totalWeightWithMultiplier = weight + primitiveDrop.getChanceWeight() * (primitiveDrop.isMultipliable()? multiplier : 1.0f);
+
+        return weight;
+    }
+
+    public float getTotalWeightWithMultiplier() {
+        return totalWeightWithMultiplier;
     }
 
     public float getTotalWeight() {
@@ -78,15 +113,27 @@ public class DropCalculator {
 
         //Calculating final drop
         final ItemStack finalDrop;
-        final Random random = new Random();
+        final Random randomizer = new Random();
 
         DropEntry randomizedDropEntry = primitiveDrop;
-        float luck = random.nextFloat() * totalWeight;
-        for (int i = 0; i < dropEntries.size(); ++i)
-        {
-            luck -= dropEntries.get(i).getChanceWeight();
-            if (luck <= 0.0f)
-            {
+        final float activeMultiplier = getDropMultiplier().getCurrentDropMultiplier();
+        float luck = randomizer.nextFloat() * (totalWeight * activeMultiplier);
+        System.out.println(": = = = = = = : ");
+        System.out.println("luck: " + luck);
+        for (int i = 0; i < dropEntries.size(); ++i) {
+            System.out.println("item: " + dropEntries.get(i).getDropEntryIcon().getType());
+            final boolean multipliable = dropEntries.get(i).isMultipliable();
+            System.out.println("multipliable: " + multipliable);
+
+            float itemChanceWeight = dropEntries.get(i).getChanceWeight();
+            System.out.println("itemChanceWeight: " + itemChanceWeight);
+            itemChanceWeight = dropEntries.get(i).getChanceWeight() * ((multipliable) ? activeMultiplier : 1.0f);
+            System.out.println("itemChanceWeight: " + itemChanceWeight);
+
+            luck -= itemChanceWeight;
+            System.out.println("final luck: " + luck);
+
+            if (luck <= 0.0f) {
                 randomizedDropEntry = dropEntries.get(i);
                 break;
             }

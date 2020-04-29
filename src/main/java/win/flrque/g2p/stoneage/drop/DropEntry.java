@@ -1,3 +1,9 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.drop;
 
 import org.bukkit.inventory.ItemStack;
@@ -15,6 +21,8 @@ public class DropEntry {
     private int minAmount;
     private int maxAmount;
     private boolean ignoreFortuneEnchant = false;
+
+    private boolean multipliable = true;
 
     private int minExp;
     private int maxExp;
@@ -124,4 +132,13 @@ public class DropEntry {
 
         return random.nextInt(maxExp - minExp) + (minAmount);
     }
+
+    public boolean isMultipliable() {
+        return multipliable;
+    }
+
+    public void setMultipliable(boolean multipliable) {
+        this.multipliable = multipliable;
+    }
+
 }
