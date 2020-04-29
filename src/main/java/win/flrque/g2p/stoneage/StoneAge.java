@@ -1,10 +1,18 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import win.flrque.g2p.stoneage.command.DropCommand;
+import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
+import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
@@ -48,6 +56,7 @@ public final class StoneAge extends JavaPlugin {
 
         //Registering Plugin Commands
         getCommand("drop").setExecutor(new DropCommand());
+        getCommand("multiplier").setExecutor(new DropMultiplierCommand());
 
         windowManager = new WindowManager();
 
@@ -77,6 +86,10 @@ public final class StoneAge extends JavaPlugin {
         generalConfig.compile();
 
         getStoneMachine().setStoneRespawnFrequency(generalConfig.getStoneFrequency());
+        getStoneMachine().setDropItemsToFeet(generalConfig.isDropItemsToFeet());
+        getStoneMachine().setDropExpToFeet(generalConfig.isDropExpToFeet());
+
+        getDropCalculator().setDropMultiplier(new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier()));
         //TODO: Apply general config fully
 
         //Reading Primitive Stone drop

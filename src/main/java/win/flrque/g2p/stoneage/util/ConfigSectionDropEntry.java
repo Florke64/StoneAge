@@ -1,3 +1,9 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.util;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -51,6 +57,10 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
         //Fortune Enchant ignoring
         final boolean ignoreFortune = rootSection.getBoolean("ignore_fortune", true);
         dropEntry.setIgnoreFortuneEnchant(ignoreFortune);
+
+        //Accepts drop multiplication set by server admin
+        boolean multipliable = rootSection.getBoolean("multipliable", true);
+        dropEntry.setMultipliable(multipliable);
 
         //Minimal and Maximal drop count
         final int minAmount = defaultToolSection.getInt("minimal_amount", -1);

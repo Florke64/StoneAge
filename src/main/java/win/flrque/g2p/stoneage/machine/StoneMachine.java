@@ -1,3 +1,9 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.machine;
 
 import org.bukkit.ChatColor;
@@ -26,6 +32,8 @@ public class StoneMachine {
     private final List<String> machineLore = new ArrayList<>();
 
     private long stoneRespawnFrequency = 40l;
+    private boolean dropItemsToFeet = false;
+    private boolean dropExpToFeet = false;
 
     private final ItemStack stoneMachineParent;
 
@@ -171,4 +179,21 @@ public class StoneMachine {
     public void setStoneRespawnFrequency(long stoneRespawnFrequency) {
         this.stoneRespawnFrequency = stoneRespawnFrequency;
     }
+
+    public boolean isDropItemsToFeet() {
+        return dropItemsToFeet;
+    }
+
+    public void setDropItemsToFeet(boolean dropItemsToFeet) {
+        this.dropItemsToFeet = dropItemsToFeet;
+    }
+
+    public boolean isDropExpToFeet() {
+        return dropExpToFeet;
+    }
+
+    public void setDropExpToFeet(boolean dropExpToFeet) {
+        this.dropExpToFeet = dropExpToFeet;
+    }
+
 }

@@ -7,6 +7,9 @@ database:
   password: ''
 
 machines:
+  default_drop_multiplier: 1.0
+  max_drop_multiplier: 5.0
+
   commands_cooldown: 3 # in seconds
   repair_cooldown: 5 # in seconds
   stone_frequency: 40 # number in ticks (20 = 1 second)
@@ -25,6 +28,7 @@ primitive_drop:
   minimal_exp: 0
   maximal_exp: 0
   ignore_fortune: true
+  multipliable: false
   default_tool:
     material: 'COBBLESTONE'
     magic_data: 0
@@ -41,6 +45,7 @@ custom_drops:
     weight: 5.0 # float value
     minimal_exp: 1
     maximal_exp: 5
+    multipliable: true
     default_tool:
       material: 'DIAMOND' # Bukkit Material
       magic_data: 0
@@ -59,6 +64,7 @@ custom_drops:
     weight: 15.0 # float value
     minimal_exp: 1
     maximal_exp: 5
+    multipliable: true
     default_tool:
       material: 'REDSTONE' # Bukkit Material
       magic_data: 0
@@ -77,6 +83,7 @@ custom_drops:
   iron:
     weight: 20.0
     ignore_fortune: true
+    multipliable: true
     default_tool:
       material: 'IRON_ORE'
       magic_data: 0
