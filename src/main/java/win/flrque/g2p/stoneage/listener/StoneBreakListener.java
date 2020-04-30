@@ -46,22 +46,21 @@ public class StoneBreakListener implements Listener {
         if(stoneType != ((byte) 0)) return;
 
         final Block machineBlock = plugin.getStoneMachine().getConnectedStoneMachine(brokenBlock);
+
+        //Cancelling default drops
+        event.setDropItems(false);
+
+        final GameMode playerGameMode = player.getGameMode();
+        if(playerGameMode.equals(GameMode.CREATIVE) || playerGameMode.equals(GameMode.SPECTATOR))
+            return;
+
+        final ItemStack usedTool = player.getInventory().getItemInMainHand();
+        final DropLoot finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, (Dispenser) machineBlock.getState());
+
+        dropLoot(player, brokenBlock.getLocation(), machineBlock.getLocation(), finalDrop);
+
         if(machineBlock != null){
-
-            //Cancelling default drops
-            event.setDropItems(false);
-
             //Replacing broken stone with new one
-
-            final GameMode playerGameMode = player.getGameMode();
-            if(playerGameMode.equals(GameMode.CREATIVE) || playerGameMode.equals(GameMode.SPECTATOR))
-                return;
-
-            final ItemStack usedTool = player.getInventory().getItemInMainHand();
-            final DropLoot finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, (Dispenser) machineBlock.getState());
-
-            dropLoot(player, brokenBlock.getLocation(), machineBlock.getLocation(), finalDrop);
-
             new BukkitRunnable() {
                 @Override
                 public void run() {
