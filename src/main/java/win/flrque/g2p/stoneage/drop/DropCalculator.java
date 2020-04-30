@@ -112,7 +112,7 @@ public class DropCalculator {
         }
 
         //Calculating final drop
-        final ItemStack finalDrop;
+        final DropCalculator calculator = plugin.getDropCalculator();
         final Random randomizer = new Random();
 
         final DropLoot dropLoot = new DropLoot();
@@ -121,7 +121,10 @@ public class DropCalculator {
         for (int i = 0; i < dropEntries.size(); ++i) {
             final float luck = randomizer.nextFloat() * totalWeight;
 
-            if (luck > dropEntries.get(i).getChanceWeight()) {
+            final float itemChanceWeight = dropEntries.get(i).getChanceWeight();
+            final float currentDropMultiplier = calculator.getDropMultiplier().getCurrentDropMultiplier();
+
+            if (luck <  itemChanceWeight * currentDropMultiplier) {
                 final ItemStack itemDrop = dropEntries.get(i).getDrop(hasSilkTouch, fortuneLevel);
 
                 dropLoot.addLoot(dropEntries.get(i), itemDrop);

@@ -22,11 +22,6 @@ public class ConfigSectionGeneral extends ConfigSectionReader {
     //Life-ease functionalities
     private boolean dropExpToFeet, dropItemsToFeet;
 
-    //Stone Machines Behaviour
-    private boolean multipleStoneDrops;
-    private boolean alwaysDropPrimitiveItem;
-    private boolean alwaysUseCustomDrops;
-
     //Redstone-like interactions with stone machine
     private boolean allowHopperDropOutput;
     private boolean allowCoalUpgradesByHopper;
@@ -46,10 +41,6 @@ public class ConfigSectionGeneral extends ConfigSectionReader {
 
         dropExpToFeet = rootSection.getBoolean("drop_exp_to_feet", true);
         dropItemsToFeet = rootSection.getBoolean("drop_items_to_feet", false);
-
-        multipleStoneDrops = rootSection.getBoolean("multiple_drops", false);
-        alwaysDropPrimitiveItem = rootSection.getBoolean("always_drop_primitive", false);
-        alwaysUseCustomDrops = rootSection.getBoolean("always_use_custom_drops", false);
 
         allowHopperDropOutput = rootSection.getBoolean("allow_hopper_output", true);
         allowCoalUpgradesByHopper = rootSection.getBoolean("allow_hopper_input", true);
@@ -75,18 +66,6 @@ public class ConfigSectionGeneral extends ConfigSectionReader {
 
     public boolean isDropItemsToFeet() {
         return dropItemsToFeet;
-    }
-
-    public boolean isMultipleStoneDrops() {
-        return multipleStoneDrops;
-    }
-
-    public boolean isAlwaysDropPrimitiveItem() {
-        return alwaysDropPrimitiveItem;
-    }
-
-    public boolean isAlwaysUseCustomDrops() {
-        return alwaysUseCustomDrops;
     }
 
     public boolean isAllowHopperDropOutput() {
