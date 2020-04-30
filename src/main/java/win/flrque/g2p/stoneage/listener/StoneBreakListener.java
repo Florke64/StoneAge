@@ -60,8 +60,7 @@ public class StoneBreakListener implements Listener {
             final ItemStack usedTool = player.getInventory().getItemInMainHand();
             final DropLoot finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, (Dispenser) machineBlock.getState());
 
-            dropLoot(player.getLocation(), brokenBlock.getLocation(), machineBlock.getLocation(), finalDrop);
-            player.sendMessage("Udalo ci sie wykopac " + finalDrop.getItemStack().getType() + " x" + finalDrop.getItemStack().getAmount());
+            dropLoot(player, brokenBlock.getLocation(), machineBlock.getLocation(), finalDrop);
 
             new BukkitRunnable() {
                 @Override
@@ -72,17 +71,21 @@ public class StoneBreakListener implements Listener {
         }
     }
 
-    private void dropLoot(Location playerLoc, Location stoneLoc, Location machineLoc, DropLoot dropLoot) {
-        final Location expDropLocation = (plugin.getStoneMachine().isDropExpToFeet()) ? playerLoc : stoneLoc;
-        final Location itemDropLocation = (plugin.getStoneMachine().isDropItemsToFeet()) ? playerLoc : stoneLoc;
+    private void dropLoot(Player player, Location stoneLoc, Location machineLoc, DropLoot dropLoot) {
+        final Location expDropLocation = (plugin.getStoneMachine().isDropExpToFeet()) ? player.getLocation() : stoneLoc;
+        final Location itemDropLocation = (plugin.getStoneMachine().isDropItemsToFeet()) ? player.getLocation() : stoneLoc;
 
-        if(dropLoot.getExp() > 0) {
-            final Entity orb = expDropLocation.getWorld().spawnEntity(expDropLocation, EntityType.EXPERIENCE_ORB);
-            ((ExperienceOrb) orb).setExperience(dropLoot.getExp());
-        }
+        for(ItemStack itemLoot : dropLoot.getLoots()) {
+            if (dropLoot.getExp(itemLoot) > 0) {
+                final Entity orb = expDropLocation.getWorld().spawnEntity(expDropLocation, EntityType.EXPERIENCE_ORB);
+                ((ExperienceOrb) orb).setExperience(dropLoot.getExp(itemLoot));
+            }
 
-        if(dropLoot.getItemStack() != null) {
-            itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, dropLoot.getItemStack());
+            if (itemLoot != null) {
+                itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, itemLoot);
+            }
+
+            player.sendMessage("Udalo ci sie wykopac " + itemLoot.getType() + " x" + itemLoot.getAmount());
         }
     }
 

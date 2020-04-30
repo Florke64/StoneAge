@@ -115,33 +115,20 @@ public class DropCalculator {
         final ItemStack finalDrop;
         final Random randomizer = new Random();
 
-        DropEntry randomizedDropEntry = primitiveDrop;
-        final float activeMultiplier = getDropMultiplier().getCurrentDropMultiplier();
-        float luck = randomizer.nextFloat() * (totalWeight * activeMultiplier);
-        System.out.println(": = = = = = = : ");
-        System.out.println("luck: " + luck);
+        final DropLoot dropLoot = new DropLoot();
+        dropLoot.addLoot(primitiveDrop, primitiveDrop.getDrop(hasSilkTouch, fortuneLevel));
+
         for (int i = 0; i < dropEntries.size(); ++i) {
-            System.out.println("item: " + dropEntries.get(i).getDropEntryIcon().getType());
-            final boolean multipliable = dropEntries.get(i).isMultipliable();
-            System.out.println("multipliable: " + multipliable);
+            final float luck = randomizer.nextFloat() * totalWeight;
 
-            float itemChanceWeight = dropEntries.get(i).getChanceWeight();
-            System.out.println("itemChanceWeight: " + itemChanceWeight);
-            itemChanceWeight = dropEntries.get(i).getChanceWeight() * ((multipliable) ? activeMultiplier : 1.0f);
-            System.out.println("itemChanceWeight: " + itemChanceWeight);
+            if (luck > dropEntries.get(i).getChanceWeight()) {
+                final ItemStack itemDrop = dropEntries.get(i).getDrop(hasSilkTouch, fortuneLevel);
 
-            luck -= itemChanceWeight;
-            System.out.println("final luck: " + luck);
-
-            if (luck <= 0.0f) {
-                randomizedDropEntry = dropEntries.get(i);
-                break;
+                dropLoot.addLoot(dropEntries.get(i), itemDrop);
             }
         }
 
-        finalDrop = randomizedDropEntry.getDrop(hasSilkTouch, (randomizedDropEntry.equals(primitiveDrop))? 0 : fortuneLevel);
-
-        return new DropLoot(randomizedDropEntry, finalDrop);
+        return dropLoot;
     }
 
     public DropEntry getPrimitiveDrop() {
