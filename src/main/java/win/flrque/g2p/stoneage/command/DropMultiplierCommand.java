@@ -51,7 +51,7 @@ public class DropMultiplierCommand implements CommandExecutor {
             }
         }
 
-        boolean success = plugin.getDropCalculator().getDropMultiplier().setDropMultiplier(2.0f, 100000);
+        boolean success = plugin.getDropCalculator().getDropMultiplier().setDropMultiplier(2.0f, time);
         if(success) {
             Bukkit.broadcastMessage(sender.getName() + " dal mnoznik x" + multiplier + " na czas " + (time / 60 / 1000) + " minut");
         } else {
