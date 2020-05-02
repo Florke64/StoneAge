@@ -145,5 +145,7 @@ public final class StoneAge extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+
+        getWindowManager().closeAllWindows();
     }
 }
