@@ -64,7 +64,9 @@ public class DropMultiplier {
     }
 
     public boolean isActive() {
-        //TODO: Respect timeout
+        if(getMultiplierTimeout() < System.currentTimeMillis())
+            return false;
+
         return defaultDropMultiplier != currentDropMultiplier;
     }
 
