@@ -56,6 +56,9 @@ public class StoneMachineBreakListener implements Listener {
                 if(user != null && user.isOnline()) {
 
                     //TODO: To be tested in action
+                    if(user.getOpenInventory() == null)
+                        continue;
+
                     if(windowManager.getWindow(user).getBukkitInventory().equals(user.getOpenInventory().getTopInventory())) {
                         user.closeInventory();
                         user.sendMessage("Ta stoniarka zostala zniszczona.");
