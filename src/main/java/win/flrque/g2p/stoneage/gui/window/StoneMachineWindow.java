@@ -7,12 +7,13 @@
 package win.flrque.g2p.stoneage.gui.window;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.inventory.InventoryType;
 import win.flrque.g2p.stoneage.gui.InventoryPoint;
+import win.flrque.g2p.stoneage.gui.ItemButtonFactory;
+import win.flrque.g2p.stoneage.gui.ItemButtonFactory.ItemButtonType;
 import win.flrque.g2p.stoneage.gui.Window;
 
 public class StoneMachineWindow extends Window {
@@ -50,11 +51,18 @@ public class StoneMachineWindow extends Window {
 
     @Override
     public void updateInventoryContent() {
-        final ItemStack dummy = new ItemStack(Material.VINE);
+        final ItemButtonFactory buttonFactory = new ItemButtonFactory(windowOwner);
 
-        for(int i=0; i<inventory.getSize(); i++) {
-            inventory.setItem(i, dummy);
-        }
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_FILTER));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0,1).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_INFO));
+
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_MULTIPLIER));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4,2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_REPAIR));
+
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_UPGRADE));
+
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 7,2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.STONE_STATISTICS));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_INFO));
     }
 
     @Override
