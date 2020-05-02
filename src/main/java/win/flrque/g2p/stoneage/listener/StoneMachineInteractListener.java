@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.gui.Window;
 import win.flrque.g2p.stoneage.gui.window.StoneMachineWindow;
@@ -47,8 +48,19 @@ public class StoneMachineInteractListener implements Listener {
 
         event.setCancelled(true);
 
-        final Window window = new StoneMachineWindow(player, (Dispenser) event.getClickedBlock().getState());
-        window.open(player);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                final Window window = new StoneMachineWindow(player, (Dispenser) event.getClickedBlock().getState());
+
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        window.open(player);
+                    }
+                }.runTask(plugin);
+            }
+        }.runTaskAsynchronously(plugin);
 
     }
 
