@@ -51,13 +51,12 @@ public class StoneBreakListener implements Listener {
         event.setDropItems(false);
 
         final GameMode playerGameMode = player.getGameMode();
-        if(playerGameMode.equals(GameMode.CREATIVE) || playerGameMode.equals(GameMode.SPECTATOR))
-            return;
+        if(!playerGameMode.equals(GameMode.CREATIVE) && !playerGameMode.equals(GameMode.SPECTATOR)) {
+            final ItemStack usedTool = player.getInventory().getItemInMainHand();
+            final DropLoot finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, (Dispenser) machineBlock.getState());
 
-        final ItemStack usedTool = player.getInventory().getItemInMainHand();
-        final DropLoot finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, (Dispenser) machineBlock.getState());
-
-        dropLoot(player, brokenBlock.getLocation(), machineBlock.getLocation(), finalDrop);
+            dropLoot(player, brokenBlock.getLocation(), machineBlock.getLocation(), finalDrop);
+        }
 
         if(machineBlock != null){
             //Replacing broken stone with new one
