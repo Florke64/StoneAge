@@ -70,6 +70,13 @@ public class StoneMachineWindow extends Window {
 //        if(clickType.equals(ClickType.LEFT)) {
 //            player.sendMessage(clickedPoint.toString());
 //        }
+
+        //Drop info / selector
+        if(clickedPoint.getSlotNumber() == 9) {
+            player.closeInventory();
+            player.performCommand("drop");
+        }
+
     }
 
 }
