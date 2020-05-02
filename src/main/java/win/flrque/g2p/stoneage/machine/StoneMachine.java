@@ -171,7 +171,7 @@ public class StoneMachine {
         machineLore.add(ChatColor.GRAY + "gdzie ma generowac stone!");
         machineLore.add(" ");
         machineLore.add(ChatColor.DARK_RED + "Uwaga! " + ChatColor.YELLOW + "Stoniarki mozna niszczyc");
-        machineLore.add("tylko zlotym kilofem.");
+        machineLore.add(ChatColor.YELLOW + "tylko zlotym kilofem.");
 
         return machineLore;
     }
