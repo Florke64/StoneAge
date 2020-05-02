@@ -44,6 +44,7 @@ public class StoneMachineWindow extends Window {
             return false;
         }
 
+        plugin.getWindowManager().cacheMachine(stoneMachine, this);
         player.openInventory(inventory);
 
         return true;

@@ -17,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.gui.WindowManager;
 
 public class StoneMachineBreakListener implements Listener {
 
@@ -50,10 +51,15 @@ public class StoneMachineBreakListener implements Listener {
             final Block brokenBlock = event.getBlock();
             final Location brokenBlockLocation = brokenBlock.getLocation();
 
-            for(Player user : plugin.getWindowManager().getWindow((Dispenser) brokenBlock.getState()).getUsers()) {
+            final WindowManager windowManager = plugin.getWindowManager();
+            for(Player user : windowManager.getWindow((Dispenser) brokenBlock.getState()).getUsers()) {
                 if(user != null && user.isOnline()) {
-                    user.closeInventory();
-                    user.sendMessage("Ta stoniarka zostala zniszczona.");
+
+                    //TODO: To be tested in action
+                    if(windowManager.getWindow(user).getBukkitInventory().equals(user.getOpenInventory().getTopInventory())) {
+                        user.closeInventory();
+                        user.sendMessage("Ta stoniarka zostala zniszczona.");
+                    }
                 }
             }
 
