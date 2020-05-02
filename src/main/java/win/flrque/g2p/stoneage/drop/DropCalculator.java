@@ -27,7 +27,6 @@ public class DropCalculator {
     private DropMultiplier dropMultiplier;
 
     private float totalWeight = 0;
-    private float totalWeightWithMultiplier = 0;
 
     public DropCalculator() {
         plugin = StoneAge.getPlugin(StoneAge.class);
@@ -35,7 +34,6 @@ public class DropCalculator {
         this.primitiveDrop = new DropEntry(new ItemStack(Material.COBBLESTONE), 1.0f);
 
         calculateTotalWeight();
-        calculateTotalWeightWithMultiplier(1.0f);
     }
 
     public void setDropMultiplier(DropMultiplier dropMultiplier) {
@@ -66,24 +64,6 @@ public class DropCalculator {
         totalWeight = weight + primitiveDrop.getChanceWeight();
 
         return weight;
-    }
-
-    private float calculateTotalWeightWithMultiplier(float multiplier) {
-        float weight = 0.0f;
-        for(DropEntry drop : dropEntries) {
-            if(drop.isMultipliable())
-                weight += drop.getChanceWeight() * multiplier;
-            else
-                weight += drop.getChanceWeight();
-        }
-
-        totalWeightWithMultiplier = weight + primitiveDrop.getChanceWeight() * (primitiveDrop.isMultipliable()? multiplier : 1.0f);
-
-        return weight;
-    }
-
-    public float getTotalWeightWithMultiplier() {
-        return totalWeightWithMultiplier;
     }
 
     public float getTotalWeight() {
