@@ -50,6 +50,7 @@ public final class StoneAge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StoneMachineRedstoneInteractListener(), this);
         getServer().getPluginManager().registerEvents(new StoneBreakListener(), this);
 
+        getServer().getPluginManager().registerEvents(new PlayerCreatePersonalConfigListener(), this);
         getServer().getPluginManager().registerEvents(new WindowClickListener(), this);
 
         getServer().getPluginManager().registerEvents(new DebugGameJoin(), this);

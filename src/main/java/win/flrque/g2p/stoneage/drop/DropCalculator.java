@@ -8,21 +8,21 @@ package win.flrque.g2p.stoneage.drop;
 
 import jdk.internal.jline.internal.Nullable;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Dispenser;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import win.flrque.g2p.stoneage.StoneAge;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class DropCalculator {
 
     private final StoneAge plugin;
 
     private final List<DropEntry> dropEntries = new ArrayList<>();
+    private final Map<OfflinePlayer, PersonalDropConfig> personalDropConfigMap = new HashMap<>();
 
     private DropEntry primitiveDrop;
     private DropMultiplier dropMultiplier;
@@ -121,5 +121,24 @@ public class DropCalculator {
 
     public List<DropEntry> getDropEntries() {
         return dropEntries;
+    }
+
+    public PersonalDropConfig getPersonalDropConfig(OfflinePlayer player) {
+        if(!personalDropConfigMap.containsKey(player)) {
+            createPersonalDropConfig(player);
+        }
+
+        return personalDropConfigMap.get(player);
+    }
+
+//    public void loadPersonalDropConfigs() {
+//        //TODO: Load all from DataBase on server start
+//    }
+
+    private PersonalDropConfig createPersonalDropConfig(OfflinePlayer player) {
+        final PersonalDropConfig config = new PersonalDropConfig(player);
+        personalDropConfigMap.put(player, config);
+
+        return personalDropConfigMap.get(player);
     }
 }
