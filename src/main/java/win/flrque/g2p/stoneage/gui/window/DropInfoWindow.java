@@ -72,7 +72,7 @@ public class DropInfoWindow extends Window  {
         final List<String> lore = new ArrayList<>();
         final String dropEntryStatus = personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony";
         lore.add(ChatColor.translateAlternateColorCodes('&', "&7Status: " + dropEntryStatus));
-        lore.add(ChatColor.translateAlternateColorCodes('&', "(Kliknij aby zmienic)"));
+        lore.add(ChatColor.translateAlternateColorCodes('&', "&7(Kliknij aby zmienic)"));
 
         if(currentDropMultiplier != calculator.getDropMultiplier().getDefaultDropMultiplier()) {
             lore.add(" "); // spacer
