@@ -97,9 +97,17 @@ public class DropCalculator {
         final Random randomizer = new Random();
 
         final DropLoot dropLoot = new DropLoot();
-        dropLoot.addLoot(primitiveDrop, primitiveDrop.getDrop(hasSilkTouch, fortuneLevel));
+
+        //Checks if cobble wasn't disabled by the player
+        if(getPersonalDropConfig(player).isDropping(primitiveDrop))
+            dropLoot.addLoot(primitiveDrop, primitiveDrop.getDrop(hasSilkTouch, fortuneLevel));
 
         for (int i = 0; i < dropEntries.size(); ++i) {
+
+            //Checks for player's personalised drop entry settings
+            if(!getPersonalDropConfig(player).isDropping(dropEntries.get(i)))
+                continue;
+
             final float luck = randomizer.nextFloat() * totalWeight;
 
             final float itemChanceWeight = dropEntries.get(i).getChanceWeight();
