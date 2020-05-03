@@ -6,6 +6,7 @@
 
 package win.flrque.g2p.stoneage.listener;
 
+import jdk.internal.jline.internal.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -46,6 +47,7 @@ public class StoneBreakListener implements Listener {
         if(stoneType != ((byte) 0)) return;
 
         final Block machineBlock = plugin.getStoneMachine().getConnectedStoneMachine(brokenBlock);
+        final Dispenser stoneMachine = machineBlock != null ? (Dispenser) machineBlock.getState() : null;
 
         //Cancelling default drops
         event.setDropItems(false);
@@ -53,9 +55,9 @@ public class StoneBreakListener implements Listener {
         final GameMode playerGameMode = player.getGameMode();
         if(!playerGameMode.equals(GameMode.CREATIVE) && !playerGameMode.equals(GameMode.SPECTATOR)) {
             final ItemStack usedTool = player.getInventory().getItemInMainHand();
-            final DropLoot finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, (Dispenser) machineBlock.getState());
+            final DropLoot finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
 
-            dropLoot(player, brokenBlock.getLocation(), machineBlock.getLocation(), finalDrop);
+            dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
         }
 
         if(machineBlock != null){
@@ -69,7 +71,8 @@ public class StoneBreakListener implements Listener {
         }
     }
 
-    private void dropLoot(Player player, Location stoneLoc, Location machineLoc, DropLoot dropLoot) {
+    private void dropLoot(Player player, Location stoneLoc, @Nullable Dispenser stoneMachine, DropLoot dropLoot) {
+        //TODO: Add dropping to hopper under the stone machine.
         final Location expDropLocation = (plugin.getStoneMachine().isDropExpToFeet()) ? player.getLocation() : stoneLoc;
         final Location itemDropLocation = (plugin.getStoneMachine().isDropItemsToFeet()) ? player.getLocation() : stoneLoc;
 

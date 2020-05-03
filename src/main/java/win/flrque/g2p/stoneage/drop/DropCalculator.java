@@ -6,6 +6,7 @@
 
 package win.flrque.g2p.stoneage.drop;
 
+import jdk.internal.jline.internal.Nullable;
 import org.bukkit.Material;
 import org.bukkit.block.Dispenser;
 import org.bukkit.enchantments.Enchantment;
@@ -70,7 +71,7 @@ public class DropCalculator {
         return totalWeight;
     }
 
-    public DropLoot calculateDrop(Player player, ItemStack tool, Dispenser stoneMachine) {
+    public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable Dispenser stoneMachine) {
         //TODO: Check StoneMachine's configuration book inside its Inventory
 
         //No tool was used to break a block
