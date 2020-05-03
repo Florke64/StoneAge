@@ -38,16 +38,13 @@ public class StoneMachineBreakListener implements Listener {
         final Player destroyer = event.getPlayer();
         final GameMode gameMode = destroyer.getGameMode();
 
-        if(gameMode.equals(GameMode.CREATIVE) || gameMode.equals(GameMode.SPECTATOR))
-            return;
-
         if(!plugin.getStoneMachine().isStoneMachine(event.getBlock()))
             return;
 
         event.setDropItems(false);
 
         final ItemStack tool = destroyer.getInventory().getItemInMainHand();
-        if(tool.getType().equals(Material.GOLD_PICKAXE)) {
+        if(tool.getType() == Material.GOLD_PICKAXE || event.getPlayer().getGameMode() == GameMode.CREATIVE) {
             final Block brokenBlock = event.getBlock();
             final Location brokenBlockLocation = brokenBlock.getLocation();
 
@@ -66,7 +63,10 @@ public class StoneMachineBreakListener implements Listener {
                 }
             }
 
-            brokenBlockLocation.getWorld().dropItemNaturally(brokenBlockLocation, plugin.getStoneMachine().createStoneMachineItem());
+            if(event.getPlayer().getGameMode() != GameMode.CREATIVE) {
+                brokenBlockLocation.getWorld().dropItemNaturally(brokenBlockLocation, plugin.getStoneMachine().createStoneMachineItem());
+            }
+
         } else {
             event.setCancelled(true);
             destroyer.sendMessage("Stoniarka moze byc usunieta tylko przy pomocy zlotego kilofa!");
