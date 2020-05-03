@@ -70,7 +70,9 @@ public class DropInfoWindow extends Window  {
         meta.setDisplayName(ChatColor.GREEN + icon.getType().toString() + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
 
         final List<String> lore = new ArrayList<>();
-        lore.add(ChatColor.translateAlternateColorCodes('&', personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony"));
+        final String dropEntryStatus = personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony";
+        lore.add(ChatColor.translateAlternateColorCodes('&', "&7Status: " + dropEntryStatus));
+        lore.add(ChatColor.translateAlternateColorCodes('&', "(Kliknij aby zmienic)"));
 
         if(currentDropMultiplier != calculator.getDropMultiplier().getDefaultDropMultiplier()) {
             lore.add(" "); // spacer
