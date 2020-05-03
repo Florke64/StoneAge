@@ -12,6 +12,9 @@ commands:
     description: Sprawdzanie i ustawianie preferencji dropu ze stoniarek
     aliases: [dropinfo, dropy, drops, stone]
     permission: g2p.stone.drop
+  drophelp:
+    description: Wyswietla instrukcje obslugi stoniarek.
+    permission: g2p.stone.drop
   dropmultiplier:
     description: Komenda dla administratorow. Mnozy przelicznik dropu z kamienia.
     aliases: [multiplier, mnoznik]

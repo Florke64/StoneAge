@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import win.flrque.g2p.stoneage.command.DropCommand;
+import win.flrque.g2p.stoneage.command.DropHelpCommand;
 import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
@@ -57,6 +58,7 @@ public final class StoneAge extends JavaPlugin {
 
         //Registering Plugin Commands
         getCommand("drop").setExecutor(new DropCommand());
+        getCommand("drophelp").setExecutor(new DropHelpCommand());
         getCommand("multiplier").setExecutor(new DropMultiplierCommand());
 
         windowManager = new WindowManager();

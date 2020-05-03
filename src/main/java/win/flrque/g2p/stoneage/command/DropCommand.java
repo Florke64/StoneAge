@@ -38,6 +38,11 @@ public class DropCommand implements CommandExecutor {
             return true;
         }
 
+        if(args.length == 1 && (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("pomoc"))) {
+            ((Player) sender).performCommand("drophelp");
+            return true;
+        }
+
         final Player player = (Player) sender;
         final DropInfoWindow window = new DropInfoWindow(player);
 

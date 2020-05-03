@@ -2,7 +2,8 @@ config_version: 1
 
 database:
   ip: 'localhost'
-  port: 3306
+  port: '3306'
+  database: 'go2play_test'
   user: 'flrque'
   password: ''
 
