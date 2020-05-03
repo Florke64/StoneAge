@@ -78,6 +78,17 @@ public class StoneMachineWindow extends Window {
             player.performCommand("drop");
         }
 
+        //Repair Stone Machine
+        else if(clickedPoint.getSlotNumber() == 22) {
+            player.closeInventory();
+
+            if(plugin.getStoneMachine().repairStoneMachine(stoneMachine)) {
+                player.sendMessage("Naprawiono stoniarke!");
+            } else {
+                player.sendMessage("Nie udalo sie naprawic tej stoniarki, sprobuj ponownie pozniej...");
+            }
+        }
+
     }
 
 }

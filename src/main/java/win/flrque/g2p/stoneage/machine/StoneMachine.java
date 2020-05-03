@@ -20,7 +20,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import win.flrque.g2p.stoneage.StoneAge;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StoneMachine {
 
@@ -31,7 +33,11 @@ public class StoneMachine {
     private final String machineName;
     private final List<String> machineLore = new ArrayList<>();
 
+    private final Map<Dispenser, Long> lastStoneMachineRepair = new HashMap<>();
+
     private long stoneRespawnFrequency = 40l;
+    private int repairCooldown = 5;
+
     private boolean dropItemsToFeet = false;
     private boolean dropExpToFeet = false;
 
@@ -47,6 +53,21 @@ public class StoneMachine {
         }
 
         this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
+    }
+
+    public boolean repairStoneMachine(Dispenser machine) {
+        final long repairCooldownLimit = (System.currentTimeMillis() - (1000 * repairCooldown));
+        if(lastStoneMachineRepair.containsKey(machine) && lastStoneMachineRepair.get(machine) >= repairCooldownLimit ) {
+            //Player is trying to repair stone machine too frequently
+            return false;
+        }
+
+        lastStoneMachineRepair.put(machine, System.currentTimeMillis());
+        final Location stoneLocation = getGeneratedStoneLocation(machine);
+
+        generateStone(stoneLocation);
+
+        return true;
     }
 
     public boolean isStoneMachine(Block block) {
@@ -72,7 +93,6 @@ public class StoneMachine {
         return inventory.getName().equals(getExample().getItemMeta().getDisplayName());
     }
 
-    //This method will be required for stone generation on redstone input into the machine
     public Location getGeneratedStoneLocation(Dispenser stoneMachine) {
         if(!isStoneMachine(stoneMachine))
             return null;
