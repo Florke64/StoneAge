@@ -25,7 +25,7 @@ public class PersonalDropConfig {
 
         this.player = player;
 
-        customDropEntries.put(plugin.getDropCalculator().getPrimitiveDrop(), true);
+        customDropEntries.put(plugin.getDropCalculator().getPrimitiveDropEntry(), true);
         for(DropEntry drop : plugin.getDropCalculator().getDropEntries()) {
             customDropEntries.put(drop, true);
         }
@@ -37,6 +37,12 @@ public class PersonalDropConfig {
 
     public void setDropEntry(DropEntry dropEntry, boolean shouldDrop) {
         customDropEntries.put(dropEntry, shouldDrop);
+    }
+
+    public boolean switchDropEntry(DropEntry dropEntry) {
+        setDropEntry(dropEntry, !isDropping(dropEntry));
+
+        return isDropping(dropEntry);
     }
 
 }

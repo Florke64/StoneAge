@@ -28,6 +28,7 @@ public class DropEntry {
     private int maxExp;
 
     private ItemStack silkTouchItemStack;
+    //TODO: Store type of item to reduce ItemStack#getType() calls count
 
     public DropEntry(ItemStack itemStack, float weight) {
         plugin = StoneAge.getPlugin(StoneAge.class);

@@ -115,7 +115,7 @@ public class DropCalculator {
         return dropLoot;
     }
 
-    public DropEntry getPrimitiveDrop() {
+    public DropEntry getPrimitiveDropEntry() {
         return primitiveDrop;
     }
 

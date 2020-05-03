@@ -14,6 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
+import win.flrque.g2p.stoneage.drop.PersonalDropConfig;
 import win.flrque.g2p.stoneage.gui.InventoryPoint;
 import win.flrque.g2p.stoneage.gui.Window;
 
@@ -24,13 +25,16 @@ import java.util.List;
 public class DropInfoWindow extends Window  {
 
     private final Player windowContentOwner;
+    private final PersonalDropConfig personalDropConfig;
 
     final DecimalFormat df = new DecimalFormat();
 
     //TODO: Support for pagination
     public DropInfoWindow(Player owner) {
         super(ChatColor.translateAlternateColorCodes('&', "&7&lSTONIARKA &8&l> &5&lDROP INFO"));
+
         windowContentOwner = owner;
+        personalDropConfig = plugin.getDropCalculator().getPersonalDropConfig(windowContentOwner);
 
         df.setMaximumFractionDigits(2);
         df.setMinimumFractionDigits(2);
@@ -44,7 +48,7 @@ public class DropInfoWindow extends Window  {
         for(int i=0; i<=calculator.getDropEntries().size(); i++) {
             final DropEntry drop;
 
-            if(i == calculator.getDropEntries().size()) drop = calculator.getPrimitiveDrop();
+            if(i == calculator.getDropEntries().size()) drop = calculator.getPrimitiveDropEntry();
             else drop = calculator.getDropEntries().get(i);
 
             final ItemStack icon = createIconItem(drop);
@@ -55,7 +59,8 @@ public class DropInfoWindow extends Window  {
 
     private ItemStack createIconItem(DropEntry drop) {
         //Preparing data to be placed on the item
-        final float currentDropMultiplier = plugin.getDropCalculator().getDropMultiplier().getCurrentDropMultiplier();
+        final DropCalculator calculator = plugin.getDropCalculator();
+        final float currentDropMultiplier = calculator.getDropMultiplier().getCurrentDropMultiplier();
         final float dropChance = getChancePercentage(drop);
 
         final ItemStack icon = drop.getDropEntryIcon();
@@ -65,8 +70,11 @@ public class DropInfoWindow extends Window  {
         meta.setDisplayName(ChatColor.GREEN + icon.getType().toString() + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
 
         final List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.translateAlternateColorCodes('&', personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony"));
 
-        if(currentDropMultiplier != plugin.getDropCalculator().getDropMultiplier().getDefaultDropMultiplier()) {
+        if(currentDropMultiplier != calculator.getDropMultiplier().getDefaultDropMultiplier()) {
+            lore.add(" "); // spacer
+
             final float realDropChance = getRealChancePercentage(drop);
             lore.add(ChatColor.translateAlternateColorCodes('&', "&7Rzeczywisty drop: " + df.format(realDropChance) + "%"));
         }
@@ -105,7 +113,25 @@ public class DropInfoWindow extends Window  {
 
     @Override
     public void onClick(ClickType clickType, Player player, InventoryPoint clickedPoint) {
+        final int clickedSlot = clickedPoint.getSlotNumber();
 
+        final DropCalculator calculator = plugin.getDropCalculator();
+        final DropEntry dropEntry;
+
+        if(clickedSlot < calculator.getDropEntries().size())
+            dropEntry = calculator.getDropEntries().get(clickedSlot);
+        else if(clickedSlot == calculator.getDropEntries().size())
+            dropEntry = calculator.getPrimitiveDropEntry();
+        else {
+
+            return; //Clicked on empty slot perhaps
+        }
+
+        //Closing to reduce inventory update lag
+        player.closeInventory();
+
+        boolean isDropping = calculator.getPersonalDropConfig(player).switchDropEntry(dropEntry);
+        player.sendMessage("Ustawiono drop " + dropEntry.getDropEntryIcon().getType() + " na " + (isDropping? "wlaczony" : "wylaczony"));
     }
 
 }
