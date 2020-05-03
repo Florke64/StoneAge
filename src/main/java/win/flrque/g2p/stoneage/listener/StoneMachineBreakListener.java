@@ -17,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.gui.Window;
 import win.flrque.g2p.stoneage.gui.WindowManager;
 
 public class StoneMachineBreakListener implements Listener {
@@ -44,26 +45,30 @@ public class StoneMachineBreakListener implements Listener {
         event.setDropItems(false);
 
         final ItemStack tool = destroyer.getInventory().getItemInMainHand();
-        if(tool.getType() == Material.GOLD_PICKAXE || event.getPlayer().getGameMode() == GameMode.CREATIVE) {
+        if(tool.getType() == Material.GOLD_PICKAXE || gameMode == GameMode.CREATIVE) {
             final Block brokenBlock = event.getBlock();
             final Location brokenBlockLocation = brokenBlock.getLocation();
 
+            //Closing all active windows
             final WindowManager windowManager = plugin.getWindowManager();
-            for(Player user : windowManager.getWindow((Dispenser) brokenBlock.getState()).getUsers()) {
-                if(user != null && user.isOnline()) {
+            final Window brokenMachinesWindow = windowManager.getWindow((Dispenser) brokenBlock.getState());
+            if(brokenMachinesWindow != null) {
+                for (Player user : brokenMachinesWindow.getUsers()) {
+                    if (user != null && user.isOnline()) {
 
-                    //TODO: To be tested in action
-                    if(user.getOpenInventory() == null)
-                        continue;
+                        //TODO: To be tested in action
+                        if (user.getOpenInventory() == null)
+                            continue;
 
-                    if(windowManager.getWindow(user).getBukkitInventory().equals(user.getOpenInventory().getTopInventory())) {
-                        user.closeInventory();
-                        user.sendMessage("Ta stoniarka zostala zniszczona.");
+                        if (windowManager.getWindow(user).getBukkitInventory().equals(user.getOpenInventory().getTopInventory())) {
+                            user.closeInventory();
+                            user.sendMessage("Ta stoniarka zostala zniszczona.");
+                        }
                     }
                 }
             }
 
-            if(event.getPlayer().getGameMode() != GameMode.CREATIVE) {
+            if(gameMode != GameMode.CREATIVE) {
                 brokenBlockLocation.getWorld().dropItemNaturally(brokenBlockLocation, plugin.getStoneMachine().createStoneMachineItem());
             }
 
