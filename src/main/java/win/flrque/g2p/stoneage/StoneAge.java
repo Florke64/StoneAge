@@ -12,11 +12,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import win.flrque.g2p.stoneage.command.DropCommand;
 import win.flrque.g2p.stoneage.command.DropHelpCommand;
 import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
+import win.flrque.g2p.stoneage.database.DatabaseController;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
+import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
 import win.flrque.g2p.stoneage.util.ConfigSectionDropEntry;
 import win.flrque.g2p.stoneage.util.ConfigSectionGeneral;
 
@@ -29,6 +31,8 @@ public final class StoneAge extends JavaPlugin {
 
     private WindowManager windowManager;
     private DropCalculator dropCalculator;
+
+    private DatabaseController databaseController;
 
     @Override
     public void onEnable() {
@@ -72,10 +76,24 @@ public final class StoneAge extends JavaPlugin {
         stoneMachine = new StoneMachine("&6&lStoniarka", machineLore);
     }
 
+    private void initDataBase(ConfigSectionDatabase configSectionDatabase) {
+        databaseController = new DatabaseController(configSectionDatabase.getHikariConfig());
+    }
+
     @Override
     public void reloadConfig() {
         getLogger().log(Level.INFO, "Reloading configuration file...");
         super.reloadConfig();
+
+        //Reading 'database' configuration
+        if(!getConfig().isConfigurationSection("database")) {
+            getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"database\" section)!");
+            getLogger().log(Level.SEVERE, "Skipping, database won't work.");
+        }
+
+        final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
+        databaseConfig.readDatabaseConnectionDetails();
+        initDataBase(databaseConfig);
 
         //Reading 'General' configuration for Stone Machines
         if(!getConfig().isConfigurationSection("machines")) {
@@ -138,6 +156,10 @@ public final class StoneAge extends JavaPlugin {
 
     public DropCalculator getDropCalculator() {
         return dropCalculator;
+    }
+
+    public DatabaseController getDatabaseController() {
+        return databaseController;
     }
 
     @Override
