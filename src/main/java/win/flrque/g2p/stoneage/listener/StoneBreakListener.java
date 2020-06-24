@@ -7,6 +7,7 @@
 package win.flrque.g2p.stoneage.listener;
 
 import jdk.internal.jline.internal.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.drop.DropLoot;
+import win.flrque.g2p.stoneage.event.StoneMachineStoneBreakEvent;
 
 public class StoneBreakListener implements Listener {
 
@@ -53,14 +55,20 @@ public class StoneBreakListener implements Listener {
         event.setDropItems(false);
 
         final GameMode playerGameMode = player.getGameMode();
+        final DropLoot finalDrop;
         if(!playerGameMode.equals(GameMode.CREATIVE) && !playerGameMode.equals(GameMode.SPECTATOR)) {
             final ItemStack usedTool = player.getInventory().getItemInMainHand();
-            final DropLoot finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
+            finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
 
             dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
+        } else {
+            finalDrop = null;
         }
 
         if(machineBlock != null){
+            final StoneMachineStoneBreakEvent stoneBreakEvent = new StoneMachineStoneBreakEvent(player, stoneMachine, finalDrop);
+            Bukkit.getServer().getPluginManager().callEvent(stoneBreakEvent);
+
             //Replacing broken stone with new one
             new BukkitRunnable() {
                 @Override
