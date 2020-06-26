@@ -78,6 +78,13 @@ public final class StoneAge extends JavaPlugin {
 
     private void initDataBase(ConfigSectionDatabase configSectionDatabase) {
         databaseController = new DatabaseController(configSectionDatabase.getHikariConfig());
+
+        boolean databaseCreated = databaseController.createDatabase();
+        if(databaseCreated) {
+            getLogger().log(Level.INFO, "Database created!");
+        } else {
+            getLogger().log(Level.INFO, "Couldn't create a database.");
+        }
     }
 
     @Override

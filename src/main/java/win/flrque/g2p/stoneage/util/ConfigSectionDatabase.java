@@ -32,10 +32,15 @@ public class ConfigSectionDatabase extends ConfigSectionReader {
         password = rootSection.getString("db_password");
 
         //Creating Hikari Config
+//        Properties properties = new Properties();
+//        properties.setProperty("dataSource.serverName", serverAddress);
+//        properties.setProperty("dataSource.port", serverPort);
+//        properties.setProperty("dataSource.databaseName", databaseName);
+
         hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl("jdbc:mysql://"+ serverAddress +":"+ serverPort +"/"+ databaseName);
         hikariConfig.setUsername(username);
         hikariConfig.setPassword(password);
+        hikariConfig.setJdbcUrl("jdbc:mysql://"+ serverAddress +":"+ serverPort +"/"+ databaseName);
 
         hikariConfig.setMaximumPoolSize(10);
     }
