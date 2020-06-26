@@ -12,7 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import win.flrque.g2p.stoneage.command.DropCommand;
 import win.flrque.g2p.stoneage.command.DropHelpCommand;
 import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
-import win.flrque.g2p.stoneage.database.DatabaseController;
+import win.flrque.g2p.stoneage.database.SQLManager;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.gui.WindowManager;
@@ -32,7 +32,7 @@ public final class StoneAge extends JavaPlugin {
     private WindowManager windowManager;
     private DropCalculator dropCalculator;
 
-    private DatabaseController databaseController;
+    private SQLManager sqlManager;
 
     @Override
     public void onEnable() {
@@ -76,17 +76,6 @@ public final class StoneAge extends JavaPlugin {
         stoneMachine = new StoneMachine("&6&lStoniarka", machineLore);
     }
 
-    private void initDataBase(ConfigSectionDatabase configSectionDatabase) {
-        databaseController = new DatabaseController(configSectionDatabase.getHikariConfig());
-
-        boolean databaseCreated = databaseController.createDatabase();
-        if(databaseCreated) {
-            getLogger().log(Level.INFO, "Database created!");
-        } else {
-            getLogger().log(Level.INFO, "Couldn't create a database.");
-        }
-    }
-
     @Override
     public void reloadConfig() {
         getLogger().log(Level.INFO, "Reloading configuration file...");
@@ -100,7 +89,7 @@ public final class StoneAge extends JavaPlugin {
 
         final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
         databaseConfig.readDatabaseConnectionDetails();
-        initDataBase(databaseConfig);
+        sqlManager = new SQLManager(databaseConfig);
 
         //Reading 'General' configuration for Stone Machines
         if(!getConfig().isConfigurationSection("machines")) {
@@ -165,8 +154,8 @@ public final class StoneAge extends JavaPlugin {
         return dropCalculator;
     }
 
-    public DatabaseController getDatabaseController() {
-        return databaseController;
+    public SQLManager getDatabaseController() {
+        return sqlManager;
     }
 
     @Override
@@ -178,6 +167,7 @@ public final class StoneAge extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
 
-        getWindowManager().closeAllWindows();
+        getWindowManager().closeAllWindows(); //TODO: NullPointer Exception <- onDisable?
+        sqlManager.onDisable();
     }
 }

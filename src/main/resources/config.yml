@@ -1,10 +1,10 @@
 config_version: 1
 
 database:
-  server_address: 'localhost'
+  server_address: '127.0.0.1'
   server_port: '3306'
-  db_name: 'go2play_test'
-  db_user: 'flrque'
+  db_name: 'g2plocaltest'
+  db_user: 'root'
   db_password: ''
 
 machines:

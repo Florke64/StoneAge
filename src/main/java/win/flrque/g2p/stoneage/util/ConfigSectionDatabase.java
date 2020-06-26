@@ -6,19 +6,16 @@
 
 package win.flrque.g2p.stoneage.util;
 
-import com.zaxxer.hikari.HikariConfig;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class ConfigSectionDatabase extends ConfigSectionReader {
 
     private String serverAddress;
-    private String serverPort;
+    private int serverPort;
 
     private String databaseName;
     private String username;
     private String password;
-
-    private HikariConfig hikariConfig;
 
     public ConfigSectionDatabase(ConfigurationSection configurationSection) {
         super(configurationSection);
@@ -26,34 +23,17 @@ public class ConfigSectionDatabase extends ConfigSectionReader {
 
     public void readDatabaseConnectionDetails() {
         serverAddress = rootSection.getString("server_address");
-        serverPort = rootSection.getString("server_port");
+        serverPort = rootSection.getInt("server_port");
         databaseName = rootSection.getString("db_name");
         username = rootSection.getString("db_user");
         password = rootSection.getString("db_password");
-
-        //Creating Hikari Config
-//        Properties properties = new Properties();
-//        properties.setProperty("dataSource.serverName", serverAddress);
-//        properties.setProperty("dataSource.port", serverPort);
-//        properties.setProperty("dataSource.databaseName", databaseName);
-
-        hikariConfig = new HikariConfig();
-        hikariConfig.setUsername(username);
-        hikariConfig.setPassword(password);
-        hikariConfig.setJdbcUrl("jdbc:mysql://"+ serverAddress +":"+ serverPort +"/"+ databaseName);
-
-        hikariConfig.setMaximumPoolSize(10);
-    }
-
-    public HikariConfig getHikariConfig() {
-        return hikariConfig;
     }
 
     public String getServerAddress() {
         return serverAddress;
     }
 
-    public String getServerPort() {
+    public int getServerPort() {
         return serverPort;
     }
 
