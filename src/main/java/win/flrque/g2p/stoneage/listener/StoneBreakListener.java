@@ -6,7 +6,6 @@
 
 package win.flrque.g2p.stoneage.listener;
 
-import jdk.internal.jline.internal.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -22,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.drop.DropLoot;
 import win.flrque.g2p.stoneage.event.StoneMachineStoneBreakEvent;
