@@ -51,7 +51,7 @@ public class StoneMachine {
         for(String line : lore) {
             this.machineLore.add(ChatColor.translateAlternateColorCodes('&', line));
         }
-
+        
         this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
     }
 

@@ -53,11 +53,16 @@ public class ConnectionPoolManager {
         config.setUsername(username);
         config.setPassword(password);
 
-        dataSource = new HikariDataSource(config);
+        try {
+            dataSource = new HikariDataSource(config);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     public Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
+        return dataSource != null? dataSource.getConnection() : null;
     }
 
     public void close(Connection conn, PreparedStatement ps, ResultSet res) {

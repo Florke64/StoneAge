@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
 
 public class SQLManager {
 
@@ -26,8 +27,14 @@ public class SQLManager {
         connectionPool = new ConnectionPoolManager(databaseConfig);
 
         final String databaseName = connectionPool.getDatabaseConfig().getDatabaseName();
-        makeDatabase(databaseName);
-        makePlayerStatsTable();
+
+        try {
+            makeDatabase(databaseName);
+            makePlayerStatsTable();
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to initiate db! Running without DB!");
+            e.printStackTrace();
+        }
     }
 
     private void makeDatabase(final String databaseName) {
