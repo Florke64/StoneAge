@@ -29,14 +29,17 @@ public final class StoneAge extends JavaPlugin {
 
     private StoneMachine stoneMachine;
 
-    private final WindowManager windowManager = new WindowManager();
-    private DropCalculator dropCalculator = new DropCalculator();
+    private WindowManager windowManager;
+    private DropCalculator dropCalculator;
 
     private SQLManager sqlManager;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
+        windowManager = new WindowManager();
+        dropCalculator = new DropCalculator();
+
         initStoneMachines();
 
         //Saving and reloading config
@@ -60,7 +63,6 @@ public final class StoneAge extends JavaPlugin {
         getCommand("drop").setExecutor(new DropCommand());
         getCommand("drophelp").setExecutor(new DropHelpCommand());
         getCommand("multiplier").setExecutor(new DropMultiplierCommand());
-
     }
 
     private void initStoneMachines() {
