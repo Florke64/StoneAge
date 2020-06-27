@@ -22,7 +22,7 @@ machines:
   allow_hopper_input: true # allow upgrading stone machines with hopper input (Coal & Redstone Blocks)
 
 primitive_drop:
-  weight: 50.0
+  weight: 63.9
   minimal_exp: 0
   maximal_exp: 0
   ignore_fortune: true
@@ -39,11 +39,52 @@ primitive_drop:
       - '&7Drop Silktouch'
 
 custom_drops:
-  diamond:
-    weight: 5.0 # float value
+  coal:
+    weight: 11.6 # float value
     minimal_exp: 1
     maximal_exp: 5
+    multipliable: true #If set to 'true' then accepts current drop multiplication set by server admin
+    default_tool:
+      material: 'COAL' # Bukkit Material
+      magic_data: 0
+      custom_name: '' # for default item name leave empty: '' or don't include in config section
+      lore: # for no lore don't include this config section
+        - '&7Default Drop'
+      minimal_amount: 1
+    silk_touch_tool:
+      material: 'COAL_ORE'
+      magic_data: 0
+      custom_name: ''
+      lore:
+        - '&7Drop Silktouch'
+
+  iron:
+    weight: 5.1
+    ignore_fortune: true
     multipliable: true
+    default_tool:
+      material: 'IRON_ORE'
+      magic_data: 0
+      custom_name: ''
+      lore:
+        - '&7Default drop only'
+
+  gold:
+    weight: 1.2
+    ignore_fortune: true
+    multipliable: true
+    default_tool:
+      material: 'GOLD_ORE'
+      magic_data: 0
+      custom_name: ''
+      lore:
+        - '&7Default drop only'
+
+  diamond:
+    weight: 1.0 # float value
+    minimal_exp: 1
+    maximal_exp: 5
+    multipliable: true #If set to 'true' then accepts current drop multiplication set by server admin
     default_tool:
       material: 'DIAMOND' # Bukkit Material
       magic_data: 0
@@ -59,7 +100,7 @@ custom_drops:
         - '&7Drop Silktouch'
 
   redstone:
-    weight: 15.0 # float value
+    weight: 5.5 # float value
     minimal_exp: 1
     maximal_exp: 5
     multipliable: true
@@ -78,13 +119,22 @@ custom_drops:
       lore:
         - '&7Drop Silktouch'
 
-  iron:
-    weight: 20.0
-    ignore_fortune: true
+  lapis:
+    weight: 0.1 # float value
+    minimal_exp: 1
+    maximal_exp: 5
     multipliable: true
     default_tool:
-      material: 'IRON_ORE'
+      material: 'INK_SACK' # Bukkit Material
+      magic_data: 4
+      custom_name: '' # for default item name leave empty: '' or don't include in config section
+      lore: # for no lore don't include this config section
+        - '&7Default Drop'
+      minimal_amount: 4
+      maximal_amount: 8
+    silk_touch_tool:
+      material: 'LAPIS_ORE'
       magic_data: 0
       custom_name: ''
       lore:
-        - '&7Default drop only'
+        - '&7Drop Silktouch'
