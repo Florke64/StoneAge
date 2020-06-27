@@ -49,6 +49,7 @@ public class ConfigSectionItemStack extends ConfigSectionReader{
 
         final ItemStack itemStack = new ItemStack(itemMaterial);
 
+        //TODO: Fix magic value
         //Getting data magic value
         final byte magicValue = (byte) readMagicValue();
         if(magicValue < 0)
