@@ -38,6 +38,11 @@ public class PersonalDropConfig {
         return customDropEntries.containsKey(dropEntry) && customDropEntries.get(dropEntry).booleanValue();
     }
 
+    public void setDropEntry(String entryKey, boolean shouldDrop) {
+        DropEntry dropEntry = plugin.getDropCalculator().getDropEntry(entryKey);
+        setDropEntry(dropEntry, shouldDrop);
+    }
+
     public void setDropEntry(DropEntry dropEntry, boolean shouldDrop) {
         customDropEntries.put(dropEntry, shouldDrop);
     }

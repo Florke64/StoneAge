@@ -81,7 +81,7 @@ public class PlayerSetupManager {
                 final int columnCount = metaData.getColumnCount();
                 for(int i=0; i<columnCount; i++) {
                     final String columnName = metaData.getColumnName(i);
-                    stats.setStatistic(columnName, result.getInt(metaData.getColumnName(i)));
+                    stats.setStatistic(columnName, result.getInt(columnName));
                 }
             }
         } catch (SQLException e) {
@@ -91,9 +91,43 @@ public class PlayerSetupManager {
 
     }
 
-//    public void loadPersonalDropConfigs() {
-//        //TODO: Load all from DataBase on server start
-//    }
+    public void loadPersonalDropConfigFromDatabase() {
+        final String databaseName = plugin.getDatabaseController().getDatabaseName();
+        final String queryStatement = "SELECT * FROM " +databaseName+ ".`" + SQLManager.TABLE_PLAYER_DROP_CONFIG + "`";
+
+        ResultSet result = null;
+
+        try {
+            plugin.getDatabaseController().runSelectQuery(queryStatement);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if(result == null) {
+            plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
+            return;
+        }
+
+        final PlayerSetupManager playerSetup = plugin.getPlayerSetup();
+
+        try {
+            while (result.next()) {
+                final ResultSetMetaData metaData = result.getMetaData();
+                final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
+                final PersonalDropConfig config = playerSetup.getPersonalDropConfig(uuid);
+
+                final int columnCount = metaData.getColumnCount();
+                for(int i=0; i<columnCount; i++) {
+                    final String columnName = metaData.getColumnName(i);
+                    config.setDropEntry(columnName, result.getBoolean(columnName));
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Couldn't query results!");
+            e.printStackTrace();
+        }
+
+    }
 
     private PersonalDropConfig createPersonalDropConfig(UUID uuid) {
         final String playerName = Bukkit.getOfflinePlayer(uuid).getName();

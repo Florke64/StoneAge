@@ -15,15 +15,16 @@ import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class DropCalculator {
 
     private final StoneAge plugin;
 
-    private final List<DropEntry> dropEntries = new ArrayList<>();
+    private final Map<String, DropEntry> dropEntries = new HashMap<>();
 
     private DropEntry primitiveDrop;
     private DropMultiplier dropMultiplier;
@@ -52,7 +53,7 @@ public class DropCalculator {
     }
 
     public int addDrop(DropEntry dropEntry) {
-        dropEntries.add(dropEntry);
+        dropEntries.put(dropEntry.getEntryName(), dropEntry);
         calculateTotalWeight();
 
         return dropEntries.size();
@@ -60,7 +61,7 @@ public class DropCalculator {
 
     private float calculateTotalWeight() {
         float weight = 0.0f;
-        for(DropEntry drop : dropEntries)
+        for(DropEntry drop : dropEntries.values())
             weight += drop.getChanceWeight();
 
         totalWeight = weight + primitiveDrop.getChanceWeight();
@@ -129,7 +130,11 @@ public class DropCalculator {
         return primitiveDrop;
     }
 
-    public List<DropEntry> getDropEntries() {
-        return dropEntries;
+    public DropEntry getDropEntry(String key) {
+        return dropEntries.get(key);
+    }
+
+    public Collection<DropEntry> getDropEntries() {
+        return dropEntries.values();
     }
 }
