@@ -1,10 +1,18 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
@@ -12,8 +20,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.drop.DropLoot;
+import win.flrque.g2p.stoneage.event.StoneMachineStoneBreakEvent;
 
 public class StoneBreakListener implements Listener {
 
@@ -38,35 +49,52 @@ public class StoneBreakListener implements Listener {
         if(stoneType != ((byte) 0)) return;
 
         final Block machineBlock = plugin.getStoneMachine().getConnectedStoneMachine(brokenBlock);
-        if(machineBlock != null){
+        final Dispenser stoneMachine = machineBlock != null ? (Dispenser) machineBlock.getState() : null;
 
-            //Cancelling default drops
-            event.setDropItems(false);
+        //Cancelling default drops
+        event.setDropItems(false);
+
+        final GameMode playerGameMode = player.getGameMode();
+        final DropLoot finalDrop;
+        if(!playerGameMode.equals(GameMode.CREATIVE) && !playerGameMode.equals(GameMode.SPECTATOR)) {
+            final ItemStack usedTool = player.getInventory().getItemInMainHand();
+            finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
+
+            dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
+        } else {
+            finalDrop = null;
+        }
+
+        if(machineBlock != null){
+            final StoneMachineStoneBreakEvent stoneBreakEvent = new StoneMachineStoneBreakEvent(player, stoneMachine, finalDrop);
+            Bukkit.getServer().getPluginManager().callEvent(stoneBreakEvent);
 
             //Replacing broken stone with new one
-            plugin.getStoneMachine().generateStone(brokenBlock.getLocation());
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    plugin.getStoneMachine().generateStone(brokenBlock.getLocation());
+                }
+            }.runTaskLater(plugin, 1l);
+        }
+    }
 
-            final GameMode playerGameMode = player.getGameMode();
-            if(playerGameMode.equals(GameMode.CREATIVE) || playerGameMode.equals(GameMode.SPECTATOR))
-                return;
+    private void dropLoot(Player player, Location stoneLoc, @Nullable Dispenser stoneMachine, DropLoot dropLoot) {
+        //TODO: Add dropping to hopper under the stone machine.
+        final Location expDropLocation = (plugin.getStoneMachine().isDropExpToFeet()) ? player.getLocation() : stoneLoc;
+        final Location itemDropLocation = (plugin.getStoneMachine().isDropItemsToFeet()) ? player.getLocation() : stoneLoc;
 
-            final ItemStack tool = player.getInventory().getItemInMainHand();
-            DropLoot drop = plugin.getDropCalculator().calculateDrop(player, tool, (Dispenser) machineBlock.getState());
-
-            final Location location = brokenBlock.getLocation();
-
-            final int expDropAmount = drop.getExp();
-
-            if(expDropAmount > 0) {
-                final ExperienceOrb orb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
-                orb.setExperience(expDropAmount);
+        for(ItemStack itemLoot : dropLoot.getLoots()) {
+            if (dropLoot.getExp(itemLoot) > 0) {
+                final Entity orb = expDropLocation.getWorld().spawnEntity(expDropLocation, EntityType.EXPERIENCE_ORB);
+                ((ExperienceOrb) orb).setExperience(dropLoot.getExp(itemLoot));
             }
 
-            //TODO: Reorganise this spaghetti x_x
+            if (itemLoot != null) {
+                itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, itemLoot);
+            }
 
-            location.getWorld().dropItemNaturally(location, drop.getItemStack());
-
-            player.sendMessage("Udalo ci sie wykopac " + drop.getItemStack().getType() + " x" + drop.getItemStack().getAmount());
+            player.sendMessage("Udalo ci sie wykopac " + itemLoot.getType() + " x" + itemLoot.getAmount());
         }
     }
 

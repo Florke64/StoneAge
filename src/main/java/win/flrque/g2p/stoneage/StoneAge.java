@@ -1,13 +1,25 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import win.flrque.g2p.stoneage.command.DropCommand;
+import win.flrque.g2p.stoneage.command.DropHelpCommand;
+import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
+import win.flrque.g2p.stoneage.database.SQLManager;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
+import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
+import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
 import win.flrque.g2p.stoneage.util.ConfigSectionDropEntry;
 import win.flrque.g2p.stoneage.util.ConfigSectionGeneral;
 
@@ -17,16 +29,19 @@ import java.util.logging.Level;
 public final class StoneAge extends JavaPlugin {
 
     private StoneMachine stoneMachine;
+    private PlayerSetupManager playerSetup;
 
     private WindowManager windowManager;
     private DropCalculator dropCalculator;
 
+    private SQLManager sqlManager;
+
     @Override
     public void onEnable() {
         // Plugin startup logic
-
-        //Setting-up Stone Generator machines
+        windowManager = new WindowManager();
         dropCalculator = new DropCalculator();
+        playerSetup = new PlayerSetupManager();
 
         initStoneMachines();
 
@@ -42,15 +57,18 @@ public final class StoneAge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StoneMachineRedstoneInteractListener(), this);
         getServer().getPluginManager().registerEvents(new StoneBreakListener(), this);
 
+        //TODO: Consider creating PersonalConfig and StoneMachineStats on Player Join?
+        getServer().getPluginManager().registerEvents(new PlayerSaveDataOnLeaveListener(), this);
         getServer().getPluginManager().registerEvents(new WindowClickListener(), this);
+
+        getServer().getPluginManager().registerEvents(new StatisticsIncreaseListener(), this);
 
         getServer().getPluginManager().registerEvents(new DebugGameJoin(), this);
 
         //Registering Plugin Commands
         getCommand("drop").setExecutor(new DropCommand());
-
-        windowManager = new WindowManager();
-
+        getCommand("drophelp").setExecutor(new DropHelpCommand());
+        getCommand("multiplier").setExecutor(new DropMultiplierCommand());
     }
 
     private void initStoneMachines() {
@@ -74,7 +92,13 @@ public final class StoneAge extends JavaPlugin {
         }
 
         final ConfigSectionGeneral generalConfig = new ConfigSectionGeneral(getConfig().getConfigurationSection("machines"));
+        generalConfig.compile();
+
         getStoneMachine().setStoneRespawnFrequency(generalConfig.getStoneFrequency());
+        getStoneMachine().setDropItemsToFeet(generalConfig.isDropItemsToFeet());
+        getStoneMachine().setDropExpToFeet(generalConfig.isDropExpToFeet());
+
+        getDropCalculator().setDropMultiplier(new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier()));
         //TODO: Apply general config fully
 
         //Reading Primitive Stone drop
@@ -106,8 +130,25 @@ public final class StoneAge extends JavaPlugin {
             customDropsCount ++;
         }
 
+        //Reading 'database' configuration
+        if(!getConfig().isConfigurationSection("database")) {
+            getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"database\" section)!");
+            getLogger().log(Level.SEVERE, "Skipping, database won't work.");
+        }
+
+        final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
+        databaseConfig.readDatabaseConnectionDetails();
+        sqlManager = new SQLManager(databaseConfig);
+
+        playerSetup.loadPersonalStoneStatsFromDatabase();
+        playerSetup.loadPersonalDropConfigFromDatabase();
+
         getLogger().log(Level.FINE, "Config reloaded!");
         getLogger().log(Level.INFO, "Loaded "+ customDropsCount +" custom drop entries.");
+    }
+
+    public PlayerSetupManager getPlayerSetup() {
+        return playerSetup;
     }
 
     public StoneMachine getStoneMachine() {
@@ -122,6 +163,10 @@ public final class StoneAge extends JavaPlugin {
         return dropCalculator;
     }
 
+    public SQLManager getDatabaseController() {
+        return sqlManager;
+    }
+
     @Override
     public FileConfiguration getConfig() {
         return super.getConfig();
@@ -130,5 +175,10 @@ public final class StoneAge extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+
+        getWindowManager().closeAllWindows(); //TODO: NullPointer Exception <- onDisable?
+
+        playerSetup.onDisable();
+        sqlManager.onDisable();
     }
 }

@@ -1,3 +1,9 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.drop;
 
 import org.bukkit.inventory.ItemStack;
@@ -9,6 +15,8 @@ public class DropEntry {
 
     private final StoneAge plugin;
 
+    private String entryName;
+
     private final ItemStack defaultItemStack;
     private final float chanceWeight;
 
@@ -16,13 +24,18 @@ public class DropEntry {
     private int maxAmount;
     private boolean ignoreFortuneEnchant = false;
 
+    private boolean multipliable = true;
+
     private int minExp;
     private int maxExp;
 
     private ItemStack silkTouchItemStack;
+    //TODO: Store type of item to reduce ItemStack#getType() calls count
 
-    public DropEntry(ItemStack itemStack, float weight) {
+    public DropEntry(String entryName, ItemStack itemStack, float weight) {
         plugin = StoneAge.getPlugin(StoneAge.class);
+
+        this.entryName = entryName;
 
         chanceWeight = weight;
         defaultItemStack = itemStack;
@@ -50,6 +63,14 @@ public class DropEntry {
         itemStack.setAmount(calculateFinalAmount(fortuneLevel));
 
         return itemStack;
+    }
+
+    public String getEntryName() {
+        return entryName;
+    }
+
+    public ItemStack getDropEntryIcon() {
+        return defaultItemStack.clone();
     }
 
     public void setIgnoreFortuneEnchant(boolean ignoreFortuneEnchant) {
@@ -120,4 +141,13 @@ public class DropEntry {
 
         return random.nextInt(maxExp - minExp) + (minAmount);
     }
+
+    public boolean isMultipliable() {
+        return multipliable;
+    }
+
+    public void setMultipliable(boolean multipliable) {
+        this.multipliable = multipliable;
+    }
+
 }

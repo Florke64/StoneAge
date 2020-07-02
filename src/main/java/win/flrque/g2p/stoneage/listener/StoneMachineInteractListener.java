@@ -1,14 +1,23 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.listener;
 
+import org.bukkit.Material;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import win.flrque.g2p.stoneage.StoneAge;
-import win.flrque.g2p.stoneage.gui.StoneMachineWindow;
 import win.flrque.g2p.stoneage.gui.Window;
+import win.flrque.g2p.stoneage.gui.window.StoneMachineWindow;
 
 public class StoneMachineInteractListener implements Listener {
 
@@ -31,10 +40,27 @@ public class StoneMachineInteractListener implements Listener {
         if(!plugin.getStoneMachine().isStoneMachine(event.getClickedBlock()))
             return;
 
+        final ItemStack tool = player.getInventory().getItemInMainHand();
+        if(tool != null && tool.getType() == Material.GOLD_PICKAXE) {
+            if(player.isOp())
+                return;
+        }
+
         event.setCancelled(true);
 
-        final Window window = new StoneMachineWindow(player, (Dispenser) event.getClickedBlock().getState());
-        window.open(player);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                final Window window = new StoneMachineWindow(player, (Dispenser) event.getClickedBlock().getState());
+
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        window.open(player);
+                    }
+                }.runTask(plugin);
+            }
+        }.runTaskAsynchronously(plugin);
 
     }
 

@@ -1,30 +1,32 @@
 config_version: 1
 
 database:
-  ip: 'localhost'
-  port: 3306
-  user: 'flrque'
-  password: ''
+  server_address: '127.0.0.1'
+  server_port: '3306'
+  db_name: 'g2plocaltest'
+  db_user: 'root'
+  db_password: ''
 
 machines:
+  default_drop_multiplier: 1.0
+  max_drop_multiplier: 5.0
+
   commands_cooldown: 3 # in seconds
   repair_cooldown: 5 # in seconds
   stone_frequency: 40 # number in ticks (20 = 1 second)
 
   drop_exp_to_feet: true # drops exp orbs under player
   drop_items_to_feet: true # drops exp orbs under player
-  multiple_drops: false # if false - stone will only drop 1 item at the time
-  always_drop_primitive: false # if true - primitive_drop.chance has no power
-  always_use_custom_stone_drops: false # will use custom drops list even when breaking stone block not connected to the machine
 
   allow_hopper_output: true # pass stone machine drops to hopper under it
   allow_hopper_input: true # allow upgrading stone machines with hopper input (Coal & Redstone Blocks)
 
 primitive_drop:
-  weight: 50.0
+  weight: 63.9
   minimal_exp: 0
   maximal_exp: 0
   ignore_fortune: true
+  multipliable: false
   default_tool:
     material: 'COBBLESTONE'
     magic_data: 0
@@ -37,10 +39,52 @@ primitive_drop:
       - '&7Drop Silktouch'
 
 custom_drops:
-  diamond:
-    weight: 5.0 # float value
+  coal:
+    weight: 11.6 # float value
     minimal_exp: 1
     maximal_exp: 5
+    multipliable: true #If set to 'true' then accepts current drop multiplication set by server admin
+    default_tool:
+      material: 'COAL' # Bukkit Material
+      magic_data: 0
+      custom_name: '' # for default item name leave empty: '' or don't include in config section
+      lore: # for no lore don't include this config section
+        - '&7Default Drop'
+      minimal_amount: 1
+    silk_touch_tool:
+      material: 'COAL_ORE'
+      magic_data: 0
+      custom_name: ''
+      lore:
+        - '&7Drop Silktouch'
+
+  iron:
+    weight: 5.1
+    ignore_fortune: true
+    multipliable: true
+    default_tool:
+      material: 'IRON_ORE'
+      magic_data: 0
+      custom_name: ''
+      lore:
+        - '&7Default drop only'
+
+  gold:
+    weight: 1.2
+    ignore_fortune: true
+    multipliable: true
+    default_tool:
+      material: 'GOLD_ORE'
+      magic_data: 0
+      custom_name: ''
+      lore:
+        - '&7Default drop only'
+
+  diamond:
+    weight: 1.0 # float value
+    minimal_exp: 1
+    maximal_exp: 5
+    multipliable: true #If set to 'true' then accepts current drop multiplication set by server admin
     default_tool:
       material: 'DIAMOND' # Bukkit Material
       magic_data: 0
@@ -56,9 +100,10 @@ custom_drops:
         - '&7Drop Silktouch'
 
   redstone:
-    weight: 15.0 # float value
+    weight: 5.5 # float value
     minimal_exp: 1
     maximal_exp: 5
+    multipliable: true
     default_tool:
       material: 'REDSTONE' # Bukkit Material
       magic_data: 0
@@ -74,12 +119,22 @@ custom_drops:
       lore:
         - '&7Drop Silktouch'
 
-  iron:
-    weight: 20.0
-    ignore_fortune: true
+  lapis:
+    weight: 0.1 # float value
+    minimal_exp: 1
+    maximal_exp: 5
+    multipliable: true
     default_tool:
-      material: 'IRON_ORE'
+      material: 'INK_SACK' # Bukkit Material
+      magic_data: 4
+      custom_name: '' # for default item name leave empty: '' or don't include in config section
+      lore: # for no lore don't include this config section
+        - '&7Default Drop'
+      minimal_amount: 4
+      maximal_amount: 8
+    silk_touch_tool:
+      material: 'LAPIS_ORE'
       magic_data: 0
       custom_name: ''
       lore:
-        - '&7Default drop only'
+        - '&7Drop Silktouch'

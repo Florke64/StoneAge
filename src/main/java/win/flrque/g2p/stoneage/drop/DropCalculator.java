@@ -1,3 +1,9 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.drop;
 
 import org.bukkit.Material;
@@ -5,28 +11,37 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class DropCalculator {
 
     private final StoneAge plugin;
 
-    private final List<DropEntry> dropEntries = new ArrayList<>();
+    private final Map<String, DropEntry> dropEntries = new LinkedHashMap<>();
 
     private DropEntry primitiveDrop;
+    private DropMultiplier dropMultiplier;
 
     private float totalWeight = 0;
 
     public DropCalculator() {
         plugin = StoneAge.getPlugin(StoneAge.class);
 
-        this.primitiveDrop = new DropEntry(new ItemStack(Material.COBBLESTONE), 1.0f);
+        this.primitiveDrop = new DropEntry("primitive_drop", new ItemStack(Material.COBBLESTONE), 1.0f);
 
         calculateTotalWeight();
+    }
+
+    public void setDropMultiplier(DropMultiplier dropMultiplier) {
+        this.dropMultiplier = dropMultiplier;
+    }
+
+    public DropMultiplier getDropMultiplier() {
+        return dropMultiplier == null ? new DropMultiplier(1.0f, 2.0f) : dropMultiplier;
     }
 
     public void setPrimitiveDrop(DropEntry dropEntry) {
@@ -35,7 +50,7 @@ public class DropCalculator {
     }
 
     public int addDrop(DropEntry dropEntry) {
-        dropEntries.add(dropEntry);
+        dropEntries.put(dropEntry.getEntryName(), dropEntry);
         calculateTotalWeight();
 
         return dropEntries.size();
@@ -43,7 +58,7 @@ public class DropCalculator {
 
     private float calculateTotalWeight() {
         float weight = 0.0f;
-        for(DropEntry drop : dropEntries)
+        for(DropEntry drop : dropEntries.values())
             weight += drop.getChanceWeight();
 
         totalWeight = weight + primitiveDrop.getChanceWeight();
@@ -51,7 +66,11 @@ public class DropCalculator {
         return weight;
     }
 
-    public DropLoot calculateDrop(Player player, ItemStack tool, Dispenser stoneMachine) {
+    public float getTotalWeight() {
+        return totalWeight;
+    }
+
+    public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable Dispenser stoneMachine) {
         //TODO: Check StoneMachine's configuration book inside its Inventory
 
         //No tool was used to break a block
@@ -73,26 +92,51 @@ public class DropCalculator {
         }
 
         //Calculating final drop
-        final ItemStack finalDrop;
-        final Random random = new Random();
+        final DropCalculator calculator = plugin.getDropCalculator();
+        final Random randomizer = new Random();
 
-        DropEntry randomizedDropEntry = primitiveDrop;
-        float luck = random.nextFloat() * totalWeight;
-        for (int i = 0; i < dropEntries.size(); ++i)
-        {
-            luck -= dropEntries.get(i).getChanceWeight();
-            if (luck <= 0.0f)
-            {
-                randomizedDropEntry = dropEntries.get(i);
-                break;
+        final DropLoot dropLoot = new DropLoot();
+
+        //Checks if cobble wasn't disabled by the player
+        final PlayerSetupManager playerSetup = plugin.getPlayerSetup();
+        if(playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(primitiveDrop))
+            dropLoot.addLoot(primitiveDrop, primitiveDrop.getDrop(hasSilkTouch, fortuneLevel));
+
+        for (int i = 0; i < dropEntries.size(); ++i) {
+
+            //Checks for player's personalised drop entry settings
+            if(!playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(dropEntries.get(i)))
+                continue;
+
+            final float luck = randomizer.nextFloat() * totalWeight;
+
+            final float itemChanceWeight = dropEntries.get(i).getChanceWeight();
+            final float currentDropMultiplier = calculator.getDropMultiplier().getCurrentDropMultiplier();
+
+            if (luck <  itemChanceWeight * currentDropMultiplier) {
+                final ItemStack itemDrop = dropEntries.get(i).getDrop(hasSilkTouch, fortuneLevel);
+
+                dropLoot.addLoot(dropEntries.get(i), itemDrop);
             }
         }
 
-        finalDrop = randomizedDropEntry.getDrop(hasSilkTouch, (randomizedDropEntry.equals(primitiveDrop))? 0 : fortuneLevel);
-
-        return new DropLoot(randomizedDropEntry, finalDrop);
+        return dropLoot;
     }
 
+    public DropEntry getPrimitiveDropEntry() {
+        return primitiveDrop;
+    }
 
+    public DropEntry getDropEntry(String key) {
+        if(key.contentEquals(primitiveDrop.getEntryName()))
+            return getPrimitiveDropEntry();
+        return dropEntries.get(key);
+    }
 
+    public List<DropEntry> getDropEntries() {
+        final List<DropEntry> dropEntryList = new ArrayList<>();
+        dropEntryList.addAll(dropEntries.values());
+
+        return dropEntryList;
+    }
 }

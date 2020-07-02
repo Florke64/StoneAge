@@ -1,30 +1,41 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.drop;
 
 import org.bukkit.inventory.ItemStack;
 
+import java.util.*;
+
 public class DropLoot {
 
-    private final DropEntry dropEntry;
+    private final Map<ItemStack, Integer> loots = new HashMap<>();
+    private final List<DropEntry> activeDropEntries = new LinkedList<>();
 
-    private final ItemStack itemStack;
-    private final int exp;
-
-    public DropLoot(final DropEntry dropEntry, final ItemStack itemStack) {
-        this.dropEntry = dropEntry;
-
-        this.itemStack = itemStack;
+    public void addLoot(DropEntry dropEntry, ItemStack itemStack) {
+        final int exp;
 
         if(dropEntry.getMaximalExp() > 0)
-            this.exp = dropEntry.calculateFinalExpValue();
-        else this.exp = 0;
+            exp = dropEntry.calculateFinalExpValue();
+        else exp = 0;
+
+        loots.put(itemStack, exp);
+        activeDropEntries.add(dropEntry);
     }
 
-    public ItemStack getItemStack() {
-        return itemStack;
+    public Set<ItemStack> getLoots() {
+        return loots.keySet();
     }
 
-    public int getExp() {
-        return exp;
+    public int getExp(ItemStack itemStack) {
+        return loots.get(itemStack);
+    }
+
+    public Collection<DropEntry> getActiveDropEntries() {
+        return activeDropEntries;
     }
 
 }

@@ -1,3 +1,9 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.machine;
 
 import org.bukkit.ChatColor;
@@ -14,7 +20,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import win.flrque.g2p.stoneage.StoneAge;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StoneMachine {
 
@@ -25,7 +33,13 @@ public class StoneMachine {
     private final String machineName;
     private final List<String> machineLore = new ArrayList<>();
 
+    private final Map<Dispenser, Long> lastStoneMachineRepair = new HashMap<>();
+
     private long stoneRespawnFrequency = 40l;
+    private int repairCooldown = 5;
+
+    private boolean dropItemsToFeet = false;
+    private boolean dropExpToFeet = false;
 
     private final ItemStack stoneMachineParent;
 
@@ -37,8 +51,23 @@ public class StoneMachine {
         for(String line : lore) {
             this.machineLore.add(ChatColor.translateAlternateColorCodes('&', line));
         }
-
+        
         this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
+    }
+
+    public boolean repairStoneMachine(Dispenser machine) {
+        final long repairCooldownLimit = (System.currentTimeMillis() - (1000 * repairCooldown));
+        if(lastStoneMachineRepair.containsKey(machine) && lastStoneMachineRepair.get(machine) >= repairCooldownLimit ) {
+            //Player is trying to repair stone machine too frequently
+            return false;
+        }
+
+        lastStoneMachineRepair.put(machine, System.currentTimeMillis());
+        final Location stoneLocation = getGeneratedStoneLocation(machine);
+
+        generateStone(stoneLocation);
+
+        return true;
     }
 
     public boolean isStoneMachine(Block block) {
@@ -64,7 +93,6 @@ public class StoneMachine {
         return inventory.getName().equals(getExample().getItemMeta().getDisplayName());
     }
 
-    //This method will be required for stone generation on redstone input into the machine
     public Location getGeneratedStoneLocation(Dispenser stoneMachine) {
         if(!isStoneMachine(stoneMachine))
             return null;
@@ -163,7 +191,7 @@ public class StoneMachine {
         machineLore.add(ChatColor.GRAY + "gdzie ma generowac stone!");
         machineLore.add(" ");
         machineLore.add(ChatColor.DARK_RED + "Uwaga! " + ChatColor.YELLOW + "Stoniarki mozna niszczyc");
-        machineLore.add("tylko zlotym kilofem.");
+        machineLore.add(ChatColor.YELLOW + "tylko zlotym kilofem.");
 
         return machineLore;
     }
@@ -171,4 +199,21 @@ public class StoneMachine {
     public void setStoneRespawnFrequency(long stoneRespawnFrequency) {
         this.stoneRespawnFrequency = stoneRespawnFrequency;
     }
+
+    public boolean isDropItemsToFeet() {
+        return dropItemsToFeet;
+    }
+
+    public void setDropItemsToFeet(boolean dropItemsToFeet) {
+        this.dropItemsToFeet = dropItemsToFeet;
+    }
+
+    public boolean isDropExpToFeet() {
+        return dropExpToFeet;
+    }
+
+    public void setDropExpToFeet(boolean dropExpToFeet) {
+        this.dropExpToFeet = dropExpToFeet;
+    }
+
 }

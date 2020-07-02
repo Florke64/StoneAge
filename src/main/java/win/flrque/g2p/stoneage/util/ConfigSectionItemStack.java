@@ -1,3 +1,9 @@
+/*
+ * Copyright Go2Play.pl (c) 2020.
+ * Program made for Go2Play Skyblock server. It's not allowed to re-distribute the code.
+ * Author: FlrQue
+ */
+
 package win.flrque.g2p.stoneage.util;
 
 import org.bukkit.ChatColor;
@@ -43,6 +49,7 @@ public class ConfigSectionItemStack extends ConfigSectionReader{
 
         final ItemStack itemStack = new ItemStack(itemMaterial);
 
+        //TODO: Fix magic value
         //Getting data magic value
         final byte magicValue = (byte) readMagicValue();
         if(magicValue < 0)
