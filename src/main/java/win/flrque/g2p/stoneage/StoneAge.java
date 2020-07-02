@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import win.flrque.g2p.stoneage.command.DropCommand;
 import win.flrque.g2p.stoneage.command.DropHelpCommand;
 import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
+import win.flrque.g2p.stoneage.database.PlayerSetupManager;
 import win.flrque.g2p.stoneage.database.SQLManager;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
@@ -28,6 +29,7 @@ import java.util.logging.Level;
 public final class StoneAge extends JavaPlugin {
 
     private StoneMachine stoneMachine;
+    private PlayerSetupManager playerSetup;
 
     private WindowManager windowManager;
     private DropCalculator dropCalculator;
@@ -39,6 +41,7 @@ public final class StoneAge extends JavaPlugin {
         // Plugin startup logic
         windowManager = new WindowManager();
         dropCalculator = new DropCalculator();
+        playerSetup = new PlayerSetupManager();
 
         initStoneMachines();
 
@@ -54,8 +57,11 @@ public final class StoneAge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StoneMachineRedstoneInteractListener(), this);
         getServer().getPluginManager().registerEvents(new StoneBreakListener(), this);
 
+        getServer().getPluginManager().registerEvents(new PlayerCreateStoneMachineStatsListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerCreatePersonalConfigListener(), this);
         getServer().getPluginManager().registerEvents(new WindowClickListener(), this);
+
+        getServer().getPluginManager().registerEvents(new StatisticsIncreaseListener(), this);
 
         getServer().getPluginManager().registerEvents(new DebugGameJoin(), this);
 
@@ -136,6 +142,10 @@ public final class StoneAge extends JavaPlugin {
 
         getLogger().log(Level.FINE, "Config reloaded!");
         getLogger().log(Level.INFO, "Loaded "+ customDropsCount +" custom drop entries.");
+    }
+
+    public PlayerSetupManager getPlayerSetup() {
+        return playerSetup;
     }
 
     public StoneMachine getStoneMachine() {

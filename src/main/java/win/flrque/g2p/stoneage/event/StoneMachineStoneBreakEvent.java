@@ -27,6 +27,27 @@ public class StoneMachineStoneBreakEvent extends Event {
         this.location = stoneMachine.getLocation();
     }
 
+    public Dispenser getStoneMachine() {
+        return stoneMachine;
+    }
+
+    public DropLoot getLoot() {
+        return loot;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    @Override
+    public String getEventName() {
+        return super.getEventName();
+    }
+
     public static final HandlerList handlers = new HandlerList();
 
     @Override

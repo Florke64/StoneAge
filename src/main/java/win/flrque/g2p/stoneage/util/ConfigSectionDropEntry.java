@@ -26,6 +26,8 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
         ItemStack defaultToolItem = null;
         ItemStack silkToolItem = null;
 
+        final String canonicalEntryName = rootSection.getName();
+
         //Reading drops for default tool
         final ConfigurationSection defaultToolSection = rootSection.getConfigurationSection("default_tool");
         if(defaultToolSection != null) {
@@ -48,7 +50,8 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
             return null;
         }
 
-        final DropEntry dropEntry = new DropEntry((defaultToolItem != null)? defaultToolItem : silkToolItem, weight);
+        defaultToolItem = (defaultToolItem != null)? defaultToolItem : silkToolItem;
+        final DropEntry dropEntry = new DropEntry(canonicalEntryName, defaultToolItem, weight);
 
         //Setting Silk Touch enchantment drop
         if(silkToolItem != null)

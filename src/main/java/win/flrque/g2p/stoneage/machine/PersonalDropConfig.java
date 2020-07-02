@@ -4,26 +4,29 @@
  * Author: FlrQue
  */
 
-package win.flrque.g2p.stoneage.drop;
+package win.flrque.g2p.stoneage.machine;
 
-import org.bukkit.OfflinePlayer;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.drop.DropEntry;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class PersonalDropConfig {
 
     private final StoneAge plugin;
 
-    private final OfflinePlayer player;
+    private final UUID uuid;
+    private final String playerName;
 
     private final Map<DropEntry, Boolean> customDropEntries = new HashMap<>();
 
-    public PersonalDropConfig(OfflinePlayer player) {
+    public PersonalDropConfig(final UUID uuid, final String playerName) {
         plugin = StoneAge.getPlugin(StoneAge.class);
 
-        this.player = player;
+        this.uuid = uuid;
+        this.playerName = playerName;
 
         customDropEntries.put(plugin.getDropCalculator().getPrimitiveDropEntry(), true);
         for(DropEntry drop : plugin.getDropCalculator().getDropEntries()) {

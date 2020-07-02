@@ -16,6 +16,7 @@ public class DebugGameJoin implements Listener {
 
     private final StoneAge plugin;
 
+    //TODO: To be deleted...
     public DebugGameJoin() {
         plugin = StoneAge.getPlugin(StoneAge.class);
     }

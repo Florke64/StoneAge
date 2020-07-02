@@ -8,13 +8,12 @@ package win.flrque.g2p.stoneage.drop;
 
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DropLoot {
 
     private final Map<ItemStack, Integer> loots = new HashMap<>();
+    private final List<DropEntry> activeDropEntries = new LinkedList<>();
 
     public void addLoot(DropEntry dropEntry, ItemStack itemStack) {
         final int exp;
@@ -24,6 +23,7 @@ public class DropLoot {
         else exp = 0;
 
         loots.put(itemStack, exp);
+        activeDropEntries.add(dropEntry);
     }
 
     public Set<ItemStack> getLoots() {
@@ -32,6 +32,10 @@ public class DropLoot {
 
     public int getExp(ItemStack itemStack) {
         return loots.get(itemStack);
+    }
+
+    public Collection<DropEntry> getActiveDropEntries() {
+        return activeDropEntries;
     }
 
 }

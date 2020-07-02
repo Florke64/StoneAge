@@ -14,9 +14,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
-import win.flrque.g2p.stoneage.drop.PersonalDropConfig;
 import win.flrque.g2p.stoneage.gui.InventoryPoint;
 import win.flrque.g2p.stoneage.gui.Window;
+import win.flrque.g2p.stoneage.machine.PersonalDropConfig;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class DropInfoWindow extends Window  {
         super(ChatColor.translateAlternateColorCodes('&', "&7&lSTONIARKA &8&l> &5&lDROP INFO"));
 
         windowContentOwner = owner;
-        personalDropConfig = plugin.getDropCalculator().getPersonalDropConfig(windowContentOwner);
+        personalDropConfig = plugin.getPlayerSetup().getPersonalDropConfig(windowContentOwner.getUniqueId());
 
         df.setMaximumFractionDigits(2);
         df.setMinimumFractionDigits(2);
@@ -132,7 +132,7 @@ public class DropInfoWindow extends Window  {
         //Closing to reduce inventory update lag
         player.closeInventory();
 
-        boolean isDropping = calculator.getPersonalDropConfig(player).switchDropEntry(dropEntry);
+        boolean isDropping = plugin.getPlayerSetup().getPersonalDropConfig(player.getUniqueId()).switchDropEntry(dropEntry);
         player.sendMessage("Ustawiono drop " + dropEntry.getDropEntryIcon().getType() + " na " + (isDropping? "wlaczony" : "wylaczony"));
     }
 

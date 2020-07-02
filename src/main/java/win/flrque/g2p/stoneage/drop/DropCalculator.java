@@ -7,22 +7,23 @@
 package win.flrque.g2p.stoneage.drop;
 
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Dispenser;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.database.PlayerSetupManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class DropCalculator {
 
     private final StoneAge plugin;
 
     private final List<DropEntry> dropEntries = new ArrayList<>();
-    private final Map<OfflinePlayer, PersonalDropConfig> personalDropConfigMap = new HashMap<>();
 
     private DropEntry primitiveDrop;
     private DropMultiplier dropMultiplier;
@@ -32,7 +33,7 @@ public class DropCalculator {
     public DropCalculator() {
         plugin = StoneAge.getPlugin(StoneAge.class);
 
-        this.primitiveDrop = new DropEntry(new ItemStack(Material.COBBLESTONE), 1.0f);
+        this.primitiveDrop = new DropEntry("primitive", new ItemStack(Material.COBBLESTONE), 1.0f);
 
         calculateTotalWeight();
     }
@@ -99,13 +100,14 @@ public class DropCalculator {
         final DropLoot dropLoot = new DropLoot();
 
         //Checks if cobble wasn't disabled by the player
-        if(getPersonalDropConfig(player).isDropping(primitiveDrop))
+        final PlayerSetupManager playerSetup = plugin.getPlayerSetup();
+        if(playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(primitiveDrop))
             dropLoot.addLoot(primitiveDrop, primitiveDrop.getDrop(hasSilkTouch, fortuneLevel));
 
         for (int i = 0; i < dropEntries.size(); ++i) {
 
             //Checks for player's personalised drop entry settings
-            if(!getPersonalDropConfig(player).isDropping(dropEntries.get(i)))
+            if(!playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(dropEntries.get(i)))
                 continue;
 
             final float luck = randomizer.nextFloat() * totalWeight;
@@ -129,24 +131,5 @@ public class DropCalculator {
 
     public List<DropEntry> getDropEntries() {
         return dropEntries;
-    }
-
-    public PersonalDropConfig getPersonalDropConfig(OfflinePlayer player) {
-        if(!personalDropConfigMap.containsKey(player)) {
-            createPersonalDropConfig(player);
-        }
-
-        return personalDropConfigMap.get(player);
-    }
-
-//    public void loadPersonalDropConfigs() {
-//        //TODO: Load all from DataBase on server start
-//    }
-
-    private PersonalDropConfig createPersonalDropConfig(OfflinePlayer player) {
-        final PersonalDropConfig config = new PersonalDropConfig(player);
-        personalDropConfigMap.put(player, config);
-
-        return personalDropConfigMap.get(player);
     }
 }

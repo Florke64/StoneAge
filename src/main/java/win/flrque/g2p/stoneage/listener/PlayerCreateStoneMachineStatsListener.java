@@ -11,13 +11,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import win.flrque.g2p.stoneage.StoneAge;
-import win.flrque.g2p.stoneage.machine.PersonalDropConfig;
+import win.flrque.g2p.stoneage.machine.StoneMachinePlayerStats;
 
-public class PlayerCreatePersonalConfigListener implements Listener {
+public class PlayerCreateStoneMachineStatsListener implements Listener {
 
     private final StoneAge plugin;
 
-    public PlayerCreatePersonalConfigListener() {
+    public PlayerCreateStoneMachineStatsListener() {
         plugin = StoneAge.getPlugin(StoneAge.class);
     }
 
@@ -25,14 +25,7 @@ public class PlayerCreatePersonalConfigListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         final OfflinePlayer player = event.getPlayer();
 
-        final PersonalDropConfig personalDropConfig = plugin.getPlayerSetup().getPersonalDropConfig(player.getUniqueId());
-
-//        for(DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
-//            if(player.isOnline()) {
-//
-//
-//            }
-//        }
+        final StoneMachinePlayerStats playerStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(player.getUniqueId());
     }
 
 }

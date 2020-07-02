@@ -15,6 +15,8 @@ public class DropEntry {
 
     private final StoneAge plugin;
 
+    private String entryName;
+
     private final ItemStack defaultItemStack;
     private final float chanceWeight;
 
@@ -30,8 +32,10 @@ public class DropEntry {
     private ItemStack silkTouchItemStack;
     //TODO: Store type of item to reduce ItemStack#getType() calls count
 
-    public DropEntry(ItemStack itemStack, float weight) {
+    public DropEntry(String entryName, ItemStack itemStack, float weight) {
         plugin = StoneAge.getPlugin(StoneAge.class);
+
+        this.entryName = entryName;
 
         chanceWeight = weight;
         defaultItemStack = itemStack;
@@ -59,6 +63,10 @@ public class DropEntry {
         itemStack.setAmount(calculateFinalAmount(fortuneLevel));
 
         return itemStack;
+    }
+
+    public String getEntryName() {
+        return entryName;
     }
 
     public ItemStack getDropEntryIcon() {
