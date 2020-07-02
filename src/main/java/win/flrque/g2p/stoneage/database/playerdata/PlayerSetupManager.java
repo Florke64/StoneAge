@@ -60,7 +60,7 @@ public class PlayerSetupManager {
         ResultSet result = null;
 
         try {
-            result = plugin.getDatabaseController().runSelectQuery(queryStatement);
+            result = plugin.getDatabaseController().runQuery(queryStatement);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -98,7 +98,7 @@ public class PlayerSetupManager {
         ResultSet result = null;
 
         try {
-            result = plugin.getDatabaseController().runSelectQuery(queryStatement);
+            result = plugin.getDatabaseController().runQuery(queryStatement);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -116,10 +116,16 @@ public class PlayerSetupManager {
                 final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
                 final PersonalDropConfig config = playerSetup.getPersonalDropConfig(uuid);
 
+                plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
+
                 final int columnCount = metaData.getColumnCount();
-                for(int i=0; i<columnCount; i++) {
+                for(int i=1; i<=columnCount; i++) {
                     final String columnName = metaData.getColumnName(i);
+                    if(columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
+                        continue;
+
                     config.setDropEntry(columnName, result.getBoolean(columnName));
+
                 }
             }
         } catch (SQLException e) {
@@ -129,6 +135,35 @@ public class PlayerSetupManager {
 
     }
 
+    public void savePersonalDropConfigInDatabase(PersonalDropConfig config) {
+        try {
+            plugin.getDatabaseController().runUpdateForPersonalDropConfig(config);
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Unable to update PersonalDropConfig in database!");
+            e.printStackTrace();
+        }
+
+        config.onDatabaseSave();
+    }
+
+    public void saveAllUnsavedDropConfigs() {
+        int saved = 0, skipped = 0;
+        for(PersonalDropConfig config : playerPersonalDropConfig.values()) {
+            if(config.hasUnsavedEdits()) {
+                savePersonalDropConfigInDatabase(config);
+                saved++;
+
+                continue;
+            }
+
+            skipped++;
+        }
+    }
+
+    public void onDisable() {
+        saveAllUnsavedDropConfigs();
+    }
+
     private PersonalDropConfig createPersonalDropConfig(UUID uuid) {
         final String playerName = Bukkit.getOfflinePlayer(uuid).getName();
         final PersonalDropConfig config = new PersonalDropConfig(uuid, playerName);
@@ -136,5 +171,4 @@ public class PlayerSetupManager {
 
         return playerPersonalDropConfig.get(uuid);
     }
-
 }

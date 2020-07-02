@@ -21,6 +21,8 @@ public class StoneMachinePlayerStats {
     private final UUID uuid;
     private final String playerName;
 
+    private boolean unsavedEdits = false;
+
     private final Map<String, Integer> statistics = new HashMap<>();
 
     public StoneMachinePlayerStats(final UUID uuid, final String playerName) {
@@ -42,6 +44,7 @@ public class StoneMachinePlayerStats {
     public int increaseStatistic(String key) {
         final int value = getStatistic(key)+1;
         statistics.put(key, value);
+        unsavedEdits = true;
 
         return value;
     }
@@ -60,5 +63,13 @@ public class StoneMachinePlayerStats {
 
     public UUID getUniqueId() {
         return uuid;
+    }
+
+    public boolean hasUnsavedEdits() {
+        return unsavedEdits;
+    }
+
+    public void onDatabaseSave() {
+        unsavedEdits = false;
     }
 }

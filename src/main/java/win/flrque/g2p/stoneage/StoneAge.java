@@ -57,8 +57,8 @@ public final class StoneAge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StoneMachineRedstoneInteractListener(), this);
         getServer().getPluginManager().registerEvents(new StoneBreakListener(), this);
 
-        getServer().getPluginManager().registerEvents(new PlayerCreateStoneMachineStatsListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerCreatePersonalConfigListener(), this);
+        //TODO: Consider creating PersonalConfig and StoneMachineStats on Player Join?
+        getServer().getPluginManager().registerEvents(new PlayerSaveDataOnLeaveListener(), this);
         getServer().getPluginManager().registerEvents(new WindowClickListener(), this);
 
         getServer().getPluginManager().registerEvents(new StatisticsIncreaseListener(), this);
@@ -177,6 +177,8 @@ public final class StoneAge extends JavaPlugin {
         // Plugin shutdown logic
 
         getWindowManager().closeAllWindows(); //TODO: NullPointer Exception <- onDisable?
+
+        playerSetup.onDisable();
         sqlManager.onDisable();
     }
 }

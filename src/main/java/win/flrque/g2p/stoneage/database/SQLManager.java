@@ -7,6 +7,7 @@
 package win.flrque.g2p.stoneage.database;
 
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
 
@@ -14,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 import java.util.logging.Level;
 
 public class SQLManager {
@@ -36,14 +38,72 @@ public class SQLManager {
         }
     }
 
-    public ResultSet runSelectQuery(final String query) throws SQLException {
+    public int runUpdateForPersonalDropConfig(PersonalDropConfig config) throws SQLException {
+        try (Connection conn = connectionPool.getConnection()){
+            final StringBuilder query = new StringBuilder();
+            final StringBuilder fields = new StringBuilder();
+            query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_DROP_CONFIG+ "` (");
+
+            fields.append("`PlayerUUID`, ");
+            fields.append("`PlayerName`, ");
+
+            final Set<DropEntry> entries = config.getCustomDropEntries();
+
+            int i = 0;
+            for(DropEntry entry : entries) {
+                i++;
+                if(entry == null) continue;
+
+                fields.append("`" +entry.getEntryName()+ "`");
+                if(i < entries.size()) {
+                    fields.append(", ");
+                }
+            }
+
+            query.append(fields);
+
+            i = 0;
+            query.append(") VALUES (");
+            query.append("'" +config.getUniqueId()+ "', ");
+            query.append("'" +config.getPlayerName()+ "', ");
+            for(DropEntry entry : entries) {
+                i++;
+                if(entry == null) continue;
+
+                int dropSwitchStatus = config.isDropping(entry)? 1 : 0;
+                query.append("'" +dropSwitchStatus+ "'");
+                if(i < entries.size()) {
+                    query.append(", ");
+                }
+            }
+            query.append(") ON DUPLICATE KEY UPDATE ");
+
+            i = 0;
+            for(DropEntry entry : entries) {
+                i++;
+                if(entry == null) continue;
+
+                query.append("`" +entry.getEntryName()+ "`=VALUES(`" +entry.getEntryName()+ "`)");
+                if(i < entries.size()) {
+                    query.append(", ");
+                }
+            }
+
+            PreparedStatement ps = conn.prepareStatement(query.toString());
+
+            final int response = ps.executeUpdate();
+
+            return response;
+        }
+    }
+
+    public ResultSet runQuery(final String query) throws SQLException {
         try (Connection conn = connectionPool.getConnection()){
             PreparedStatement ps = conn.prepareStatement(query);
 
-            ResultSet rs = ps.executeQuery();
+            final ResultSet rs = ps.executeQuery();
 
             return rs;
-
         }
     }
 
@@ -60,6 +120,9 @@ public class SQLManager {
             addTableColumnInNotExist(TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnInNotExist(TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
+
+        addTableColumnInNotExist(TABLE_PLAYER_STATS, "primitive_drop", "INT", "0");
+        addTableColumnInNotExist(TABLE_PLAYER_DROP_CONFIG, "primitive_drop", "BOOLEAN", "true");
     }
 
     private void makeDatabase(final String databaseName) {
@@ -155,7 +218,9 @@ public class SQLManager {
     }
 
     public void onDisable() {
-        connectionPool.closePool();
+        if(connectionPool != null) {
+            connectionPool.closePool();
+        }
     }
 
     public String getDatabaseName() {

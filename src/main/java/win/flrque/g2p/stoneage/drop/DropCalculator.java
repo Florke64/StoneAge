@@ -31,7 +31,7 @@ public class DropCalculator {
     public DropCalculator() {
         plugin = StoneAge.getPlugin(StoneAge.class);
 
-        this.primitiveDrop = new DropEntry("primitive", new ItemStack(Material.COBBLESTONE), 1.0f);
+        this.primitiveDrop = new DropEntry("primitive_drop", new ItemStack(Material.COBBLESTONE), 1.0f);
 
         calculateTotalWeight();
     }
@@ -128,6 +128,8 @@ public class DropCalculator {
     }
 
     public DropEntry getDropEntry(String key) {
+        if(key.contentEquals(primitiveDrop.getEntryName()))
+            return getPrimitiveDropEntry();
         return dropEntries.get(key);
     }
 
