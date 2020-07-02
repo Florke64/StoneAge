@@ -28,22 +28,37 @@ public class SQLManager {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
         connectionPool = new ConnectionPoolManager(databaseConfig);
 
-        final String databaseName = connectionPool.getDatabaseConfig().getDatabaseName();
-
         try {
-            makeDatabase(databaseName);
-
-            makePlayerStatsTable();
-            makePlayerDropConfigTable();
-
-            for(DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
-                final String dropEntryName = entry.getEntryName();
-                addTableColumnInNotExist(TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
-                addTableColumnInNotExist(TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
-            }
+            init();
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to initialize db! Running without DB!");
             e.printStackTrace();
+        }
+    }
+
+    public ResultSet runSelectQuery(final String query) throws SQLException {
+        try (Connection conn = connectionPool.getConnection()){
+            PreparedStatement ps = conn.prepareStatement(query);
+
+            ResultSet rs = ps.executeQuery();
+
+            return rs;
+
+        }
+    }
+
+    private void init() {
+        final String databaseName = getDatabaseName();
+
+        makeDatabase(databaseName);
+
+        makePlayerStatsTable();
+        makePlayerDropConfigTable();
+
+        for(DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
+            final String dropEntryName = entry.getEntryName();
+            addTableColumnInNotExist(TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
+            addTableColumnInNotExist(TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
     }
 
@@ -60,7 +75,7 @@ public class SQLManager {
     }
 
     private void addTableColumnInNotExist(final String tableName, final String columnName, final String columnType, final String defaultValue) {
-        final String databaseName = connectionPool.getDatabaseConfig().getDatabaseName();
+        final String databaseName = getDatabaseName();
 
         try (Connection conn = connectionPool.getConnection()) {
             final StringBuilder query = new StringBuilder();
@@ -78,7 +93,7 @@ public class SQLManager {
     }
 
     private void makePlayerDropConfigTable() {
-        final String databaseName = connectionPool.getDatabaseConfig().getDatabaseName();
+        final String databaseName = getDatabaseName();
 
         try (Connection conn = connectionPool.getConnection()) {
             final StringBuilder query = new StringBuilder();
@@ -141,6 +156,10 @@ public class SQLManager {
 
     public void onDisable() {
         connectionPool.closePool();
+    }
+
+    public String getDatabaseName() {
+        return connectionPool.getDatabaseConfig().getDatabaseName();
     }
 
 }

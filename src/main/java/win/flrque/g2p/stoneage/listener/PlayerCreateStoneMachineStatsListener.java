@@ -11,7 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import win.flrque.g2p.stoneage.StoneAge;
-import win.flrque.g2p.stoneage.machine.StoneMachinePlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
 
 public class PlayerCreateStoneMachineStatsListener implements Listener {
 

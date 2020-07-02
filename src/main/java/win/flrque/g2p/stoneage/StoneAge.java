@@ -12,8 +12,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import win.flrque.g2p.stoneage.command.DropCommand;
 import win.flrque.g2p.stoneage.command.DropHelpCommand;
 import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
-import win.flrque.g2p.stoneage.database.PlayerSetupManager;
 import win.flrque.g2p.stoneage.database.SQLManager;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.gui.WindowManager;
@@ -139,6 +139,8 @@ public final class StoneAge extends JavaPlugin {
         final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
         databaseConfig.readDatabaseConnectionDetails();
         sqlManager = new SQLManager(databaseConfig);
+
+        playerSetup.loadPersonalStoneStatsFromDatabase();
 
         getLogger().log(Level.FINE, "Config reloaded!");
         getLogger().log(Level.INFO, "Loaded "+ customDropsCount +" custom drop entries.");

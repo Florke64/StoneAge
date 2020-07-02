@@ -4,7 +4,7 @@
  * Author: FlrQue
  */
 
-package win.flrque.g2p.stoneage.machine;
+package win.flrque.g2p.stoneage.database.playerdata;
 
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.drop.DropEntry;

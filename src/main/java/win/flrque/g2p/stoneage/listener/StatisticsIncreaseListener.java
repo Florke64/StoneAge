@@ -9,9 +9,9 @@ package win.flrque.g2p.stoneage.listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.event.StoneMachineStoneBreakEvent;
-import win.flrque.g2p.stoneage.machine.StoneMachinePlayerStats;
 
 import java.util.Collection;
 import java.util.UUID;

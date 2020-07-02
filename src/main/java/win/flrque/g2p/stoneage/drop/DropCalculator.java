@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
-import win.flrque.g2p.stoneage.database.PlayerSetupManager;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 
 import java.util.ArrayList;
 import java.util.List;
