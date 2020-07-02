@@ -141,6 +141,7 @@ public final class StoneAge extends JavaPlugin {
         sqlManager = new SQLManager(databaseConfig);
 
         playerSetup.loadPersonalStoneStatsFromDatabase();
+        playerSetup.loadPersonalDropConfigFromDatabase();
 
         getLogger().log(Level.FINE, "Config reloaded!");
         getLogger().log(Level.INFO, "Loaded "+ customDropsCount +" custom drop entries.");
