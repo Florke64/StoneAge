@@ -60,7 +60,7 @@ public class PlayerSetupManager {
         ResultSet result = null;
 
         try {
-            plugin.getDatabaseController().runSelectQuery(queryStatement);
+            result = plugin.getDatabaseController().runSelectQuery(queryStatement);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -98,13 +98,13 @@ public class PlayerSetupManager {
         ResultSet result = null;
 
         try {
-            plugin.getDatabaseController().runSelectQuery(queryStatement);
+            result = plugin.getDatabaseController().runSelectQuery(queryStatement);
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         if(result == null) {
-            plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
+            plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Drop Config on start!");
             return;
         }
 

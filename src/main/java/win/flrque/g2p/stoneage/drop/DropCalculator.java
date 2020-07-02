@@ -15,16 +15,13 @@ import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class DropCalculator {
 
     private final StoneAge plugin;
 
-    private final Map<String, DropEntry> dropEntries = new HashMap<>();
+    private final Map<String, DropEntry> dropEntries = new LinkedHashMap<>();
 
     private DropEntry primitiveDrop;
     private DropMultiplier dropMultiplier;
@@ -134,7 +131,10 @@ public class DropCalculator {
         return dropEntries.get(key);
     }
 
-    public Collection<DropEntry> getDropEntries() {
-        return dropEntries.values();
+    public List<DropEntry> getDropEntries() {
+        final List<DropEntry> dropEntryList = new ArrayList<>();
+        dropEntryList.addAll(dropEntries.values());
+
+        return dropEntryList;
     }
 }
