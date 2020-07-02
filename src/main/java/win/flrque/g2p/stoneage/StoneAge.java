@@ -83,16 +83,6 @@ public final class StoneAge extends JavaPlugin {
         getLogger().log(Level.INFO, "Reloading configuration file...");
         super.reloadConfig();
 
-        //Reading 'database' configuration
-        if(!getConfig().isConfigurationSection("database")) {
-            getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"database\" section)!");
-            getLogger().log(Level.SEVERE, "Skipping, database won't work.");
-        }
-
-        final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
-        databaseConfig.readDatabaseConnectionDetails();
-        sqlManager = new SQLManager(databaseConfig);
-
         //Reading 'General' configuration for Stone Machines
         if(!getConfig().isConfigurationSection("machines")) {
             getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"machines\" section)!");
@@ -139,6 +129,16 @@ public final class StoneAge extends JavaPlugin {
 
             customDropsCount ++;
         }
+
+        //Reading 'database' configuration
+        if(!getConfig().isConfigurationSection("database")) {
+            getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"database\" section)!");
+            getLogger().log(Level.SEVERE, "Skipping, database won't work.");
+        }
+
+        final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
+        databaseConfig.readDatabaseConnectionDetails();
+        sqlManager = new SQLManager(databaseConfig);
 
         getLogger().log(Level.FINE, "Config reloaded!");
         getLogger().log(Level.INFO, "Loaded "+ customDropsCount +" custom drop entries.");
