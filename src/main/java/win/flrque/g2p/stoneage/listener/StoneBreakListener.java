@@ -38,6 +38,8 @@ public class StoneBreakListener implements Listener {
     public void onStoneBreak(BlockBreakEvent event) {
         if(event.isCancelled()) return;
 
+//        long start = System.currentTimeMillis();
+
         final Player player = event.getPlayer();
         if(player == null) return;
 
@@ -58,6 +60,7 @@ public class StoneBreakListener implements Listener {
         final DropLoot finalDrop;
         if(!playerGameMode.equals(GameMode.CREATIVE) && !playerGameMode.equals(GameMode.SPECTATOR)) {
             final ItemStack usedTool = player.getInventory().getItemInMainHand();
+            //TODO: Async calculation
             finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
 
             dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
@@ -77,6 +80,10 @@ public class StoneBreakListener implements Listener {
                 }
             }.runTaskLater(plugin, 1l);
         }
+
+//        long stop = System.currentTimeMillis();
+//        plugin.getLogger().log(Level.INFO, "StoneBreakListener took " + (stop-start) + "ms of main thread time.");
+
     }
 
     private void dropLoot(Player player, Location stoneLoc, @Nullable Dispenser stoneMachine, DropLoot dropLoot) {
