@@ -42,7 +42,11 @@ public class StoneMachinePlayerStats {
     }
 
     public int increaseStatistic(String key) {
-        final int value = getStatistic(key)+1;
+        return increaseStatistic(key, 1);
+    }
+
+    public int increaseStatistic(String key, int amount) {
+        final int value = getStatistic(key) + amount;
         statistics.put(key, value);
         unsavedEdits = true;
 

@@ -32,7 +32,8 @@ public class StatisticsIncreaseListener implements Listener {
         final Collection<DropEntry> dropEntries = event.getLoot().getActiveDropEntries();
 
         for(DropEntry entry : dropEntries) {
-            playerStats.increaseStatistic(entry.getEntryName());
+            final int amount = event.getLoot().getAmountLooted(entry);
+            playerStats.increaseStatistic(entry.getEntryName(), amount);
         }
     }
 

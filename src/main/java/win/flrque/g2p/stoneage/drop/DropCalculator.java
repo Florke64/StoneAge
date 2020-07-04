@@ -16,6 +16,7 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 
 import java.util.*;
+import java.util.logging.Level;
 
 public class DropCalculator {
 
@@ -73,6 +74,8 @@ public class DropCalculator {
     public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable Dispenser stoneMachine) {
         //TODO: Check StoneMachine's configuration book inside its Inventory
 
+        plugin.getLogger().log(Level.INFO, "calculateDrop()");
+
         //No tool was used to break a block
         if(tool == null) return null;
 
@@ -102,21 +105,25 @@ public class DropCalculator {
         if(playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(primitiveDrop))
             dropLoot.addLoot(primitiveDrop, primitiveDrop.getDrop(hasSilkTouch, fortuneLevel));
 
-        for (int i = 0; i < dropEntries.size(); ++i) {
+        plugin.getLogger().log(Level.INFO, "dropEntries.size() : " + dropEntries.size());
+        for (DropEntry dropEntry : dropEntries.values()) {
 
             //Checks for player's personalised drop entry settings
-            if(!playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(dropEntries.get(i)))
+            if(!playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(dropEntry)) {
+                plugin.getLogger().log(Level.INFO, "notDropping : " + dropEntry);
                 continue;
+            }
 
             final float luck = randomizer.nextFloat() * totalWeight;
 
-            final float itemChanceWeight = dropEntries.get(i).getChanceWeight();
+            final float itemChanceWeight = dropEntry.getChanceWeight();
             final float currentDropMultiplier = calculator.getDropMultiplier().getCurrentDropMultiplier();
 
             if (luck <  itemChanceWeight * currentDropMultiplier) {
-                final ItemStack itemDrop = dropEntries.get(i).getDrop(hasSilkTouch, fortuneLevel);
+                final ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
 
-                dropLoot.addLoot(dropEntries.get(i), itemDrop);
+                plugin.getLogger().log(Level.INFO, "dropLoot.addLoot : " + dropEntry.getEntryName());
+                dropLoot.addLoot(dropEntry, itemDrop);
             }
         }
 
