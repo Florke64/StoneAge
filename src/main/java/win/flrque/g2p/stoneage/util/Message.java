@@ -10,16 +10,22 @@ import org.bukkit.ChatColor;
 
 public class Message {
 
+    public static final String EMPTY = "";
+
     public static String prettify(String text) {
         if(text == null || text.isEmpty()) {
             return text;
         }
 
-        String result = ChatColor.translateAlternateColorCodes('&', text);
+        String result = color(text);
         result = replaceUnderlines(result);
         result = capitalize(result);
 
         return result;
+    }
+
+    public static String color(String text) {
+        return ChatColor.translateAlternateColorCodes('&', text);
     }
 
     public static String capitalize(String text) {

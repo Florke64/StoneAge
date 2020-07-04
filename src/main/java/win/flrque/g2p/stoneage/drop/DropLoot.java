@@ -11,38 +11,34 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class DropLoot {
 
-    private final Map<ItemStack, Integer> loots = new HashMap<>();
-    private final Map<DropEntry, Integer> activeDropEntries = new HashMap<>();
+    private final Map<DropEntry, ItemStack> loots = new HashMap<>();
+
+    private int totalExp = 0;
 
     public void addLoot(DropEntry dropEntry, ItemStack itemStack) {
-        final int exp;
-
         if(dropEntry.getMaximalExp() > 0)
-            exp = dropEntry.calculateFinalExpValue();
-        else exp = 0;
+            totalExp += dropEntry.calculateFinalExpValue();
 
-        loots.put(itemStack, exp);
-        activeDropEntries.put(dropEntry, itemStack.getAmount());
+        loots.put(dropEntry, itemStack);
     }
 
-    public Set<ItemStack> getLoots() {
-        return loots.keySet();
+    public ItemStack getItemLoot(DropEntry entry) {
+        return loots.get(entry);
     }
 
-    public int getExp(ItemStack itemStack) {
-        return loots.get(itemStack);
+    public int getExp() {
+        return totalExp;
     }
 
     public Collection<DropEntry> getActiveDropEntries() {
-        return activeDropEntries.keySet();
+        return loots.keySet();
     }
 
     public int getAmountLooted(DropEntry key) {
-        return activeDropEntries.get(key);
+        return loots.get(key).getAmount();
     }
 
 }

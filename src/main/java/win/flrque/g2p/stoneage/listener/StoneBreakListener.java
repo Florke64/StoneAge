@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropLoot;
 import win.flrque.g2p.stoneage.event.StoneMachineStoneBreakEvent;
 
@@ -91,17 +92,18 @@ public class StoneBreakListener implements Listener {
         final Location expDropLocation = (plugin.getStoneMachine().isDropExpToFeet()) ? player.getLocation() : stoneLoc;
         final Location itemDropLocation = (plugin.getStoneMachine().isDropItemsToFeet()) ? player.getLocation() : stoneLoc;
 
-        for(ItemStack itemLoot : dropLoot.getLoots()) {
-            if (dropLoot.getExp(itemLoot) > 0) {
-                final Entity orb = expDropLocation.getWorld().spawnEntity(expDropLocation, EntityType.EXPERIENCE_ORB);
-                ((ExperienceOrb) orb).setExperience(dropLoot.getExp(itemLoot));
-            }
+        if (dropLoot.getExp() > 0) {
+            final Entity orb = expDropLocation.getWorld().spawnEntity(expDropLocation, EntityType.EXPERIENCE_ORB);
+            ((ExperienceOrb) orb).setExperience(dropLoot.getExp());
+        }
 
-            if (itemLoot != null) {
+        for(DropEntry drop : dropLoot.getActiveDropEntries()) {
+            final ItemStack itemLoot = dropLoot.getItemLoot(drop);
+            if (drop != null && itemLoot != null) {
                 itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, itemLoot);
             }
 
-            player.sendMessage("Udalo ci sie wykopac " + itemLoot.getType() + " x" + itemLoot.getAmount());
+            player.sendMessage("Udalo ci sie wykopac " + drop.getCustomName() + " x" + dropLoot.getAmountLooted(drop));
         }
     }
 

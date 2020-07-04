@@ -74,16 +74,16 @@ public class DropInfoWindow extends Window  {
 
         final List<String> lore = new ArrayList<>();
         final String dropEntryStatus = personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony";
-        lore.add(ChatColor.translateAlternateColorCodes('&', "&7Status: " + dropEntryStatus));
-        lore.add(ChatColor.translateAlternateColorCodes('&', "&7(Kliknij aby zmienic)"));
-        lore.add(ChatColor.translateAlternateColorCodes('&', ""));
-        lore.add(ChatColor.translateAlternateColorCodes('&', "&cWykopano juz: " + stats.getStatistic(drop.getEntryName())));
+        lore.add(Message.color("&7Status: " + dropEntryStatus));
+        lore.add(Message.color("&7(Kliknij aby zmienic)"));
+        lore.add(Message.EMPTY);
+        lore.add(Message.color("&cWykopano juz: " + stats.getStatistic(drop.getEntryName())));
 
         if(currentDropMultiplier != calculator.getDropMultiplier().getDefaultDropMultiplier()) {
             lore.add(" "); // spacer
 
             final float realDropChance = getRealChancePercentage(drop);
-            lore.add(ChatColor.translateAlternateColorCodes('&', "&7Rzeczywisty drop: " + df.format(realDropChance) + "%"));
+            lore.add(Message.color("&7Rzeczywisty drop: " + df.format(realDropChance) + "%"));
         }
 
         meta.setLore(lore);
