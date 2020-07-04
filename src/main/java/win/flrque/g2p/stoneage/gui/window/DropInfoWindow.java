@@ -18,6 +18,7 @@ import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.gui.InventoryPoint;
 import win.flrque.g2p.stoneage.gui.Window;
+import win.flrque.g2p.stoneage.util.Message;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public class DropInfoWindow extends Window  {
         icon.setAmount(1);
 
         final ItemMeta meta = icon.getItemMeta();
-        meta.setDisplayName(ChatColor.GREEN + icon.getType().toString() + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
+        meta.setDisplayName(ChatColor.GREEN + Message.prettify(icon.getType().toString()) + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
 
         final List<String> lore = new ArrayList<>();
         final String dropEntryStatus = personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony";
