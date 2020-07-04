@@ -70,7 +70,7 @@ public class DropInfoWindow extends Window  {
         icon.setAmount(1);
 
         final ItemMeta meta = icon.getItemMeta();
-        meta.setDisplayName(ChatColor.GREEN + Message.prettify(icon.getType().toString()) + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
+        meta.setDisplayName(ChatColor.GREEN + Message.prettify(drop.getCustomName()) + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
 
         final List<String> lore = new ArrayList<>();
         final String dropEntryStatus = personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony";
@@ -138,7 +138,7 @@ public class DropInfoWindow extends Window  {
         player.closeInventory();
 
         boolean isDropping = plugin.getPlayerSetup().getPersonalDropConfig(player.getUniqueId()).switchDropEntry(dropEntry);
-        player.sendMessage("Ustawiono drop " + dropEntry.getDropEntryIcon().getType() + " na " + (isDropping? "wlaczony" : "wylaczony"));
+        player.sendMessage("Ustawiono drop " + dropEntry.getCustomName() + " na " + (isDropping? "wlaczony" : "wylaczony"));
     }
 
 }
