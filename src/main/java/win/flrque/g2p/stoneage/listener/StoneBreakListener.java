@@ -26,6 +26,7 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropLoot;
 import win.flrque.g2p.stoneage.event.StoneMachineStoneBreakEvent;
+import win.flrque.g2p.stoneage.util.Message;
 
 public class StoneBreakListener implements Listener {
 
@@ -103,7 +104,7 @@ public class StoneBreakListener implements Listener {
                 itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, itemLoot);
             }
 
-            player.sendMessage("Udalo ci sie wykopac " + drop.getCustomName() + " x" + dropLoot.getAmountLooted(drop));
+            player.sendMessage("Udalo ci sie wykopac " + Message.prettify(drop.getCustomName()) + " x" + dropLoot.getAmountLooted(drop));
         }
     }
 
