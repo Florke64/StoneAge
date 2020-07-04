@@ -8,6 +8,7 @@ package win.flrque.g2p.stoneage.database;
 
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
+import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
 
@@ -86,6 +87,67 @@ public class SQLManager {
                 if(entry == null) continue;
 
                 query.append("`" +entry.getEntryName()+ "`=VALUES(`" +entry.getEntryName()+ "`)");
+                if(i < entries.size()) {
+                    query.append(", ");
+                }
+            }
+
+            PreparedStatement ps = conn.prepareStatement(query.toString());
+
+            final int response = ps.executeUpdate();
+
+            return response;
+        }
+    }
+
+    public int runUpdateForPersonalStoneStats(StoneMachinePlayerStats stats) throws SQLException {
+        try (Connection conn = connectionPool.getConnection()){
+            if(conn == null) return -1;
+
+            final StringBuilder query = new StringBuilder();
+            final StringBuilder fields = new StringBuilder();
+            query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_STATS+ "` (");
+
+            fields.append("`PlayerUUID`, ");
+            fields.append("`PlayerName`, ");
+
+            final Set<String> entries = stats.getStatisticKeys();
+
+            int i = 0;
+            for(String key : entries) {
+                i++;
+                if(key == null) continue;
+
+                fields.append("`" +key+ "`");
+                if(i < entries.size()) {
+                    fields.append(", ");
+                }
+            }
+
+            query.append(fields);
+
+            i = 0;
+            query.append(") VALUES (");
+            query.append("'" +stats.getUniqueId()+ "', ");
+            query.append("'" +stats.getPlayerName()+ "', ");
+            for(String key : entries) {
+                i++;
+                if(key == null) continue;
+
+                int dropStatistic = stats.getStatistic(key);
+                query.append("'" +dropStatistic+ "'");
+                if(i < entries.size()) {
+                    query.append(", ");
+                }
+            }
+            query.append(") ON DUPLICATE KEY UPDATE ");
+
+            i = 0;
+            for(String key : entries) {
+                i++;
+                if(key == null) continue;
+
+                query.append("`" +key+ "`=VALUES(`" +key+ "`)");
                 if(i < entries.size()) {
                     query.append(", ");
                 }

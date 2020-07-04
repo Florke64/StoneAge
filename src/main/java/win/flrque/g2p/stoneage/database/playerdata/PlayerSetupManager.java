@@ -78,9 +78,14 @@ public class PlayerSetupManager {
                 final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
                 final StoneMachinePlayerStats stats = playerSetup.getPlayerStoneMachineStats(uuid);
 
+                plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
+
                 final int columnCount = metaData.getColumnCount();
-                for(int i=0; i<columnCount; i++) {
+                for(int i=1; i<=columnCount; i++) {
                     final String columnName = metaData.getColumnName(i);
+                    if(columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
+                        continue;
+
                     stats.setStatistic(columnName, result.getInt(columnName));
                 }
             }
@@ -146,6 +151,17 @@ public class PlayerSetupManager {
         config.onDatabaseSave();
     }
 
+    public void savePersonalStoneStatsInDatabase(StoneMachinePlayerStats stats) {
+        try {
+            plugin.getDatabaseController().runUpdateForPersonalStoneStats(stats);
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Unable to update PersonalStoneStats in database!");
+            e.printStackTrace();
+        }
+
+        stats.onDatabaseSave();
+    }
+
     public void saveAllUnsavedDropConfigs() {
         int saved = 0, skipped = 0;
         for(PersonalDropConfig config : playerPersonalDropConfig.values()) {
@@ -158,6 +174,22 @@ public class PlayerSetupManager {
 
             skipped++;
         }
+
+        plugin.getLogger().log(Level.INFO, "Saved "+saved+" personal configs (skipped: "+skipped+")");
+
+        saved = 0; skipped = 0;
+        for(StoneMachinePlayerStats playerStats : stoneMachinePlayerStats.values()) {
+            if(playerStats.hasUnsavedEdits()) {
+                savePersonalStoneStatsInDatabase(playerStats);
+                saved++;
+
+                continue;
+            }
+
+            skipped++;
+        }
+
+        plugin.getLogger().log(Level.INFO, "Saved "+saved+" player stats (skipped: "+skipped+")");
     }
 
     public void onDisable() {
