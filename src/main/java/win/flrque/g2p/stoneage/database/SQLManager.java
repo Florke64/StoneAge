@@ -40,6 +40,8 @@ public class SQLManager {
 
     public int runUpdateForPersonalDropConfig(PersonalDropConfig config) throws SQLException {
         try (Connection conn = connectionPool.getConnection()){
+            if(conn == null) return -1;
+
             final StringBuilder query = new StringBuilder();
             final StringBuilder fields = new StringBuilder();
             query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_DROP_CONFIG+ "` (");
@@ -99,6 +101,8 @@ public class SQLManager {
 
     public ResultSet runQuery(final String query) throws SQLException {
         try (Connection conn = connectionPool.getConnection()){
+            if(conn == null) return null;
+
             PreparedStatement ps = conn.prepareStatement(query);
 
             final ResultSet rs = ps.executeQuery();
@@ -127,12 +131,14 @@ public class SQLManager {
 
     private void makeDatabase(final String databaseName) {
         try (Connection conn = connectionPool.getConnection()) {
+            if(conn == null) return;
+
             final String query = "CREATE DATABASE IF NOT EXISTS " +databaseName;
             PreparedStatement ps = conn.prepareStatement(query);
 
             ps.executeUpdate();
 
-        } catch (SQLException ex) {
+        } catch (SQLException | NullPointerException ex) {
             ex.printStackTrace();
         }
     }
@@ -141,6 +147,8 @@ public class SQLManager {
         final String databaseName = getDatabaseName();
 
         try (Connection conn = connectionPool.getConnection()) {
+            if(conn == null) return;
+
             final StringBuilder query = new StringBuilder();
 
             query.append("ALTER TABLE " +databaseName+ ".`" +tableName+ "` ");
@@ -150,7 +158,7 @@ public class SQLManager {
 
             ps.executeUpdate();
 
-        } catch (SQLException ex) {
+        } catch (SQLException | NullPointerException ex) {
             ex.printStackTrace();
         }
     }
@@ -159,6 +167,8 @@ public class SQLManager {
         final String databaseName = getDatabaseName();
 
         try (Connection conn = connectionPool.getConnection()) {
+            if(conn == null) return;
+
             final StringBuilder query = new StringBuilder();
 
             query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." +TABLE_PLAYER_DROP_CONFIG);
@@ -172,7 +182,7 @@ public class SQLManager {
 
             ps.executeUpdate();
 
-        } catch (SQLException ex) {
+        } catch (SQLException | NullPointerException ex) {
             ex.printStackTrace();
         }
     }
@@ -181,6 +191,8 @@ public class SQLManager {
         final String databaseName = connectionPool.getDatabaseConfig().getDatabaseName();
 
         try (Connection conn = connectionPool.getConnection()) {
+            if(conn == null) return;
+
             final StringBuilder query = new StringBuilder();
 
             query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." +TABLE_PLAYER_STATS);
@@ -194,7 +206,7 @@ public class SQLManager {
 
             ps.executeUpdate();
 
-        } catch (SQLException ex) {
+        } catch (SQLException | NullPointerException ex) {
             ex.printStackTrace();
         }
     }
