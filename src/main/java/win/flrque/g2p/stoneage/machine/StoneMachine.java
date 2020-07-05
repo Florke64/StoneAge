@@ -38,6 +38,8 @@ public class StoneMachine {
     private long stoneRespawnFrequency = 40l;
     private int repairCooldown = 5;
 
+    private boolean allowHopperOutput = false;
+
     private boolean dropItemsToFeet = false;
     private boolean dropExpToFeet = false;
 
@@ -198,6 +200,14 @@ public class StoneMachine {
 
     public void setStoneRespawnFrequency(long stoneRespawnFrequency) {
         this.stoneRespawnFrequency = stoneRespawnFrequency;
+    }
+
+    public boolean isHopperOutputAllowed() {
+        return allowHopperOutput;
+    }
+
+    public void setAllowHopperOutput(boolean allow) {
+        this.allowHopperOutput = allow;
     }
 
     public boolean isDropItemsToFeet() {
