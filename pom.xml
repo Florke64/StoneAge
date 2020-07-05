@@ -20,6 +20,8 @@
     <description>Spigot Plugin adding stone generator machines.</description>
     <properties>
         <java.version>1.8</java.version>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <url>https://www.flrque.win/</url>

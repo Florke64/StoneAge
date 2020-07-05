@@ -7,10 +7,39 @@
 package win.flrque.g2p.stoneage.util;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 public class Message {
 
     public static final String EMPTY = "";
+
+    private String message = "";
+    private boolean usePrefixOnSend = true;
+
+    public Message(String message) {
+        this.message = message;
+    }
+
+    public void send(@NotNull CommandSender target) {
+        target.sendMessage(prettify(this.message));
+    }
+
+    public String getRawMessage() {
+        return message;
+    }
+
+    public void setVariable(int n, String value) {
+        this.message = message.replace(("$_"+n), value);
+    }
+
+    public void setUsePrefixOnSend(boolean usePrefix) {
+        this.usePrefixOnSend = usePrefix;
+    }
+
+    public boolean isUsingPrefixOnSend() {
+        return usePrefixOnSend;
+    }
 
     public static String prettify(String text) {
         if(text == null || text.isEmpty()) {
@@ -24,6 +53,7 @@ public class Message {
         return result;
     }
 
+    @NotNull
     public static String color(String text) {
         return ChatColor.translateAlternateColorCodes('&', text);
     }
@@ -33,7 +63,7 @@ public class Message {
             return text;
         }
 
-        return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
+        return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
 
     public static String replaceUnderlines(String text) {
