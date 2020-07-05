@@ -69,7 +69,7 @@ public class StoneBreakListener implements Listener {
 
     }
 
-    private void customizeStoneDrop(Player player, Dispenser stoneMachine, Block brokenBlock) {
+    private void customizeStoneDrop(@NotNull Player player, Dispenser stoneMachine, Block brokenBlock) {
         final GameMode playerGameMode = player.getGameMode();
         final DropLoot finalDrop;
         if(!playerGameMode.equals(GameMode.CREATIVE) && !playerGameMode.equals(GameMode.SPECTATOR)) {

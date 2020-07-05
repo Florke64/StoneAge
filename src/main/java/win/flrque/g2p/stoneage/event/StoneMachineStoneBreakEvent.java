@@ -11,6 +11,7 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.drop.DropLoot;
 
 public class StoneMachineStoneBreakEvent extends Event {
@@ -20,7 +21,7 @@ public class StoneMachineStoneBreakEvent extends Event {
     private final Dispenser stoneMachine;
     private final Location location;
 
-    public StoneMachineStoneBreakEvent(Player player, Dispenser stoneMachine, DropLoot loot) {
+    public StoneMachineStoneBreakEvent(Player player, @NotNull Dispenser stoneMachine, DropLoot loot) {
         this.player = player;
         this.loot = loot;
         this.stoneMachine = stoneMachine;

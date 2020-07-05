@@ -11,6 +11,7 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
@@ -128,7 +129,7 @@ public class DropCalculator {
         return primitiveDrop;
     }
 
-    public DropEntry getDropEntry(String key) {
+    public DropEntry getDropEntry(@NotNull String key) {
         if(key.contentEquals(primitiveDrop.getEntryName()))
             return getPrimitiveDropEntry();
         return dropEntries.get(key);

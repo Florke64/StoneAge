@@ -7,6 +7,7 @@
 package win.flrque.g2p.stoneage.drop;
 
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,7 +19,7 @@ public class DropLoot {
 
     private int totalExp = 0;
 
-    public void addLoot(DropEntry dropEntry, ItemStack itemStack) {
+    public void addLoot(@NotNull DropEntry dropEntry, ItemStack itemStack) {
         if(dropEntry.getMaximalExp() > 0)
             totalExp += dropEntry.calculateFinalExpValue();
 

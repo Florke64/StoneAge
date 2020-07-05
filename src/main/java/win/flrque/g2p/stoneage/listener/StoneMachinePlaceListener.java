@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.material.Directional;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 
 public class StoneMachinePlaceListener implements Listener {
@@ -24,7 +25,7 @@ public class StoneMachinePlaceListener implements Listener {
     }
 
     @EventHandler
-    public void onStoneMachinePlace(BlockPlaceEvent event) {
+    public void onStoneMachinePlace(@NotNull BlockPlaceEvent event) {
         if(event.isCancelled())
             return;
 

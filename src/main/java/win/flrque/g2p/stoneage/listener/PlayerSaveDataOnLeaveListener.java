@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 
@@ -25,7 +26,7 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
         final UUID playerUUID = event.getPlayer().getUniqueId();
         final PersonalDropConfig dropConfig = plugin.getPlayerSetup().getPersonalDropConfig(playerUUID);
 

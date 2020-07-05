@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
@@ -60,7 +61,8 @@ public class DropInfoWindow extends Window  {
         }
     }
 
-    private ItemStack createIconItem(DropEntry drop, StoneMachinePlayerStats stats) {
+    @NotNull
+    private ItemStack createIconItem(@NotNull DropEntry drop, @NotNull StoneMachinePlayerStats stats) {
         //Preparing data to be placed on the item
         final DropCalculator calculator = plugin.getDropCalculator();
         final float currentDropMultiplier = calculator.getDropMultiplier().getCurrentDropMultiplier();

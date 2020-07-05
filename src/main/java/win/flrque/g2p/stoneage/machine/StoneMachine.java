@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Directional;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 
 import java.util.ArrayList;
@@ -186,6 +187,7 @@ public class StoneMachine {
         return machineLore;
     }
 
+    @NotNull
     public static List<String> createDefaultMachineLore() {
         final List<String> machineLore = new ArrayList<>();
 

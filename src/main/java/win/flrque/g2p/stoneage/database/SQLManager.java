@@ -273,24 +273,6 @@ public class SQLManager {
         }
     }
 
-    public String getDataFromPlayerName(String playerName) throws SQLException{
-        try (Connection conn = connectionPool.getConnection()){
-            final String query = "SELECT data FROM Go2PlayLocalTesting WHERE `mcPlayerName` = ? LIMIT 1";
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setString(1, playerName);
-
-            ResultSet rs = ps.executeQuery();
-
-            while(rs.next()) {
-                return rs.getString("data");
-            }
-
-            return "";
-
-        }
-
-    }
-
     public void onDisable() {
         if(connectionPool != null) {
             connectionPool.closePool();

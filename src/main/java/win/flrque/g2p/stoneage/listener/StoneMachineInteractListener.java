@@ -15,6 +15,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.gui.Window;
 import win.flrque.g2p.stoneage.gui.window.StoneMachineWindow;
@@ -28,7 +29,7 @@ public class StoneMachineInteractListener implements Listener {
     }
 
     @EventHandler
-    public void onStoneMachineClick(PlayerInteractEvent event) {
+    public void onStoneMachineClick(@NotNull PlayerInteractEvent event) {
         if(event.getPlayer() == null || event.isCancelled())
             return;
 

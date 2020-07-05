@@ -30,7 +30,7 @@ public class ItemButtonFactory {
         this.player = player;
     }
 
-    public ItemStack getButton(ItemButtonType buttonType) {
+    public ItemStack getButton(@NotNull ItemButtonType buttonType) {
         switch (buttonType) {
             case DROP_MULTIPLIER:
                 return getUpdatedDropMultiplier();
@@ -45,6 +45,7 @@ public class ItemButtonFactory {
         }
     }
 
+    @NotNull
     private ItemStack getUpdatedDropMultiplier() {
         final ItemStack item = ItemButtonType.DROP_MULTIPLIER.getItemIcon();
         final ItemMeta meta = item.getItemMeta();

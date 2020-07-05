@@ -8,6 +8,8 @@ package win.flrque.g2p.stoneage.util;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 
 import java.util.logging.Level;
@@ -96,10 +98,6 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
         }
 
         return weight;
-    }
-
-    private ItemStack readItemStackDrop() {
-        return null;
     }
 
 }

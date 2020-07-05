@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 
 import java.util.logging.Level;
@@ -23,7 +24,7 @@ public class StoneMachineHopperInteractListener implements Listener {
     }
 
     @EventHandler
-    public void onHopperInteraction(InventoryMoveItemEvent event) {
+    public void onHopperInteraction(@NotNull InventoryMoveItemEvent event) {
         if(event.isCancelled())
             return;
 

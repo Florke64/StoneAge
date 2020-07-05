@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.gui.Window;
 import win.flrque.g2p.stoneage.gui.WindowManager;
@@ -29,7 +30,7 @@ public class StoneMachineBreakListener implements Listener {
     }
 
     @EventHandler
-    public void onStoneMachineBreak(BlockBreakEvent event) {
+    public void onStoneMachineBreak(@NotNull BlockBreakEvent event) {
         if(event.isCancelled())
             return;
 

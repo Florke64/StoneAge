@@ -11,6 +11,7 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.gui.InventoryPoint;
 import win.flrque.g2p.stoneage.gui.ItemButtonFactory;
 import win.flrque.g2p.stoneage.gui.ItemButtonFactory.ItemButtonType;
@@ -67,7 +68,7 @@ public class StoneMachineWindow extends Window {
     }
 
     @Override
-    public void onClick(ClickType clickType, Player player, InventoryPoint clickedPoint) {
+    public void onClick(ClickType clickType, Player player, @NotNull InventoryPoint clickedPoint) {
 //        if(clickType.equals(ClickType.LEFT)) {
 //            player.sendMessage(clickedPoint.toString());
 //        }
