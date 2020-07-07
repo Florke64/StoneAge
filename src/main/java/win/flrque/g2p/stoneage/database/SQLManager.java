@@ -26,6 +26,7 @@ public class SQLManager {
 
     public static final String TABLE_PLAYER_STATS = "StoneAge_Stats";
     public static final String TABLE_PLAYER_DROP_CONFIG = "StoneAge_Config";
+    public static final String TABLE_DROP_MULTIPLIER = "StoneAge_DropMultiplier";
 
     public SQLManager(ConfigSectionDatabase databaseConfig) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
@@ -180,6 +181,7 @@ public class SQLManager {
 
         makePlayerStatsTable();
         makePlayerDropConfigTable();
+        makeDropMultiplierTable();
 
         for(DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
             final String dropEntryName = entry.getEntryName();
@@ -215,6 +217,32 @@ public class SQLManager {
 
             query.append("ALTER TABLE " +databaseName+ ".`" +tableName+ "` ");
             query.append("ADD COLUMN IF NOT EXISTS `" +columnName+ "` " +columnType+ " NOT NULL default " +defaultValue+ ";");
+
+            PreparedStatement ps = conn.prepareStatement(query.toString());
+
+            ps.executeUpdate();
+
+        } catch (SQLException | NullPointerException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void makeDropMultiplierTable() {
+        final String databaseName = getDatabaseName();
+
+        try (Connection conn = connectionPool.getConnection()) {
+            if(conn == null) return;
+
+            final StringBuilder query = new StringBuilder();
+
+            query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." + TABLE_DROP_MULTIPLIER);
+            query.append(" (");
+            query.append(" MultiplierId INT,");
+            query.append(" Timeout LONG,");
+            query.append(" SetTime LONG,");
+            query.append(" MultiplierValue DOUBLE,");
+            query.append(" PRIMARY KEY (`MultiplierId`)");
+            query.append(") ");
 
             PreparedStatement ps = conn.prepareStatement(query.toString());
 
