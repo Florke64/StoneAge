@@ -10,12 +10,10 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
+import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -227,14 +225,6 @@ public class SQLManager {
         }
     }
 
-    /*
-    CREATE TABLE `g2plocaltest`.`StoneAge_DropMultiplier`
-    ( `MultiplierId` INT NOT NULL AUTO_INCREMENT ,
-    `SetOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-    `Timeout` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-    `MultiplierValue` FLOAT NOT NULL DEFAULT '1.0' ,
-    PRIMARY KEY (`MultiplierId`))
-     */
     private void makeDropMultiplierTable() {
         final String databaseName = getDatabaseName();
 
@@ -258,6 +248,29 @@ public class SQLManager {
 
         } catch (SQLException | NullPointerException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    public void insertDropMultiplierRecord(DropMultiplier dropMultiplier) throws SQLException {
+
+        try (Connection conn = connectionPool.getConnection()){
+            if(conn == null) return;
+
+            final Timestamp startTime = new Timestamp(dropMultiplier.getMultiplierStartTime());
+            final Timestamp timeoutTime = new Timestamp(dropMultiplier.getMultiplierTimeout());
+
+            final StringBuilder query = new StringBuilder();
+            query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_STATS+ "` ");
+
+            query.append(" (`MultiplierId`, `SetOn`, `Timeout`, `MultiplierValue`) VALUES (NULL,");
+            query.append(" '" +startTime+ "',");
+            query.append(" '" +timeoutTime+ "',");
+            query.append(" '" +dropMultiplier.getCurrentDropMultiplier()+ "');");
+
+            PreparedStatement ps = conn.prepareStatement(query.toString());
+
+            ps.execute();
+
         }
     }
 
