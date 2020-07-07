@@ -17,6 +17,7 @@ public class DropMultiplier {
 
     private float currentDropMultiplier;
     private long multiplierTimeout = 0;
+    private long multiplierSetOn = 0;
 
     public DropMultiplier(float defaultDropMultiplier, float maxDropMultiplier) {
         plugin = StoneAge.getPlugin(StoneAge.class);
@@ -50,6 +51,14 @@ public class DropMultiplier {
         this.multiplierTimeout = multiplierTimeout;
     }
 
+    public long getMultiplierStartTime() {
+        return multiplierSetOn;
+    }
+
+    private void setMultiplierStartTime(long multiplierSetOn) {
+        this.multiplierSetOn = multiplierSetOn;
+    }
+
     public boolean setDropMultiplier(float value, long time) {
         if(value <= defaultDropMultiplier || value > maxDropMultiplier)
             return false;
@@ -58,6 +67,7 @@ public class DropMultiplier {
             return false;
 
         setCurrentDropMultiplier(value);
+        setMultiplierStartTime(System.currentTimeMillis());
         setMultiplierTimeout(System.currentTimeMillis() + time);
 
         return true;
