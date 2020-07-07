@@ -80,4 +80,8 @@ public class DropMultiplier {
         return defaultDropMultiplier != currentDropMultiplier;
     }
 
+    public void readPreviousMultiplierFromDatabase() {
+        //TODO: Query database entry and apply if there is anything relatable
+    }
+
 }

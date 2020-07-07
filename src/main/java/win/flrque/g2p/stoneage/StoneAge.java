@@ -142,6 +142,8 @@ public final class StoneAge extends JavaPlugin {
 
             playerSetup.loadPersonalStoneStatsFromDatabase();
             playerSetup.loadPersonalDropConfigFromDatabase();
+
+            getDropCalculator().getDropMultiplier().readPreviousMultiplierFromDatabase();
         }
 
         getLogger().log(Level.FINE, "Config reloaded!");
