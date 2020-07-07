@@ -227,6 +227,14 @@ public class SQLManager {
         }
     }
 
+    /*
+    CREATE TABLE `g2plocaltest`.`StoneAge_DropMultiplier`
+    ( `MultiplierId` INT NOT NULL AUTO_INCREMENT ,
+    `SetOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+    `Timeout` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+    `MultiplierValue` FLOAT NOT NULL DEFAULT '1.0' ,
+    PRIMARY KEY (`MultiplierId`))
+     */
     private void makeDropMultiplierTable() {
         final String databaseName = getDatabaseName();
 
@@ -235,12 +243,12 @@ public class SQLManager {
 
             final StringBuilder query = new StringBuilder();
 
-            query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." + TABLE_DROP_MULTIPLIER);
+            query.append("CREATE TABLE IF NOT EXISTS `" +databaseName+ "`.`" + TABLE_DROP_MULTIPLIER + "`");
             query.append(" (");
-            query.append(" MultiplierId INT,");
-            query.append(" Timeout LONG,");
-            query.append(" SetTime LONG,");
-            query.append(" MultiplierValue FLOAT,");
+            query.append(" `MultiplierId` INT NOT NULL AUTO_INCREMENT,");
+            query.append(" `SetOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,");
+            query.append(" `Timeout` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,");
+            query.append(" `MultiplierValue` FLOAT NOT NULL DEFAULT '1.0',");
             query.append(" PRIMARY KEY (`MultiplierId`)");
             query.append(") ");
 
