@@ -240,7 +240,7 @@ public class SQLManager {
             query.append(" MultiplierId INT,");
             query.append(" Timeout LONG,");
             query.append(" SetTime LONG,");
-            query.append(" MultiplierValue DOUBLE,");
+            query.append(" MultiplierValue FLOAT,");
             query.append(" PRIMARY KEY (`MultiplierId`)");
             query.append(") ");
 
