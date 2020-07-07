@@ -6,7 +6,13 @@
 
 package win.flrque.g2p.stoneage.drop;
 
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.event.DropMultiplierStartEvent;
+
+import java.util.UUID;
 
 public class DropMultiplier {
 
@@ -59,16 +65,39 @@ public class DropMultiplier {
         this.multiplierSetOn = multiplierSetOn;
     }
 
-    public boolean setDropMultiplier(float value, long time) {
+    public boolean setDropMultiplier(@NotNull CommandSender caller, float value, long time) {
+        final String callerName = caller.getName();
+        final UUID callerUniqueId;
+
+        if(caller instanceof Player) {
+            callerUniqueId = ((Player) caller).getUniqueId();
+        } else {
+            callerUniqueId = UUID.randomUUID();
+        }
+
+        return setDropMultiplier(callerName, callerUniqueId, value, time);
+    }
+
+    public boolean setDropMultiplier(String callerName, UUID callerUniqueId, float value, long time) {
         if(value <= defaultDropMultiplier || value > maxDropMultiplier)
             return false;
 
         if(time < (1 * 60 * 1000) || time > (24 * 60 * 60 * 1000))
             return false;
 
+        final long startTime = System.currentTimeMillis();
+        final long timeout = System.currentTimeMillis() + time;
+
+        DropMultiplierStartEvent event = new DropMultiplierStartEvent(callerName, callerUniqueId, value, startTime, timeout);
+        plugin.getServer().getPluginManager().callEvent(event);
+
+        if(event.isCancelled()) {
+            return false;
+        }
+
         setCurrentDropMultiplier(value);
-        setMultiplierStartTime(System.currentTimeMillis());
-        setMultiplierTimeout(System.currentTimeMillis() + time);
+        setMultiplierStartTime(startTime);
+        setMultiplierTimeout(timeout);
 
         return true;
     }
@@ -80,6 +109,7 @@ public class DropMultiplier {
         return defaultDropMultiplier != currentDropMultiplier;
     }
 
+    /* SELECT * FROM `StoneAge_DropMultiplier` WHERE `StoneAge_DropMultiplier`.`Timeout` > CURRENT_TIMESTAMP; */
     public void readPreviousMultiplierFromDatabase() {
         //TODO: Query database entry and apply if there is anything relatable
     }
