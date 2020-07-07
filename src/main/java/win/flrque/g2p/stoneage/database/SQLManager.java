@@ -239,6 +239,8 @@ public class SQLManager {
             query.append(" `SetOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,");
             query.append(" `Timeout` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,");
             query.append(" `MultiplierValue` FLOAT NOT NULL DEFAULT '1.0',");
+            query.append(" `CallerName` VARCHAR(16),");
+            query.append(" `CallerUUID` VARCHAR(36),");
             query.append(" PRIMARY KEY (`MultiplierId`)");
             query.append(") ");
 
@@ -266,6 +268,8 @@ public class SQLManager {
             query.append(" '" +startTime+ "',");
             query.append(" '" +timeoutTime+ "',");
             query.append(" '" +dropMultiplier.getCurrentDropMultiplier()+ "');");
+            query.append(" '" +dropMultiplier.getCallerName()+ "');");
+            query.append(" '" +dropMultiplier.getCallerUniqueId()+ "');");
 
             PreparedStatement ps = conn.prepareStatement(query.toString());
 
