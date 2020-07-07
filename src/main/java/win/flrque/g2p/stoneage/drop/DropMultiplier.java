@@ -68,14 +68,6 @@ public class DropMultiplier {
         this.multiplierSetOn = multiplierSetOn;
     }
 
-    public long getMultiplierSetOn() {
-        return multiplierSetOn;
-    }
-
-    public void setMultiplierSetOn(long multiplierSetOn) {
-        this.multiplierSetOn = multiplierSetOn;
-    }
-
     public UUID getCallerUniqueId() {
         return callerUniqueId;
     }
@@ -125,6 +117,9 @@ public class DropMultiplier {
         setCurrentDropMultiplier(value);
         setMultiplierStartTime(startTime);
         setMultiplierTimeout(timeout);
+
+        setCallerName(callerName);
+        setCallerUniqueId(callerUniqueId);
 
         return true;
     }
