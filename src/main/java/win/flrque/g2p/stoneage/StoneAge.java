@@ -135,14 +135,14 @@ public final class StoneAge extends JavaPlugin {
         if(!getConfig().isConfigurationSection("database")) {
             getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"database\" section)!");
             getLogger().log(Level.SEVERE, "Skipping, database won't work.");
+        } else {
+            final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
+            databaseConfig.readDatabaseConnectionDetails();
+            sqlManager = new SQLManager(databaseConfig);
+
+            playerSetup.loadPersonalStoneStatsFromDatabase();
+            playerSetup.loadPersonalDropConfigFromDatabase();
         }
-
-        final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
-        databaseConfig.readDatabaseConnectionDetails();
-        sqlManager = new SQLManager(databaseConfig);
-
-        playerSetup.loadPersonalStoneStatsFromDatabase();
-        playerSetup.loadPersonalDropConfigFromDatabase();
 
         getLogger().log(Level.FINE, "Config reloaded!");
         getLogger().log(Level.INFO, "Loaded "+ customDropsCount +" custom drop entries.");
