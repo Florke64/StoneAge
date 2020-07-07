@@ -50,6 +50,10 @@ public class DropInfoWindow extends Window  {
         final StoneMachinePlayerStats stats = plugin.getPlayerSetup().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
 
         for(int i=0; i<=calculator.getDropEntries().size(); i++) {
+            if(i >= inventory.getSize()) {
+                break;
+            }
+
             final DropEntry drop;
 
             if(i == calculator.getDropEntries().size()) drop = calculator.getPrimitiveDropEntry();
