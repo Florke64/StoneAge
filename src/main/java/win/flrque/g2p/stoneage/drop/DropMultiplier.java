@@ -25,6 +25,9 @@ public class DropMultiplier {
     private long multiplierTimeout = 0;
     private long multiplierSetOn = 0;
 
+    private String callerName;
+    private UUID callerUniqueId;
+
     public DropMultiplier(float defaultDropMultiplier, float maxDropMultiplier) {
         plugin = StoneAge.getPlugin(StoneAge.class);
 
@@ -63,6 +66,30 @@ public class DropMultiplier {
 
     private void setMultiplierStartTime(long multiplierSetOn) {
         this.multiplierSetOn = multiplierSetOn;
+    }
+
+    public long getMultiplierSetOn() {
+        return multiplierSetOn;
+    }
+
+    public void setMultiplierSetOn(long multiplierSetOn) {
+        this.multiplierSetOn = multiplierSetOn;
+    }
+
+    public UUID getCallerUniqueId() {
+        return callerUniqueId;
+    }
+
+    public void setCallerUniqueId(UUID callerUniqueId) {
+        this.callerUniqueId = callerUniqueId;
+    }
+
+    public String getCallerName() {
+        return callerName;
+    }
+
+    public void setCallerName(String callerName) {
+        this.callerName = callerName;
     }
 
     public boolean setDropMultiplier(@NotNull CommandSender caller, float value, long time) {
