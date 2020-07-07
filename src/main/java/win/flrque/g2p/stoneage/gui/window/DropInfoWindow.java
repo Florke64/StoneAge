@@ -30,7 +30,7 @@ public class DropInfoWindow extends Window  {
     private final Player windowContentOwner;
     private final PersonalDropConfig personalDropConfig;
 
-    final DecimalFormat df = new DecimalFormat();
+    final DecimalFormat df = new DecimalFormat("0.00");
 
     //TODO: Support for pagination
     public DropInfoWindow(Player owner) {
@@ -38,9 +38,6 @@ public class DropInfoWindow extends Window  {
 
         windowContentOwner = owner;
         personalDropConfig = plugin.getPlayerSetup().getPersonalDropConfig(windowContentOwner.getUniqueId());
-
-        df.setMaximumFractionDigits(2);
-        df.setMinimumFractionDigits(2);
     }
 
     @Override
