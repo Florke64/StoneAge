@@ -124,6 +124,10 @@ public class DropMultiplier {
         return true;
     }
 
+    public int getMinutesLeft() {
+        return (int)((getMultiplierTimeout()/1000 - System.currentTimeMillis()/1000)/60);
+    }
+
     public boolean isActive() {
         if(getMultiplierTimeout() < System.currentTimeMillis())
             return false;

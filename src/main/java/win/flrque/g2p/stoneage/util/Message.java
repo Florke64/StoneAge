@@ -6,6 +6,7 @@
 
 package win.flrque.g2p.stoneage.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +20,10 @@ public class Message {
 
     public Message(String message) {
         this.message = message;
+    }
+
+    public void broadcastToTheServer() {
+        Bukkit.getServer().broadcastMessage(prettify(this.message));
     }
 
     public void send(@NotNull CommandSender target) {
