@@ -46,7 +46,8 @@ public class StoneMachineBreakListener implements Listener {
         event.setDropItems(false);
 
         final ItemStack tool = destroyer.getInventory().getItemInMainHand();
-        if(tool.getType() == Material.GOLD_PICKAXE || gameMode == GameMode.CREATIVE) {
+        //TODO: Flexible machine pickup tool
+        if(tool.getType() == Material.GOLDEN_PICKAXE || gameMode == GameMode.CREATIVE) {
             final Block brokenBlock = event.getBlock();
             final Location brokenBlockLocation = brokenBlock.getLocation();
 

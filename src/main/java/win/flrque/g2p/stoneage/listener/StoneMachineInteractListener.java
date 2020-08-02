@@ -42,7 +42,7 @@ public class StoneMachineInteractListener implements Listener {
             return;
 
         final ItemStack tool = player.getInventory().getItemInMainHand();
-        if(tool != null && tool.getType() == Material.GOLD_PICKAXE) {
+        if(tool != null && tool.getType() == Material.GOLDEN_PICKAXE) {
             if(player.isOp())
                 return;
         }
