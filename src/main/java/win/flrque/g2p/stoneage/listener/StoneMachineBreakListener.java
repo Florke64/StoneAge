@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.gui.Window;
 import win.flrque.g2p.stoneage.gui.WindowManager;
+import win.flrque.g2p.stoneage.util.Message;
 
 public class StoneMachineBreakListener implements Listener {
 
@@ -43,18 +44,25 @@ public class StoneMachineBreakListener implements Listener {
         if(!plugin.getStoneMachine().isStoneMachine(event.getBlock()))
             return;
 
+        final Block brokenBlock = event.getBlock();
+        final Dispenser stoneMachine = (Dispenser) brokenBlock.getState();
+
         event.setDropItems(false);
 
         final ItemStack tool = destroyer.getInventory().getItemInMainHand();
         //TODO: Flexible machine pickup tool
         if(tool.getType() == Material.GOLDEN_PICKAXE || gameMode == GameMode.CREATIVE) {
-            final Block brokenBlock = event.getBlock();
             final Location brokenBlockLocation = brokenBlock.getLocation();
+
+            //TODO: Maybe do not clear all drops? Clearing only the machine's label should be enough.
+            stoneMachine.getInventory().clear();
 
             //Closing all active windows
             final WindowManager windowManager = plugin.getWindowManager();
-            final Window brokenMachinesWindow = windowManager.getWindow((Dispenser) brokenBlock.getState());
+            final Window brokenMachinesWindow = windowManager.getWindow(stoneMachine);
             if(brokenMachinesWindow != null) {
+
+                final Message machineDestroyedMsg = new Message("&cTa stoniarka zostala zniszczona.");
                 for (Player user : brokenMachinesWindow.getUsers()) {
                     if (user != null && user.isOnline()) {
 
@@ -64,7 +72,7 @@ public class StoneMachineBreakListener implements Listener {
 
                         if (windowManager.getWindow(user).getBukkitInventory().equals(user.getOpenInventory().getTopInventory())) {
                             user.closeInventory();
-                            user.sendMessage("Ta stoniarka zostala zniszczona.");
+                            machineDestroyedMsg.send(destroyer);
                         }
                     }
                 }
@@ -76,7 +84,9 @@ public class StoneMachineBreakListener implements Listener {
 
         } else {
             event.setCancelled(true);
-            destroyer.sendMessage("Stoniarka moze byc usunieta tylko przy pomocy zlotego kilofa!");
+
+            final Message wrongToolMsg = new Message("&7Stoniarka moze byc usunieta tylko przy pomocy &czlotego kilofa&7!");
+            wrongToolMsg.send(destroyer);
         }
     }
 

@@ -86,7 +86,7 @@ public class StoneMachine {
         if(block.getState() instanceof Dispenser) {
             return isStoneMachine((Dispenser) block.getState());
         }
-
+        
         return false;
     }
 

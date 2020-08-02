@@ -49,10 +49,12 @@ public class StoneMachineInteractListener implements Listener {
 
         event.setCancelled(true);
 
+        final Dispenser clickedStoneMachine = (Dispenser) event.getClickedBlock().getState();
+
         new BukkitRunnable() {
             @Override
             public void run() {
-                final Window window = new StoneMachineWindow(player, (Dispenser) event.getClickedBlock().getState());
+                final Window window = new StoneMachineWindow(player, clickedStoneMachine);
 
                 new BukkitRunnable() {
                     @Override

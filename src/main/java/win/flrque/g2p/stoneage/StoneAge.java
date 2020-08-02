@@ -123,7 +123,16 @@ public final class StoneAge extends JavaPlugin {
         int customDropsCount = 0;
         final ConfigurationSection customDropsSection = getConfig().getConfigurationSection("custom_drops");
         for(String entryName : customDropsSection.getKeys(false)) {
+
+            getLogger().log(Level.INFO, "Attempting to load drop entry: "+ entryName);
+
             final ConfigSectionDropEntry customDropEntry = new ConfigSectionDropEntry(customDropsSection.getConfigurationSection(entryName));
+
+            if(customDropEntry == null) {
+                getLogger().log(Level.SEVERE, "Custom Drop Entry equals null value! Skipping...");
+                continue;
+            }
+
             dropCalculator.addDrop(customDropEntry.compileDropEntry());
 
             getLogger().log(Level.INFO, "Loaded custom drop: "+ entryName);

@@ -126,8 +126,8 @@ custom_drops:
     maximal_exp: 5
     multipliable: true
     default_tool:
-      material: 'INK_SACK' # Bukkit Material
-      magic_data: 4
+      material: 'LAPIS_LAZULI' # Bukkit Material enum name
+      magic_data: 0
       custom_name: '' # for default item name leave empty: '' or don't include in config section
       lore: # for no lore don't include this config section
         - '&7Default Drop'
