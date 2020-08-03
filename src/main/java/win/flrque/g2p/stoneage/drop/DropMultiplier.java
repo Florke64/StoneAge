@@ -6,7 +6,13 @@
 
 package win.flrque.g2p.stoneage.drop;
 
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.event.DropMultiplierStartEvent;
+
+import java.util.UUID;
 
 public class DropMultiplier {
 
@@ -17,6 +23,10 @@ public class DropMultiplier {
 
     private float currentDropMultiplier;
     private long multiplierTimeout = 0;
+    private long multiplierSetOn = 0;
+
+    private String callerName;
+    private UUID callerUniqueId;
 
     public DropMultiplier(float defaultDropMultiplier, float maxDropMultiplier) {
         plugin = StoneAge.getPlugin(StoneAge.class);
@@ -50,17 +60,72 @@ public class DropMultiplier {
         this.multiplierTimeout = multiplierTimeout;
     }
 
-    public boolean setDropMultiplier(float value, long time) {
+    public long getMultiplierStartTime() {
+        return multiplierSetOn;
+    }
+
+    private void setMultiplierStartTime(long multiplierSetOn) {
+        this.multiplierSetOn = multiplierSetOn;
+    }
+
+    public UUID getCallerUniqueId() {
+        return callerUniqueId;
+    }
+
+    public void setCallerUniqueId(UUID callerUniqueId) {
+        this.callerUniqueId = callerUniqueId;
+    }
+
+    public String getCallerName() {
+        return callerName;
+    }
+
+    public void setCallerName(String callerName) {
+        this.callerName = callerName;
+    }
+
+    public boolean setDropMultiplier(@NotNull CommandSender caller, float value, long time) {
+        final String callerName = caller.getName();
+        final UUID callerUniqueId;
+
+        if(caller instanceof Player) {
+            callerUniqueId = ((Player) caller).getUniqueId();
+        } else {
+            callerUniqueId = UUID.randomUUID();
+        }
+
+        return setDropMultiplier(callerName, callerUniqueId, value, time);
+    }
+
+    public boolean setDropMultiplier(String callerName, UUID callerUniqueId, float value, long time) {
         if(value <= defaultDropMultiplier || value > maxDropMultiplier)
             return false;
 
         if(time < (1 * 60 * 1000) || time > (24 * 60 * 60 * 1000))
             return false;
 
+        final long startTime = System.currentTimeMillis();
+        final long timeout = System.currentTimeMillis() + time;
+
+        DropMultiplierStartEvent event = new DropMultiplierStartEvent(callerName, callerUniqueId, value, startTime, timeout);
+        plugin.getServer().getPluginManager().callEvent(event);
+
+        if(event.isCancelled()) {
+            return false;
+        }
+
         setCurrentDropMultiplier(value);
-        setMultiplierTimeout(System.currentTimeMillis() + time);
+        setMultiplierStartTime(startTime);
+        setMultiplierTimeout(timeout);
+
+        setCallerName(callerName);
+        setCallerUniqueId(callerUniqueId);
 
         return true;
+    }
+
+    public int getMinutesLeft() {
+        return (int)((getMultiplierTimeout()/1000 - System.currentTimeMillis()/1000)/60);
     }
 
     public boolean isActive() {
@@ -68,6 +133,11 @@ public class DropMultiplier {
             return false;
 
         return defaultDropMultiplier != currentDropMultiplier;
+    }
+
+    /* SELECT * FROM `StoneAge_DropMultiplier` WHERE `StoneAge_DropMultiplier`.`Timeout` > CURRENT_TIMESTAMP; */
+    public void readPreviousMultiplierFromDatabase() {
+        //TODO: Query database entry and apply if there is anything relatable
     }
 
 }

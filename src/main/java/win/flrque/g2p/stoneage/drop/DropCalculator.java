@@ -11,6 +11,7 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
@@ -102,21 +103,22 @@ public class DropCalculator {
         if(playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(primitiveDrop))
             dropLoot.addLoot(primitiveDrop, primitiveDrop.getDrop(hasSilkTouch, fortuneLevel));
 
-        for (int i = 0; i < dropEntries.size(); ++i) {
+        for (DropEntry dropEntry : dropEntries.values()) {
 
             //Checks for player's personalised drop entry settings
-            if(!playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(dropEntries.get(i)))
+            if(!playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(dropEntry)) {
                 continue;
+            }
 
             final float luck = randomizer.nextFloat() * totalWeight;
 
-            final float itemChanceWeight = dropEntries.get(i).getChanceWeight();
+            final float itemChanceWeight = dropEntry.getChanceWeight();
             final float currentDropMultiplier = calculator.getDropMultiplier().getCurrentDropMultiplier();
 
             if (luck <  itemChanceWeight * currentDropMultiplier) {
-                final ItemStack itemDrop = dropEntries.get(i).getDrop(hasSilkTouch, fortuneLevel);
+                final ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
 
-                dropLoot.addLoot(dropEntries.get(i), itemDrop);
+                dropLoot.addLoot(dropEntry, itemDrop);
             }
         }
 
@@ -127,7 +129,7 @@ public class DropCalculator {
         return primitiveDrop;
     }
 
-    public DropEntry getDropEntry(String key) {
+    public DropEntry getDropEntry(@NotNull String key) {
         if(key.contentEquals(primitiveDrop.getEntryName()))
             return getPrimitiveDropEntry();
         return dropEntries.get(key);

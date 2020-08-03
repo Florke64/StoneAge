@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 
 public class StoneMachineRedstoneInteractListener implements Listener {
@@ -21,7 +22,7 @@ public class StoneMachineRedstoneInteractListener implements Listener {
     }
 
     @EventHandler
-    public void onRedstoneInteract(BlockDispenseEvent event) {
+    public void onRedstoneInteract(@NotNull BlockDispenseEvent event) {
         if(event.isCancelled())
             return;
 

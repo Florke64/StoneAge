@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public abstract class Window {
         inventory = Bukkit.createInventory(null, InventoryType.CHEST, windowTitle);
     }
 
-    public boolean open(Player player) {
+    public boolean open(@NotNull Player player) {
         player.closeInventory();
 
         if(player.isSleeping()) {

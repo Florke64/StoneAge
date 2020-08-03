@@ -8,11 +8,12 @@ package win.flrque.g2p.stoneage.listener;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import org.bukkit.block.Dispenser;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.material.Directional;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 
 public class StoneMachinePlaceListener implements Listener {
@@ -24,11 +25,10 @@ public class StoneMachinePlaceListener implements Listener {
     }
 
     @EventHandler
-    public void onStoneMachinePlace(BlockPlaceEvent event) {
+    public void onStoneMachinePlace(@NotNull BlockPlaceEvent event) {
         if(event.isCancelled())
             return;
 
-        final Player player = event.getPlayer();
         final Block placedBlock = event.getBlockPlaced();
 
         if(!plugin.getStoneMachine().isStoneMachine(event.getBlock()))
@@ -36,6 +36,9 @@ public class StoneMachinePlaceListener implements Listener {
 
         final Directional machine = (Directional) placedBlock.getState().getData();
         final Location stoneGenerationLocation = placedBlock.getRelative(machine.getFacing(), 1).getLocation();
+
+        final Dispenser stoneMachine = (Dispenser) placedBlock.getState();
+        stoneMachine.getInventory().setItem(0, plugin.getStoneMachine().getMachineLabel());
 
         plugin.getStoneMachine().generateStone(stoneGenerationLocation);
     }

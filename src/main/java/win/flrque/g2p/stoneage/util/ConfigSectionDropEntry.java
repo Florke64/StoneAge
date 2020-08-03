@@ -58,6 +58,10 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
             dropEntry.setSilkTouchItemStack(silkToolItem);
 
         //Fortune Enchant ignoring
+        final String customEntryName = rootSection.getString("custom_name", canonicalEntryName);
+        dropEntry.setCustomName(customEntryName);
+
+        //Fortune Enchant ignoring
         final boolean ignoreFortune = rootSection.getBoolean("ignore_fortune", true);
         dropEntry.setIgnoreFortuneEnchant(ignoreFortune);
 
@@ -92,10 +96,6 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
         }
 
         return weight;
-    }
-
-    private ItemStack readItemStackDrop() {
-        return null;
     }
 
 }

@@ -9,6 +9,7 @@ package win.flrque.g2p.stoneage;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.command.DropCommand;
 import win.flrque.g2p.stoneage.command.DropHelpCommand;
 import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
@@ -97,6 +98,7 @@ public final class StoneAge extends JavaPlugin {
         getStoneMachine().setStoneRespawnFrequency(generalConfig.getStoneFrequency());
         getStoneMachine().setDropItemsToFeet(generalConfig.isDropItemsToFeet());
         getStoneMachine().setDropExpToFeet(generalConfig.isDropExpToFeet());
+        getStoneMachine().setAllowHopperOutput(generalConfig.isAllowHopperDropOutput());
 
         getDropCalculator().setDropMultiplier(new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier()));
         //TODO: Apply general config fully
@@ -122,7 +124,16 @@ public final class StoneAge extends JavaPlugin {
         int customDropsCount = 0;
         final ConfigurationSection customDropsSection = getConfig().getConfigurationSection("custom_drops");
         for(String entryName : customDropsSection.getKeys(false)) {
+
+            getLogger().log(Level.INFO, "Attempting to load drop entry: "+ entryName);
+
             final ConfigSectionDropEntry customDropEntry = new ConfigSectionDropEntry(customDropsSection.getConfigurationSection(entryName));
+
+            if(customDropEntry == null) {
+                getLogger().log(Level.SEVERE, "Custom Drop Entry equals null value! Skipping...");
+                continue;
+            }
+
             dropCalculator.addDrop(customDropEntry.compileDropEntry());
 
             getLogger().log(Level.INFO, "Loaded custom drop: "+ entryName);
@@ -134,14 +145,16 @@ public final class StoneAge extends JavaPlugin {
         if(!getConfig().isConfigurationSection("database")) {
             getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"database\" section)!");
             getLogger().log(Level.SEVERE, "Skipping, database won't work.");
+        } else {
+            final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
+            databaseConfig.readDatabaseConnectionDetails();
+            sqlManager = new SQLManager(databaseConfig);
+
+            playerSetup.loadPersonalStoneStatsFromDatabase();
+            playerSetup.loadPersonalDropConfigFromDatabase();
+
+            getDropCalculator().getDropMultiplier().readPreviousMultiplierFromDatabase();
         }
-
-        final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
-        databaseConfig.readDatabaseConnectionDetails();
-        sqlManager = new SQLManager(databaseConfig);
-
-        playerSetup.loadPersonalStoneStatsFromDatabase();
-        playerSetup.loadPersonalDropConfigFromDatabase();
 
         getLogger().log(Level.FINE, "Config reloaded!");
         getLogger().log(Level.INFO, "Loaded "+ customDropsCount +" custom drop entries.");
@@ -167,6 +180,7 @@ public final class StoneAge extends JavaPlugin {
         return sqlManager;
     }
 
+    @NotNull
     @Override
     public FileConfiguration getConfig() {
         return super.getConfig();

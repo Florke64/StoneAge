@@ -78,8 +78,4 @@ public class PersonalDropConfig {
         return playerName;
     }
 
-    public Map<DropEntry, Boolean> _getEntries() {
-        return customDropEntries;
-    }
-
 }

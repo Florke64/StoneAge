@@ -16,6 +16,7 @@ public class DropEntry {
     private final StoneAge plugin;
 
     private String entryName;
+    private String customName;
 
     private final ItemStack defaultItemStack;
     private final float chanceWeight;
@@ -67,6 +68,14 @@ public class DropEntry {
 
     public String getEntryName() {
         return entryName;
+    }
+
+    public String getCustomName() {
+        return customName;
+    }
+
+    public void setCustomName(String customName) {
+        this.customName = customName;
     }
 
     public ItemStack getDropEntryIcon() {

@@ -7,35 +7,39 @@
 package win.flrque.g2p.stoneage.drop;
 
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DropLoot {
 
-    private final Map<ItemStack, Integer> loots = new HashMap<>();
-    private final List<DropEntry> activeDropEntries = new LinkedList<>();
+    private final Map<DropEntry, ItemStack> loots = new HashMap<>();
 
-    public void addLoot(DropEntry dropEntry, ItemStack itemStack) {
-        final int exp;
+    private int totalExp = 0;
 
+    public void addLoot(@NotNull DropEntry dropEntry, ItemStack itemStack) {
         if(dropEntry.getMaximalExp() > 0)
-            exp = dropEntry.calculateFinalExpValue();
-        else exp = 0;
+            totalExp += dropEntry.calculateFinalExpValue();
 
-        loots.put(itemStack, exp);
-        activeDropEntries.add(dropEntry);
+        loots.put(dropEntry, itemStack);
     }
 
-    public Set<ItemStack> getLoots() {
-        return loots.keySet();
+    public ItemStack getItemLoot(DropEntry entry) {
+        return loots.get(entry);
     }
 
-    public int getExp(ItemStack itemStack) {
-        return loots.get(itemStack);
+    public int getExp() {
+        return totalExp;
     }
 
     public Collection<DropEntry> getActiveDropEntries() {
-        return activeDropEntries;
+        return loots.keySet();
+    }
+
+    public int getAmountLooted(DropEntry key) {
+        return loots.get(key).getAmount();
     }
 
 }

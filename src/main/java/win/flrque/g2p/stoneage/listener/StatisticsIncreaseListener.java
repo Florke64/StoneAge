@@ -8,6 +8,7 @@ package win.flrque.g2p.stoneage.listener;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
@@ -25,14 +26,15 @@ public class StatisticsIncreaseListener implements Listener {
     }
 
     @EventHandler
-    public void onStoneMachineUse(StoneMachineStoneBreakEvent event) {
+    public void onStoneMachineUse(@NotNull StoneMachineStoneBreakEvent event) {
         final UUID playerUUID = event.getPlayer().getUniqueId();
         final StoneMachinePlayerStats playerStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
 
         final Collection<DropEntry> dropEntries = event.getLoot().getActiveDropEntries();
 
         for(DropEntry entry : dropEntries) {
-            playerStats.increaseStatistic(entry.getEntryName());
+            final int amount = event.getLoot().getAmountLooted(entry);
+            playerStats.increaseStatistic(entry.getEntryName(), amount);
         }
     }
 

@@ -17,7 +17,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Directional;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.util.Message;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,21 +40,31 @@ public class StoneMachine {
     private long stoneRespawnFrequency = 40l;
     private int repairCooldown = 5;
 
+    private boolean allowHopperOutput = false;
+
     private boolean dropItemsToFeet = false;
     private boolean dropExpToFeet = false;
 
     private final ItemStack stoneMachineParent;
+    private final ItemStack machineLabel;
 
     public StoneMachine(String machineName, List<String> lore) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
 
-        this.machineName = ChatColor.translateAlternateColorCodes('&', machineName);
+        this.machineName = Message.color(machineName);
 
         for(String line : lore) {
-            this.machineLore.add(ChatColor.translateAlternateColorCodes('&', line));
+            this.machineLore.add(Message.color(line));
         }
         
         this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
+
+        this.machineLabel = new ItemStack(Material.PAPER, 1);
+        final ItemMeta im = this.machineLabel.getItemMeta();
+        im.setLore(this.machineLore);
+        im.setDisplayName(this.machineName);
+
+        this.machineLabel.setItemMeta(im);
     }
 
     public boolean repairStoneMachine(Dispenser machine) {
@@ -74,7 +86,7 @@ public class StoneMachine {
         if(block.getState() instanceof Dispenser) {
             return isStoneMachine((Dispenser) block.getState());
         }
-
+        
         return false;
     }
 
@@ -86,11 +98,11 @@ public class StoneMachine {
     }
 
     public boolean isStoneMachine(Inventory inventory) {
-        if(inventory.getName() == null) {
+        if(inventory == null) {
             return false;
         }
 
-        return inventory.getName().equals(getExample().getItemMeta().getDisplayName());
+        return inventory.contains(this.machineLabel);
     }
 
     public Location getGeneratedStoneLocation(Dispenser stoneMachine) {
@@ -184,6 +196,7 @@ public class StoneMachine {
         return machineLore;
     }
 
+    @NotNull
     public static List<String> createDefaultMachineLore() {
         final List<String> machineLore = new ArrayList<>();
 
@@ -198,6 +211,14 @@ public class StoneMachine {
 
     public void setStoneRespawnFrequency(long stoneRespawnFrequency) {
         this.stoneRespawnFrequency = stoneRespawnFrequency;
+    }
+
+    public boolean isHopperOutputAllowed() {
+        return allowHopperOutput;
+    }
+
+    public void setAllowHopperOutput(boolean allow) {
+        this.allowHopperOutput = allow;
     }
 
     public boolean isDropItemsToFeet() {
@@ -216,4 +237,7 @@ public class StoneMachine {
         this.dropExpToFeet = dropExpToFeet;
     }
 
+    public ItemStack getMachineLabel() {
+        return machineLabel;
+    }
 }

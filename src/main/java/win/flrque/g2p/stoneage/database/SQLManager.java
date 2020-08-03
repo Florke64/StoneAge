@@ -8,13 +8,12 @@ package win.flrque.g2p.stoneage.database;
 
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
+import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
+import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -25,6 +24,7 @@ public class SQLManager {
 
     public static final String TABLE_PLAYER_STATS = "StoneAge_Stats";
     public static final String TABLE_PLAYER_DROP_CONFIG = "StoneAge_Config";
+    public static final String TABLE_DROP_MULTIPLIER = "StoneAge_DropMultiplier";
 
     public SQLManager(ConfigSectionDatabase databaseConfig) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
@@ -40,6 +40,8 @@ public class SQLManager {
 
     public int runUpdateForPersonalDropConfig(PersonalDropConfig config) throws SQLException {
         try (Connection conn = connectionPool.getConnection()){
+            if(conn == null) return -1;
+
             final StringBuilder query = new StringBuilder();
             final StringBuilder fields = new StringBuilder();
             query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_DROP_CONFIG+ "` (");
@@ -97,8 +99,71 @@ public class SQLManager {
         }
     }
 
+    public int runUpdateForPersonalStoneStats(StoneMachinePlayerStats stats) throws SQLException {
+        try (Connection conn = connectionPool.getConnection()){
+            if(conn == null) return -1;
+
+            final StringBuilder query = new StringBuilder();
+            final StringBuilder fields = new StringBuilder();
+            query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_STATS+ "` (");
+
+            fields.append("`PlayerUUID`, ");
+            fields.append("`PlayerName`, ");
+
+            final Set<String> entries = stats.getStatisticKeys();
+
+            int i = 0;
+            for(String key : entries) {
+                i++;
+                if(key == null) continue;
+
+                fields.append("`" +key+ "`");
+                if(i < entries.size()) {
+                    fields.append(", ");
+                }
+            }
+
+            query.append(fields);
+
+            i = 0;
+            query.append(") VALUES (");
+            query.append("'" +stats.getUniqueId()+ "', ");
+            query.append("'" +stats.getPlayerName()+ "', ");
+            for(String key : entries) {
+                i++;
+                if(key == null) continue;
+
+                int dropStatistic = stats.getStatistic(key);
+                query.append("'" +dropStatistic+ "'");
+                if(i < entries.size()) {
+                    query.append(", ");
+                }
+            }
+            query.append(") ON DUPLICATE KEY UPDATE ");
+
+            i = 0;
+            for(String key : entries) {
+                i++;
+                if(key == null) continue;
+
+                query.append("`" +key+ "`=VALUES(`" +key+ "`)");
+                if(i < entries.size()) {
+                    query.append(", ");
+                }
+            }
+
+            PreparedStatement ps = conn.prepareStatement(query.toString());
+
+            final int response = ps.executeUpdate();
+
+            return response;
+        }
+    }
+
     public ResultSet runQuery(final String query) throws SQLException {
         try (Connection conn = connectionPool.getConnection()){
+            if(conn == null) return null;
+
             PreparedStatement ps = conn.prepareStatement(query);
 
             final ResultSet rs = ps.executeQuery();
@@ -114,6 +179,7 @@ public class SQLManager {
 
         makePlayerStatsTable();
         makePlayerDropConfigTable();
+        makeDropMultiplierTable();
 
         for(DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
             final String dropEntryName = entry.getEntryName();
@@ -127,12 +193,14 @@ public class SQLManager {
 
     private void makeDatabase(final String databaseName) {
         try (Connection conn = connectionPool.getConnection()) {
+            if(conn == null) return;
+
             final String query = "CREATE DATABASE IF NOT EXISTS " +databaseName;
             PreparedStatement ps = conn.prepareStatement(query);
 
             ps.executeUpdate();
 
-        } catch (SQLException ex) {
+        } catch (SQLException | NullPointerException ex) {
             ex.printStackTrace();
         }
     }
@@ -141,6 +209,8 @@ public class SQLManager {
         final String databaseName = getDatabaseName();
 
         try (Connection conn = connectionPool.getConnection()) {
+            if(conn == null) return;
+
             final StringBuilder query = new StringBuilder();
 
             query.append("ALTER TABLE " +databaseName+ ".`" +tableName+ "` ");
@@ -150,8 +220,61 @@ public class SQLManager {
 
             ps.executeUpdate();
 
-        } catch (SQLException ex) {
+        } catch (SQLException | NullPointerException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    private void makeDropMultiplierTable() {
+        final String databaseName = getDatabaseName();
+
+        try (Connection conn = connectionPool.getConnection()) {
+            if(conn == null) return;
+
+            final StringBuilder query = new StringBuilder();
+
+            query.append("CREATE TABLE IF NOT EXISTS `" +databaseName+ "`.`" + TABLE_DROP_MULTIPLIER + "`");
+            query.append(" (");
+            query.append(" `MultiplierId` INT NOT NULL AUTO_INCREMENT,");
+            query.append(" `SetOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,");
+            query.append(" `Timeout` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,");
+            query.append(" `MultiplierValue` FLOAT NOT NULL DEFAULT '1.0',");
+            query.append(" `CallerName` VARCHAR(16),");
+            query.append(" `CallerUUID` VARCHAR(36),");
+            query.append(" PRIMARY KEY (`MultiplierId`)");
+            query.append(") ");
+
+            PreparedStatement ps = conn.prepareStatement(query.toString());
+
+            ps.executeUpdate();
+
+        } catch (SQLException | NullPointerException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void insertDropMultiplierRecord(DropMultiplier dropMultiplier) throws SQLException {
+
+        try (Connection conn = connectionPool.getConnection()){
+            if(conn == null) return;
+
+            final Timestamp startTime = new Timestamp(dropMultiplier.getMultiplierStartTime());
+            final Timestamp timeoutTime = new Timestamp(dropMultiplier.getMultiplierTimeout());
+
+            final StringBuilder query = new StringBuilder();
+            query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_STATS+ "` ");
+
+            query.append(" (`MultiplierId`, `SetOn`, `Timeout`, `MultiplierValue`) VALUES (NULL,");
+            query.append(" '" +startTime+ "',");
+            query.append(" '" +timeoutTime+ "',");
+            query.append(" '" +dropMultiplier.getCurrentDropMultiplier()+ "');");
+            query.append(" '" +dropMultiplier.getCallerName()+ "');");
+            query.append(" '" +dropMultiplier.getCallerUniqueId()+ "');");
+
+            PreparedStatement ps = conn.prepareStatement(query.toString());
+
+            ps.execute();
+
         }
     }
 
@@ -159,6 +282,8 @@ public class SQLManager {
         final String databaseName = getDatabaseName();
 
         try (Connection conn = connectionPool.getConnection()) {
+            if(conn == null) return;
+
             final StringBuilder query = new StringBuilder();
 
             query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." +TABLE_PLAYER_DROP_CONFIG);
@@ -172,7 +297,7 @@ public class SQLManager {
 
             ps.executeUpdate();
 
-        } catch (SQLException ex) {
+        } catch (SQLException | NullPointerException ex) {
             ex.printStackTrace();
         }
     }
@@ -181,6 +306,8 @@ public class SQLManager {
         final String databaseName = connectionPool.getDatabaseConfig().getDatabaseName();
 
         try (Connection conn = connectionPool.getConnection()) {
+            if(conn == null) return;
+
             final StringBuilder query = new StringBuilder();
 
             query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." +TABLE_PLAYER_STATS);
@@ -194,27 +321,9 @@ public class SQLManager {
 
             ps.executeUpdate();
 
-        } catch (SQLException ex) {
+        } catch (SQLException | NullPointerException ex) {
             ex.printStackTrace();
         }
-    }
-
-    public String getDataFromPlayerName(String playerName) throws SQLException{
-        try (Connection conn = connectionPool.getConnection()){
-            final String query = "SELECT data FROM Go2PlayLocalTesting WHERE `mcPlayerName` = ? LIMIT 1";
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setString(1, playerName);
-
-            ResultSet rs = ps.executeQuery();
-
-            while(rs.next()) {
-                return rs.getString("data");
-            }
-
-            return "";
-
-        }
-
     }
 
     public void onDisable() {
