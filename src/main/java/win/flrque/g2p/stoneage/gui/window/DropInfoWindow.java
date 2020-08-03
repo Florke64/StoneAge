@@ -73,7 +73,7 @@ public class DropInfoWindow extends Window  {
         icon.setAmount(1);
 
         final ItemMeta meta = icon.getItemMeta();
-        meta.setDisplayName(ChatColor.GREEN + Message.prettify(drop.getCustomName()) + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
+        meta.setDisplayName(ChatColor.GREEN + Message.simplePrepare(drop.getCustomName()) + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
 
         final List<String> lore = new ArrayList<>();
         final String dropEntryStatus = personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony";

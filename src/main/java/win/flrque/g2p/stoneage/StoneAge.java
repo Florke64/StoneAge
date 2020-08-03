@@ -9,6 +9,7 @@ package win.flrque.g2p.stoneage;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.command.DropCommand;
 import win.flrque.g2p.stoneage.command.DropHelpCommand;
 import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
@@ -179,6 +180,7 @@ public final class StoneAge extends JavaPlugin {
         return sqlManager;
     }
 
+    @NotNull
     @Override
     public FileConfiguration getConfig() {
         return super.getConfig();
