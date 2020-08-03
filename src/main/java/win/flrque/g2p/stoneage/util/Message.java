@@ -32,7 +32,7 @@ public class Message {
     private final List<String> rawMessage = new ArrayList<>();
     private final List<String> message = new ArrayList<>();
 
-    private boolean usePrefixOnSend = true;
+    private boolean usePrefixOnSend = false;
 
     public Message(@NotNull String ...message) {
         for(final String line : message) {
@@ -54,7 +54,7 @@ public class Message {
         }
     }
 
-    public void addLines(final String ...lines) {
+    public void addLines(@NotNull final String ...lines) {
         for(final String line : lines) {
             this.rawMessage.add(line);
         }
@@ -81,18 +81,6 @@ public class Message {
         color();
     }
 
-    public static String simplePrepare(String textLine) {
-        if(textLine == null || textLine.isEmpty()) {
-            return textLine;
-        }
-
-        String result = color(textLine);
-        result = replaceUnderlines(result);
-        result = capitalize(result);
-
-        return result;
-    }
-
     private void insertVariableValues() {
         for(int i=0; i<this.rawMessage.size(); i++) {
             final String currentLine = this.rawMessage.get(i);
@@ -104,8 +92,8 @@ public class Message {
 
     private String insertVariableValues(String line) {
         for(int v : this.variables.keySet()) {
-            final String variable = this.variables.get(v);
-            line.replace(("$_"+v), variable);
+            final String variable = capitalize(this.variables.get(v));
+            line = line.replace(("$_"+v), variable);
         }
 
         return line;
@@ -114,7 +102,7 @@ public class Message {
     private void color() {
         for(int i=0; i<this.rawMessage.size(); i++) {
             final String coloredLine = color(this.rawMessage.get(i));
-            this.message.set(i, coloredLine);
+            this.message.add(coloredLine);
         }
     }
 
@@ -132,6 +120,18 @@ public class Message {
         }
 
         return ChatColor.translateAlternateColorCodes('&', text);
+    }
+
+    public static String simplePrepare(String textLine) {
+        if(textLine == null || textLine.isEmpty()) {
+            return textLine;
+        }
+
+        String result = color(textLine);
+        result = replaceUnderlines(result);
+        result = capitalize(result);
+
+        return result;
     }
 
     public static String capitalize(String text) {

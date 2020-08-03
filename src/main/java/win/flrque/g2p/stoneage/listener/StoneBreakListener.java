@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropLoot;
+import win.flrque.g2p.stoneage.event.StoneDropLootEvent;
 import win.flrque.g2p.stoneage.event.StoneMachineStoneBreakEvent;
 import win.flrque.g2p.stoneage.util.Message;
 
@@ -82,7 +83,7 @@ public class StoneBreakListener implements Listener {
             finalDrop = null;
         }
 
-        if(stoneMachine.getBlock() != null){
+        if(stoneMachine != null && stoneMachine.getBlock() != null){
             final StoneMachineStoneBreakEvent stoneBreakEvent = new StoneMachineStoneBreakEvent(player, stoneMachine, finalDrop);
             Bukkit.getServer().getPluginManager().callEvent(stoneBreakEvent);
 
@@ -97,11 +98,10 @@ public class StoneBreakListener implements Listener {
     }
 
     private void dropLoot(Player player, Location stoneLoc, @Nullable Dispenser stoneMachine, DropLoot dropLoot) {
-        //TODO: Add dropping to hopper under the stone machine.
         boolean hasHopper = false;
         Block blockUnderStoneMachine = null;
         //Verifying plugin's config and using hopper output if allowed
-        if (plugin.getStoneMachine().isHopperOutputAllowed()) {
+        if (stoneMachine != null && plugin.getStoneMachine().isHopperOutputAllowed()) {
             blockUnderStoneMachine = stoneMachine.getBlock().getRelative(BlockFace.DOWN);
             if (blockUnderStoneMachine != null && blockUnderStoneMachine.getState() instanceof Hopper) {
                 hasHopper = true;
@@ -117,13 +117,17 @@ public class StoneBreakListener implements Listener {
             ((ExperienceOrb) orb).setExperience(dropLoot.getExp());
         }
 
-//        plugin.getLogger().log(Level.INFO, "- - - - -");
         //Looping through all loots and dropping them for the player to pickup.
         for (DropEntry drop : dropLoot.getActiveDropEntries()) {
             final ItemStack itemLoot = dropLoot.getItemLoot(drop);
             final int totalAmount = itemLoot.getAmount();
 
-//            plugin.getLogger().log(Level.INFO, "drop: " + itemLoot.toString());
+            final StoneDropLootEvent lootEvent = new StoneDropLootEvent(itemLoot);
+            Bukkit.getServer().getPluginManager().callEvent(lootEvent);
+
+            if(lootEvent.isCancelled()) {
+                continue;
+            }
 
             //Drop to hopper under the Stone Machine
             ItemStack hopperLeftItem = null;
@@ -165,14 +169,10 @@ public class StoneBreakListener implements Listener {
             final int maxStackSize = itemInInv.getMaxStackSize();
             if (itemInInv.isSimilar(itemStack) && itemInInv.getAmount() < maxStackSize) {
                 final int handleSize = maxStackSize - itemInInv.getAmount();
-//                plugin.getLogger().log(Level.INFO, "handlesize: " + itemInInv.toString() + "/" + handleSize);
                 final int adding = itemStack.getAmount() < handleSize ? itemStack.getAmount() : handleSize;
-//                plugin.getLogger().log(Level.INFO, "adding: " + itemInInv.toString() + "/" + adding);
                 itemInInv.setAmount(itemInInv.getAmount() + ((adding > 0)? adding : 0));
-//                plugin.getLogger().log(Level.INFO, "setAmount: " + itemInInv.getAmount() + ((adding > 0)? adding : 0));
 
                 leftToAdd -= adding > 0? adding : 0;
-//                plugin.getLogger().log(Level.INFO, "leftToAdd: " + itemInInv.getAmount() + leftToAdd);
 
                 if(leftToAdd < 1) break;
 
