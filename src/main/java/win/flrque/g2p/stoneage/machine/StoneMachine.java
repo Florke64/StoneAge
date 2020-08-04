@@ -33,7 +33,7 @@ public class StoneMachine {
     private final StoneAge plugin;
 
     private final String machineName;
-    private final List<String> machineLore = new ArrayList<>();
+    private final List<String> machineLore;
 
     private final Map<Dispenser, Long> lastStoneMachineRepair = new HashMap<>();
 
@@ -48,14 +48,13 @@ public class StoneMachine {
     private final ItemStack stoneMachineParent;
     private final ItemStack machineLabel;
 
-    public StoneMachine(String machineName, List<String> lore) {
+    public StoneMachine(String machineName, List<String> machineLore) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
 
         this.machineName = Message.color(machineName);
 
-        for(String line : lore) {
-            this.machineLore.add(Message.color(line));
-        }
+        final Message lore = new Message(machineLore);
+        this.machineLore = lore.getPreparedMessage();
         
         this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
 
