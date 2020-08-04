@@ -6,12 +6,15 @@
 
 package win.flrque.g2p.stoneage.listener;
 
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
+import win.flrque.g2p.stoneage.drop.DropLoot;
 import win.flrque.g2p.stoneage.event.StoneMachineStoneBreakEvent;
 
 import java.util.Collection;
@@ -27,10 +30,21 @@ public class StatisticsIncreaseListener implements Listener {
 
     @EventHandler
     public void onStoneMachineUse(@NotNull StoneMachineStoneBreakEvent event) {
-        final UUID playerUUID = event.getPlayer().getUniqueId();
+        final Player player = event.getPlayer();
+
+        if(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+            return;
+        }
+
+        final UUID playerUUID = player.getUniqueId();
         final StoneMachinePlayerStats playerStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
 
-        final Collection<DropEntry> dropEntries = event.getLoot().getActiveDropEntries();
+        final DropLoot dropLoot = event.getLoot();
+        if(dropLoot == null) {
+            return;
+        }
+
+        final Collection<DropEntry> dropEntries = dropLoot.getActiveDropEntries();
 
         for(DropEntry entry : dropEntries) {
             final int amount = event.getLoot().getAmountLooted(entry);
