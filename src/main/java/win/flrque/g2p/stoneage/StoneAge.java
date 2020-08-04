@@ -78,7 +78,7 @@ public final class StoneAge extends JavaPlugin {
         getCommand("drophelp").setExecutor(new DropHelpCommand());
         getCommand("multiplier").setExecutor(new DropMultiplierCommand());
 
-        final long minute = 60 * 1000;
+        final long minute = 60 * 20;
         final long period = 15;
 
         initAsyncAutosave(period);
