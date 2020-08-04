@@ -6,9 +6,13 @@
 
 package win.flrque.g2p.stoneage.util;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -51,6 +55,13 @@ public class Message {
     public void send(@NotNull CommandSender target) {
         for(final String line : this.message) {
             target.sendMessage((usePrefixOnSend? linePrefix : "") + line);
+        }
+    }
+
+    public void sendActionMessage(@NotNull Player target) {
+        for(final String line : this.message) {
+            final BaseComponent chatComponent = new TextComponent((usePrefixOnSend? linePrefix : "") + line);
+            target.spigot().sendMessage(ChatMessageType.ACTION_BAR, chatComponent);
         }
     }
 

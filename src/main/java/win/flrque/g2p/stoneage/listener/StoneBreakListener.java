@@ -148,7 +148,7 @@ public class StoneBreakListener implements Listener {
             final Message dropMessage = new Message("&7Udalo ci sie wykopac &c$_1 &7x&6$_2");
             dropMessage.setVariable(1, drop.getCustomName());
             dropMessage.setVariable(2, Integer.toString(totalAmount));
-            dropMessage.send(player);
+            dropMessage.sendActionMessage(player);
         }
     }
 
