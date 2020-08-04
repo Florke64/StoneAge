@@ -40,7 +40,15 @@ public class Message {
 
     public Message(@NotNull String ...message) {
         for(final String line : message) {
-           this.rawMessage.add(line);
+            this.rawMessage.add(line);
+        }
+
+        prepare();
+    }
+
+    public Message(@NotNull List<String> message) {
+        for(final String line : message) {
+            this.rawMessage.add(line);
         }
 
         prepare();
@@ -66,6 +74,14 @@ public class Message {
     }
 
     public void addLines(@NotNull final String ...lines) {
+        for(final String line : lines) {
+            this.rawMessage.add(line);
+        }
+
+        prepare();
+    }
+
+    public void addLines(@NotNull final List<String> lines) {
         for(final String line : lines) {
             this.rawMessage.add(line);
         }
