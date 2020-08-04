@@ -162,7 +162,7 @@ public class PlayerSetupManager {
         stats.onDatabaseSave();
     }
 
-    public void saveAllUnsavedDropConfigs() {
+    public void saveAllUnsavedDropData() {
         int saved = 0, skipped = 0;
         for(PersonalDropConfig config : playerPersonalDropConfig.values()) {
             if(config.hasUnsavedEdits()) {
@@ -193,7 +193,7 @@ public class PlayerSetupManager {
     }
 
     public void onDisable() {
-        saveAllUnsavedDropConfigs();
+        saveAllUnsavedDropData();
     }
 
     private PersonalDropConfig createPersonalDropConfig(UUID uuid) {
