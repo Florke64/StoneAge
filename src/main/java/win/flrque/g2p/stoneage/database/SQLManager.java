@@ -8,7 +8,7 @@ package win.flrque.g2p.stoneage.database;
 
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
-import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
@@ -99,7 +99,7 @@ public class SQLManager {
         }
     }
 
-    public int runUpdateForPersonalStoneStats(StoneMachinePlayerStats stats) throws SQLException {
+    public int runUpdateForPersonalStoneStats(PlayerStats stats) throws SQLException {
         try (Connection conn = connectionPool.getConnection()){
             if(conn == null) return -1;
 

@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
-import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
@@ -44,7 +44,7 @@ public class DropInfoWindow extends Window  {
     public void updateInventoryContent() {
 
         final DropCalculator calculator = plugin.getDropCalculator();
-        final StoneMachinePlayerStats stats = plugin.getPlayerSetup().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
+        final PlayerStats stats = plugin.getPlayerSetup().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
 
         for(int i=0; i<=calculator.getDropEntries().size(); i++) {
             if(i >= inventory.getSize()) {
@@ -63,7 +63,7 @@ public class DropInfoWindow extends Window  {
     }
 
     @NotNull
-    private ItemStack createIconItem(@NotNull DropEntry drop, @NotNull StoneMachinePlayerStats stats) {
+    private ItemStack createIconItem(@NotNull DropEntry drop, @NotNull PlayerStats stats) {
         //Preparing data to be placed on the item
         final DropCalculator calculator = plugin.getDropCalculator();
         final float currentDropMultiplier = calculator.getDropMultiplier().getCurrentDropMultiplier();

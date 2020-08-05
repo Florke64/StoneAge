@@ -19,7 +19,7 @@ import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
 import win.flrque.g2p.stoneage.database.SQLManager;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
-import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.drop.ExperienceCalculator;
@@ -190,7 +190,7 @@ public final class StoneAge extends JavaPlugin {
                 for(Player player : Bukkit.getServer().getOnlinePlayers()) {
                     final UUID playerUUID = player.getUniqueId();
                     final PersonalDropConfig dropConfig = getPlayerSetup().getPersonalDropConfig(playerUUID);
-                    final StoneMachinePlayerStats dropStats = getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
+                    final PlayerStats dropStats = getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
 
                     getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
                     getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);

@@ -23,13 +23,13 @@ public class PlayerSetupManager {
     private final StoneAge plugin;
 
     private final Map<UUID, PersonalDropConfig> playerPersonalDropConfig = new HashMap<>();
-    private final Map<UUID, StoneMachinePlayerStats> stoneMachinePlayerStats = new HashMap<>();
+    private final Map<UUID, PlayerStats> stoneMachinePlayerStats = new HashMap<>();
 
     public PlayerSetupManager() {
         plugin = StoneAge.getPlugin(StoneAge.class);
     }
 
-    public StoneMachinePlayerStats getPlayerStoneMachineStats(UUID uuid) {
+    public PlayerStats getPlayerStoneMachineStats(UUID uuid) {
         if(!stoneMachinePlayerStats.containsKey(uuid)) {
             stoneMachinePlayerStats.put(uuid, createStoneMachinePlayerStats(uuid));
         }
@@ -37,9 +37,9 @@ public class PlayerSetupManager {
         return stoneMachinePlayerStats.get(uuid);
     }
 
-    private StoneMachinePlayerStats createStoneMachinePlayerStats(UUID uuid) {
+    private PlayerStats createStoneMachinePlayerStats(UUID uuid) {
         final String playerName = Bukkit.getOfflinePlayer(uuid).getName();
-        final StoneMachinePlayerStats stats = new StoneMachinePlayerStats(uuid, playerName);
+        final PlayerStats stats = new PlayerStats(uuid, playerName);
         stoneMachinePlayerStats.put(uuid, stats);
 
         return stoneMachinePlayerStats.get(uuid);
@@ -79,7 +79,7 @@ public class PlayerSetupManager {
                 final long minerExp = result.getLong("MinerExp");
                 final int minerLvl = result.getInt("MinerLvl");
 
-                final StoneMachinePlayerStats stats = playerSetup.getPlayerStoneMachineStats(uuid);
+                final PlayerStats stats = playerSetup.getPlayerStoneMachineStats(uuid);
                 stats.setMinerExp(minerExp);
                 stats.setMinerLvl(minerLvl);
 
@@ -158,7 +158,7 @@ public class PlayerSetupManager {
         config.onDatabaseSave();
     }
 
-    public void savePersonalStoneStatsInDatabase(StoneMachinePlayerStats stats) {
+    public void savePersonalStoneStatsInDatabase(PlayerStats stats) {
         try {
             plugin.getDatabaseController().runUpdateForPersonalStoneStats(stats);
         } catch (SQLException e) {
@@ -185,7 +185,7 @@ public class PlayerSetupManager {
         plugin.getLogger().log(Level.INFO, "Saved "+saved+" personal configs (skipped: "+skipped+")");
 
         saved = 0; skipped = 0;
-        for(StoneMachinePlayerStats playerStats : stoneMachinePlayerStats.values()) {
+        for(PlayerStats playerStats : stoneMachinePlayerStats.values()) {
             if(playerStats.hasUnsavedEdits()) {
                 savePersonalStoneStatsInDatabase(playerStats);
                 saved++;

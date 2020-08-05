@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class StoneMachinePlayerStats {
+public class PlayerStats {
 
     private final StoneAge plugin;
 
@@ -29,7 +29,7 @@ public class StoneMachinePlayerStats {
 
     private final Map<String, Integer> statistics = new HashMap<>();
 
-    public StoneMachinePlayerStats(final UUID uuid, final String playerName) {
+    public PlayerStats(final UUID uuid, final String playerName) {
         plugin = StoneAge.getPlugin(StoneAge.class);
 
         this.uuid = uuid;

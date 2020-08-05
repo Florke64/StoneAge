@@ -9,16 +9,16 @@ package win.flrque.g2p.stoneage.event;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 
 public class MinerLevelUpEvent extends Event implements Cancellable {
 
     private boolean isCancelled = false;
 
-    private final StoneMachinePlayerStats playerStats;
+    private final PlayerStats playerStats;
     private final int upToLevel;
 
-    public MinerLevelUpEvent(StoneMachinePlayerStats stats, int level) {
+    public MinerLevelUpEvent(PlayerStats stats, int level) {
         this.playerStats = stats;
         this.upToLevel = level;
     }
@@ -27,7 +27,7 @@ public class MinerLevelUpEvent extends Event implements Cancellable {
         return upToLevel;
     }
 
-    public StoneMachinePlayerStats getPlayerStats() {
+    public PlayerStats getPlayerStats() {
         return playerStats;
     }
 
