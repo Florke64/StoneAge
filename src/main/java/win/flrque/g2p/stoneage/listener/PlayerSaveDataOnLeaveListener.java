@@ -32,6 +32,11 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
         final PersonalDropConfig dropConfig = plugin.getPlayerSetup().getPersonalDropConfig(playerUUID);
         final PlayerStats dropStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
 
+        saveDropConfig(dropConfig);
+        saveDropStatistics(dropStats);
+    }
+
+    private void saveDropConfig(@NotNull final PersonalDropConfig dropConfig) {
         if(!dropConfig.hasUnsavedEdits()) {
             return;
         }
@@ -41,10 +46,22 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
             @Override
             public void run() {
                 plugin.getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
-                plugin.getLogger().log(Level.INFO, "Saved Personal Configuration for " + playerUUID + ".");
-                plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
-                plugin.getLogger().log(Level.INFO, "Saved Personal Drop Stats for " + playerUUID + ".");
+                plugin.getLogger().log(Level.INFO, "Saved Personal Configuration for " + dropConfig.getUniqueId() + ".");
+            }
+        }.runTaskAsynchronously(plugin);
+    }
 
+    private void saveDropStatistics(@NotNull final PlayerStats dropStats) {
+        if(!dropStats.hasUnsavedEdits()) {
+            return;
+        }
+
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+                plugin.getLogger().log(Level.INFO, "Saved Personal Drop Stats for " + dropStats.getUniqueId() + ".");
             }
         }.runTaskAsynchronously(plugin);
     }

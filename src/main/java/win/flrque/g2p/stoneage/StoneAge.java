@@ -238,10 +238,14 @@ public final class StoneAge extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        this.getLogger().log(Level.INFO, "onDisable()");
 
+        this.getLogger().log(Level.INFO, "closing windows");
         getWindowManager().closeAllWindows(); //TODO: NullPointer Exception <- onDisable?
 
+        this.getLogger().log(Level.INFO, "saving...");
         playerSetup.onDisable();
+        this.getLogger().log(Level.INFO, "closing db");
         sqlManager.onDisable();
     }
 }

@@ -98,6 +98,8 @@ public class PlayerStats {
         }
 
         this.minerExp = minerExp;
+
+        this.unsavedEdits = true;
     }
 
     public long getMinerExp() {
@@ -112,6 +114,8 @@ public class PlayerStats {
             return;
 
         this.minerLvl = minerLvl;
+
+        this.unsavedEdits = true;
     }
 
     public int getMinerLvl() {

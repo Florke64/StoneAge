@@ -170,6 +170,8 @@ public class PlayerSetupManager {
     }
 
     public void saveAllUnsavedDropData() {
+        plugin.getLogger().log(Level.INFO, "saveAllUnsavedDropData()");
+
         int saved = 0, skipped = 0;
         for(PersonalDropConfig config : playerPersonalDropConfig.values()) {
             if(config.hasUnsavedEdits()) {
@@ -200,6 +202,7 @@ public class PlayerSetupManager {
     }
 
     public void onDisable() {
+        plugin.getLogger().log(Level.INFO, "PlayerSetupManager#onDisable()");
         saveAllUnsavedDropData();
     }
 
