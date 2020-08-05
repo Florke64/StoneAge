@@ -27,6 +27,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropLoot;
 import win.flrque.g2p.stoneage.event.StoneDropLootEvent;
@@ -129,6 +130,9 @@ public class StoneBreakListener implements Listener {
             if(lootEvent.isCancelled()) {
                 continue;
             }
+
+            final PlayerStats stats = this.plugin.getPlayerSetup().getPlayerStoneMachineStats(player.getUniqueId());
+            stats.addMinerExp(drop.getMinerExp());
 
             //Drop to hopper under the Stone Machine
             ItemStack hopperLeftItem = null;

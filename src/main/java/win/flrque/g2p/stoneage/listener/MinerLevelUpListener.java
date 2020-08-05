@@ -37,8 +37,6 @@ public class MinerLevelUpListener implements Listener {
             return;
         }
 
-        player.playSound(player.getLocation(), Sound.MUSIC_DRAGON, 1f, 1f);
-
         player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f);
 
         final Message congratulations = new Message("&dGratulacje! &c$_1 &dosiaga &6$_2 &dpoziom gornictwa!");
