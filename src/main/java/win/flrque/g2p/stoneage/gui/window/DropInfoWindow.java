@@ -76,6 +76,7 @@ public class DropInfoWindow extends Window  {
         meta.setDisplayName(ChatColor.GREEN + Message.simplePrepare(drop.getCustomName()) + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
 
         final List<String> lore = new ArrayList<>();
+        lore.add(Message.color("  &8+" + drop.getMinerExp() + "xp"));
         final String dropEntryStatus = personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony";
         lore.add(Message.color("&7Status: " + dropEntryStatus));
         lore.add(Message.color("&7(Kliknij aby zmienic)"));
