@@ -318,8 +318,8 @@ public class SQLManager {
             query.append(" (");
             query.append(" `PlayerUUID` VARCHAR(36),");
             query.append(" `PlayerName` VARCHAR(16),");
-            query.append(" `MinerExp` BIGINT UNSIGNED NOT NULL DEFAULT '0';,");
-            query.append(" `MinerLvl` INT UNSIGNED NOT NULL DEFAULT '1';,");
+            query.append(" `MinerExp` BIGINT UNSIGNED NOT NULL DEFAULT '0',");
+            query.append(" `MinerLvl` INT UNSIGNED NOT NULL DEFAULT '1',");
             query.append(" PRIMARY KEY (`PlayerUUID`)");
             query.append(") ");
 
