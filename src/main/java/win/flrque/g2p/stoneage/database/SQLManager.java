@@ -183,12 +183,12 @@ public class SQLManager {
 
         for(DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
             final String dropEntryName = entry.getEntryName();
-            addTableColumnInNotExist(TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
-            addTableColumnInNotExist(TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
+            addTableColumnIfNotExist(TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
+            addTableColumnIfNotExist(TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
 
-        addTableColumnInNotExist(TABLE_PLAYER_STATS, "primitive_drop", "INT", "0");
-        addTableColumnInNotExist(TABLE_PLAYER_DROP_CONFIG, "primitive_drop", "BOOLEAN", "true");
+        addTableColumnIfNotExist(TABLE_PLAYER_STATS, "primitive_drop", "INT", "0");
+        addTableColumnIfNotExist(TABLE_PLAYER_DROP_CONFIG, "primitive_drop", "BOOLEAN", "true");
     }
 
     private void makeDatabase(final String databaseName) {
@@ -205,7 +205,7 @@ public class SQLManager {
         }
     }
 
-    private void addTableColumnInNotExist(final String tableName, final String columnName, final String columnType, final String defaultValue) {
+    private void addTableColumnIfNotExist(final String tableName, final String columnName, final String columnType, final String defaultValue) {
         final String databaseName = getDatabaseName();
 
         try (Connection conn = connectionPool.getConnection()) {
