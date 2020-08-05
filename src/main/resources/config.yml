@@ -23,6 +23,7 @@ machines:
 
 primitive_drop:
   custom_name: 'Stone'
+  miner_exp: 1 # Integer exp value for mining level
   weight: 63.9
   minimal_exp: 0
   maximal_exp: 0
@@ -41,6 +42,7 @@ primitive_drop:
 
 custom_drops:
   coal:
+    miner_exp: 2
     weight: 11.6 # float value
     minimal_exp: 1
     maximal_exp: 5
@@ -60,6 +62,7 @@ custom_drops:
         - '&7Drop Silktouch'
 
   iron:
+    miner_exp: 2
     weight: 5.1
     ignore_fortune: true
     multipliable: true
@@ -71,6 +74,7 @@ custom_drops:
         - '&7Default drop only'
 
   gold:
+    miner_exp: 1
     weight: 1.2
     ignore_fortune: true
     multipliable: true
@@ -82,6 +86,7 @@ custom_drops:
         - '&7Default drop only'
 
   diamond:
+    miner_exp: 4
     weight: 1.0 # float value
     minimal_exp: 1
     maximal_exp: 5
@@ -101,6 +106,7 @@ custom_drops:
         - '&7Drop Silktouch'
 
   redstone:
+    miner_exp: 3
     weight: 5.5 # float value
     minimal_exp: 1
     maximal_exp: 5
@@ -121,6 +127,7 @@ custom_drops:
         - '&7Drop Silktouch'
 
   lapis:
+    miner_exp: 3
     weight: 0.1 # float value
     minimal_exp: 1
     maximal_exp: 5

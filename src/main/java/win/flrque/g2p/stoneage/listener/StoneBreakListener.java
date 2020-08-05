@@ -122,6 +122,7 @@ public class StoneBreakListener implements Listener {
             final ItemStack itemLoot = dropLoot.getItemLoot(drop);
             final int totalAmount = itemLoot.getAmount();
 
+            //Calling API Event
             final StoneDropLootEvent lootEvent = new StoneDropLootEvent(itemLoot);
             Bukkit.getServer().getPluginManager().callEvent(lootEvent);
 

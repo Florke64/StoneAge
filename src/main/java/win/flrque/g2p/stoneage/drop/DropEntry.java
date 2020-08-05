@@ -30,6 +30,8 @@ public class DropEntry {
     private int minExp;
     private int maxExp;
 
+    private int minerExp;
+
     private ItemStack silkTouchItemStack;
     //TODO: Store type of item to reduce ItemStack#getType() calls count
 
@@ -46,6 +48,8 @@ public class DropEntry {
 
         minExp = 1;
         maxExp = 5;
+
+        minerExp = 0;
 
         silkTouchItemStack = itemStack;
     }
@@ -159,4 +163,11 @@ public class DropEntry {
         this.multipliable = multipliable;
     }
 
+    public int getMinerExp() {
+        return minerExp;
+    }
+
+    public void setMinerExp(int minerExp) {
+        this.minerExp = minerExp;
+    }
 }

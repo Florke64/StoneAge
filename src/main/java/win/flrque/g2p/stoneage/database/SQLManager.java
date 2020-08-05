@@ -109,6 +109,8 @@ public class SQLManager {
 
             fields.append("`PlayerUUID`, ");
             fields.append("`PlayerName`, ");
+            fields.append("`MinerExp`, ");
+            fields.append("`MinerLvl`, ");
 
             final Set<String> entries = stats.getStatisticKeys();
 
@@ -129,6 +131,8 @@ public class SQLManager {
             query.append(") VALUES (");
             query.append("'" +stats.getUniqueId()+ "', ");
             query.append("'" +stats.getPlayerName()+ "', ");
+            query.append("'" +stats.getMinerExp()+ "', ");
+            query.append("'" +stats.getMinerLvl()+ "', ");
             for(String key : entries) {
                 i++;
                 if(key == null) continue;
@@ -288,8 +292,8 @@ public class SQLManager {
 
             query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." +TABLE_PLAYER_DROP_CONFIG);
             query.append(" (");
-            query.append(" PlayerUUID VARCHAR(36),");
-            query.append(" PlayerName VARCHAR(16),");
+            query.append(" `PlayerUUID` VARCHAR(36),");
+            query.append(" `PlayerName` VARCHAR(16),");
             query.append(" PRIMARY KEY (`PlayerUUID`)");
             query.append(") ");
 
@@ -312,8 +316,10 @@ public class SQLManager {
 
             query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." +TABLE_PLAYER_STATS);
             query.append(" (");
-            query.append(" PlayerUUID VARCHAR(36),");
-            query.append(" PlayerName VARCHAR(16),");
+            query.append(" `PlayerUUID` VARCHAR(36),");
+            query.append(" `PlayerName` VARCHAR(16),");
+            query.append(" `MinerExp` BIGINT UNSIGNED NOT NULL DEFAULT '0';,");
+            query.append(" `MinerLvl` INT UNSIGNED NOT NULL DEFAULT '1';,");
             query.append(" PRIMARY KEY (`PlayerUUID`)");
             query.append(") ");
 

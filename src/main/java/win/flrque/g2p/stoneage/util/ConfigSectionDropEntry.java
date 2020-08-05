@@ -81,6 +81,10 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
         dropEntry.setMinimalExp(minExp);
         dropEntry.setMaximalExp(maxExp);
 
+        //Mining Experience
+        final int minerExp = rootSection.getInt("miner_exp", 0);
+        dropEntry.setMinerExp(minerExp);
+
         return dropEntry;
     }
 

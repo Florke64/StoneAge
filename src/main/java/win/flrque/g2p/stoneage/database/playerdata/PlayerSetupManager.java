@@ -76,7 +76,12 @@ public class PlayerSetupManager {
             while (result.next()) {
                 final ResultSetMetaData metaData = result.getMetaData();
                 final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
+                final long minerExp = result.getLong("MinerExp");
+                final int minerLvl = result.getInt("MinerLvl");
+
                 final StoneMachinePlayerStats stats = playerSetup.getPlayerStoneMachineStats(uuid);
+                stats.setMinerExp(minerExp);
+                stats.setMinerLvl(minerLvl);
 
                 plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
 
@@ -84,6 +89,8 @@ public class PlayerSetupManager {
                 for(int i=1; i<=columnCount; i++) {
                     final String columnName = metaData.getColumnName(i);
                     if(columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
+                        continue;
+                    else if(columnName.contentEquals("MinerExp") || columnName.contentEquals("MinerLvl"))
                         continue;
 
                     stats.setStatistic(columnName, result.getInt(columnName));

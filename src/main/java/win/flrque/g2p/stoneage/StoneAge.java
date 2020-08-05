@@ -22,6 +22,7 @@ import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
+import win.flrque.g2p.stoneage.drop.ExperienceCalculator;
 import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
@@ -40,6 +41,7 @@ public final class StoneAge extends JavaPlugin {
 
     private WindowManager windowManager;
     private DropCalculator dropCalculator;
+    private ExperienceCalculator expCalculator;
 
     private SQLManager sqlManager;
     private BukkitRunnable autosaveRunnable;
@@ -49,6 +51,7 @@ public final class StoneAge extends JavaPlugin {
         // Plugin startup logic
         windowManager = new WindowManager();
         dropCalculator = new DropCalculator();
+        expCalculator = new ExperienceCalculator();
         playerSetup = new PlayerSetupManager();
 
         initStoneMachines();
@@ -215,6 +218,10 @@ public final class StoneAge extends JavaPlugin {
 
     public DropCalculator getDropCalculator() {
         return dropCalculator;
+    }
+
+    public ExperienceCalculator getExpCalculator() {
+        return expCalculator;
     }
 
     public SQLManager getDatabaseController() {
