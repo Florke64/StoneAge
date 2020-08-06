@@ -113,7 +113,7 @@ public class DropInfoWindow extends Window  {
     @Override
     public boolean open(Player player) {
         if(!super.open(player)) {
-            player.sendMessage("Nie udało się otworzyć okna dropu!");
+            new Message("&cNie udało się otworzyć okna dropu!").send(player);
             return false;
         }
 
@@ -142,7 +142,11 @@ public class DropInfoWindow extends Window  {
         player.closeInventory();
 
         boolean isDropping = plugin.getPlayerSetup().getPersonalDropConfig(player.getUniqueId()).switchDropEntry(dropEntry);
-        player.sendMessage("Ustawiono drop " + dropEntry.getCustomName() + " na " + (isDropping? "wlaczony" : "wylaczony"));
+
+        final Message infoMessage = new Message("&7Ustawiono drop &c$_1 &7na $_2&7.");
+        infoMessage.setVariable(1, dropEntry.getCustomName());
+        infoMessage.setVariable(2, (isDropping? "&2wlaczony" : "&cwylaczony"));
+        infoMessage.send(player);
     }
 
 }
