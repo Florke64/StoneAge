@@ -36,7 +36,7 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
         saveDropStatistics(dropStats);
     }
 
-    private void saveDropConfig(@NotNull final PersonalDropConfig dropConfig) {
+    private void saveDropConfig(@NotNull PersonalDropConfig dropConfig) {
         if(!dropConfig.hasUnsavedEdits()) {
             return;
         }
@@ -51,7 +51,7 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
         }.runTaskAsynchronously(plugin);
     }
 
-    private void saveDropStatistics(@NotNull final PlayerStats dropStats) {
+    private void saveDropStatistics(@NotNull PlayerStats dropStats) {
         if(!dropStats.hasUnsavedEdits()) {
             return;
         }

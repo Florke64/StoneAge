@@ -126,7 +126,7 @@ public class SQLManager {
             }
 
             query.append(fields);
-//TODO: Fix saving exp into db
+
             i = 0;
             query.append(") VALUES (");
             query.append("'" +stats.getUniqueId()+ "', ");
@@ -144,6 +144,9 @@ public class SQLManager {
                 }
             }
             query.append(") ON DUPLICATE KEY UPDATE ");
+
+            query.append("`MinerExp`=VALUES(`MinerExp`), ");
+            query.append("`MinerLvl`=VALUES(`MinerLvl`), ");
 
             i = 0;
             for(String key : entries) {
