@@ -38,6 +38,10 @@ public class Message {
 
     private boolean usePrefixOnSend = false;
 
+    public Message() {
+        this.rawMessage.clear();
+    }
+
     public Message(@NotNull String ...message) {
         for(final String line : message) {
             this.rawMessage.add(line);
