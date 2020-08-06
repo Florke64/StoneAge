@@ -6,6 +6,7 @@
 
 package win.flrque.g2p.stoneage.event;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -16,13 +17,19 @@ public class StoneDropLootEvent extends Event implements Cancellable {
     private boolean isCancelled = false;
 
     private final ItemStack itemDrop;
+    private final Player player;
 
-    public StoneDropLootEvent(final ItemStack drop) {
+    public StoneDropLootEvent(final Player player, final ItemStack drop) {
         this.itemDrop = drop;
+        this.player = player;
     }
 
     public ItemStack getDrop() {
         return this.itemDrop;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     @Override
