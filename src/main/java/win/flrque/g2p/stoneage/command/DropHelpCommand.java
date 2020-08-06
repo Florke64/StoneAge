@@ -6,36 +6,32 @@
 
 package win.flrque.g2p.stoneage.command;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
-import java.util.ArrayList;
-import java.util.List;
+import win.flrque.g2p.stoneage.util.Message;
 
 public class DropHelpCommand implements CommandExecutor {
 
-    private final List<String> helpContent = new ArrayList<>();
+    private final Message pluginHelpMessage = new Message();
 
     public DropHelpCommand() {
-        helpContent.add(" ");
-        helpContent.add("&6&l== &5Stoniarki &6Go2Play &6&l==");
-        helpContent.add("&7Postaw stoniarke w wybranym przez siebie");
-        helpContent.add("&7kierunku - w tym kierunku bedzie sie generowal kamien.");
-        helpContent.add("&4Uwaga! &eStoniarki mozna niszczyc tylko zlotymi kilofami.");
-        helpContent.add(" ");
-        helpContent.add("&aStoniarki mozna ulepszac &7za walute serwerowa oraz wegiel.");
-        helpContent.add("&7Aby dowiedziec sie wiecej o ulepszeniach, otworz panel");
-        helpContent.add("&7stoniarki - klikajac prawym przyciskiem myszy na maszyne.");
-        helpContent.add("&7- - - - - - - - - - ");
+        pluginHelpMessage.addLines(Message.EMPTY);
+        pluginHelpMessage.addLines("&6&l== &5Stoniarki &6Go2Play &6&l==");
+        pluginHelpMessage.addLines("&7Postaw stoniarke w wybranym przez siebie");
+        pluginHelpMessage.addLines("&7kierunku - w tym kierunku bedzie sie generowal kamien.");
+        pluginHelpMessage.addLines("&4Uwaga! &eStoniarki mozna niszczyc tylko zlotymi kilofami.");
+        pluginHelpMessage.addLines(" ");
+        pluginHelpMessage.addLines("&aStoniarki mozna ulepszac &7za walute serwerowa oraz wegiel.");
+        pluginHelpMessage.addLines("&7Aby dowiedziec sie wiecej o ulepszeniach, otworz panel");
+        pluginHelpMessage.addLines("&7stoniarki - klikajac prawym przyciskiem myszy na maszyne.");
+        pluginHelpMessage.addLines("&7- - - - - - - - - - ");
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        for(String line : helpContent)
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', line));
+        this.pluginHelpMessage.send(sender);
 
         return true;
     }
