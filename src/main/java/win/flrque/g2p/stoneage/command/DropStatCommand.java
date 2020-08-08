@@ -62,7 +62,7 @@ public class DropStatCommand implements CommandExecutor {
         final long miningExp = playerStats.getMinerExp();
         final int miningLevel = playerStats.getMinerLvl();
 
-        final Message message = new Message("&7= = = = = &6Statystyki &7= = = = =");
+        final Message message = new Message("&6== &5Statystyki &6==");
         message.addLines("&7Twoj poziom gornictwa: &6$_1");
         message.addLines("&7Twoje doswiadczenie: &6$_2");
         message.addLines(Message.EMPTY);
