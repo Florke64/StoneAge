@@ -95,15 +95,15 @@ public class DropEntry {
     }
 
     public void setMinAmount(int amount) {
-        minAmount = (amount < 1)? 1 : minAmount;
+        this.minAmount = (amount < 1)? 1 : amount;
     }
 
     public int getMinAmount() {
-        return minAmount;
+        return this.minAmount;
     }
 
     public void setMaxAmount(int amount) {
-        maxAmount = (amount > minAmount)? amount : minAmount;
+        this.maxAmount = (amount > this.minAmount)? amount : this.minAmount;
     }
 
     public int getMaxAmount() {
