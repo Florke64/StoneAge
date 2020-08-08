@@ -6,7 +6,6 @@
 
 package win.flrque.g2p.stoneage.database.playerdata;
 
-import org.bukkit.Bukkit;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.event.MinerLevelUpEvent;
@@ -91,7 +90,6 @@ public class PlayerStats {
 
     public void setMinerExp(final long minerExp) {
         final int updatedLevel = plugin.getExpCalculator().expToLevel(minerExp);
-        Bukkit.broadcastMessage("updatedLevel = " + updatedLevel);
 
         if(updatedLevel > this.minerLvl) {
             setMinerLvl(updatedLevel);
