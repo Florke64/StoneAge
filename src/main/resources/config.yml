@@ -86,6 +86,8 @@ custom_drops:
         - '&7Default drop only'
 
   diamond:
+    #minimal_miner_lvl # minimal mining level needed to drop this item from stone
+    #minimal_tool_lvl # minimal tool's material needed to drop this item from stone
     miner_exp: 4
     weight: 1.0 # float value
     minimal_exp: 1
