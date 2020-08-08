@@ -56,6 +56,7 @@ public final class StoneAge extends JavaPlugin {
         playerSetup = new PlayerSetupManager();
 
         initStoneMachines();
+        stoneMachine.registerCraftingRecipe();
 
         //Saving and reloading config
         saveDefaultConfig();
