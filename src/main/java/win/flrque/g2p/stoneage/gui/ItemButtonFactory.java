@@ -75,7 +75,7 @@ public class ItemButtonFactory {
         MACHINE_REPAIR(new ItemStack(Material.ANVIL), "&4&lNapraw Generator", "&4Uwaga! &eMozesz naprawiac stoniarke", "&eco kilka sekund!"),
         MACHINE_UPGRADE(new ItemStack(Material.EMERALD), "&6&lUlepsz stoniarke!", "&4Uwaga! &eZakupione ulepszenia znikaja", "&epo zniszczeniu maszyny!"),
         MACHINE_INFO(new ItemStack(Material.REDSTONE_TORCH), "&5&lInformacje", "&7Kliknij i przeczytaj", "&7informacje dt. generatowow kamienia."),
-        STONE_STATISTICS(new ItemStack(Material.KNOWLEDGE_BOOK), "&3&lStatystyki", "&7Otworz okno ze swoimi statystykami.");
+        STONE_STATISTICS(new ItemStack(Material.KNOWLEDGE_BOOK), "&3&lStatystyki", "&7Zobacz swoje statystyki.");
 
         final ItemStack itemIcon;
 
