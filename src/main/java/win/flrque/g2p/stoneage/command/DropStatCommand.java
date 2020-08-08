@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
+import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.util.Message;
 
 public class DropStatCommand implements CommandExecutor {
@@ -21,10 +22,12 @@ public class DropStatCommand implements CommandExecutor {
     private final StoneAge plugin;
 
     private final PlayerSetupManager playerSetupManager;
+    private final DropCalculator dropCalculator;
 
     public DropStatCommand() {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
         this.playerSetupManager = plugin.getPlayerSetup();
+        this.dropCalculator = plugin.getDropCalculator();
     }
 
     /**
@@ -65,7 +68,9 @@ public class DropStatCommand implements CommandExecutor {
         message.addLines(Message.EMPTY);
 
         for(String statisticKey : playerStats.getStatisticKeys()) {
-            message.addLines("&7" + statisticKey + ": &6" + playerStats.getStatistic(statisticKey));
+            final String dropEntryName = dropCalculator.getDropEntry(statisticKey).getCustomName();
+            final int dropEntryStatValue = playerStats.getStatistic(statisticKey);
+            message.addLines("&7" + Message.capitalize(dropEntryName) + ": &6" + dropEntryStatValue);
         }
 
         message.setVariable(1, Integer.toString(miningLevel));
