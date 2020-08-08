@@ -16,7 +16,6 @@ import win.flrque.g2p.stoneage.gui.InventoryPoint;
 import win.flrque.g2p.stoneage.gui.ItemButtonFactory;
 import win.flrque.g2p.stoneage.gui.ItemButtonFactory.ItemButtonType;
 import win.flrque.g2p.stoneage.gui.Window;
-import win.flrque.g2p.stoneage.util.Message;
 
 public class StoneMachineWindow extends Window {
 
@@ -95,16 +94,7 @@ public class StoneMachineWindow extends Window {
         else if(clickedPoint.getSlotNumber() == 25) {
             player.closeInventory();
 
-            final long miningExp = this.plugin.getPlayerSetup().getPlayerStoneMachineStats(player.getUniqueId()).getMinerExp();
-            final int miningLevel = this.plugin.getPlayerSetup().getPlayerStoneMachineStats(player.getUniqueId()).getMinerLvl();
-
-            final Message message = new Message("&7Twoj poziom gornictwa: &6$_1");
-            message.addLines("&7Twoj Exp: &6$_2");
-
-            message.setVariable(1, Integer.toString(miningLevel));
-            message.setVariable(2, Long.toString(miningExp));
-
-            message.send(player);
+            player.performCommand("dropstat");
         }
 
     }

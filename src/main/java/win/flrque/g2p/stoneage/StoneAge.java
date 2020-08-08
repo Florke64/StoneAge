@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.command.DropCommand;
 import win.flrque.g2p.stoneage.command.DropHelpCommand;
 import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
+import win.flrque.g2p.stoneage.command.DropStatCommand;
 import win.flrque.g2p.stoneage.database.SQLManager;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
@@ -80,6 +81,7 @@ public final class StoneAge extends JavaPlugin {
         //Registering Plugin Commands
         getCommand("drop").setExecutor(new DropCommand());
         getCommand("drophelp").setExecutor(new DropHelpCommand());
+        getCommand("dropstat").setExecutor(new DropStatCommand());
         getCommand("multiplier").setExecutor(new DropMultiplierCommand());
 
         final long minute = 60 * 20;

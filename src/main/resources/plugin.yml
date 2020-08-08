@@ -10,7 +10,7 @@ website: https://www.flrque.win/
 commands:
   drop:
     description: Sprawdzanie i ustawianie preferencji dropu ze stoniarek
-    aliases: [dropinfo, dropy, drops, stone]
+    aliases: [dropinfo, dropy, drops, stone, dropstat]
     permission: g2p.stone.drop
   drophelp:
     description: Wyswietla instrukcje obslugi stoniarek.
