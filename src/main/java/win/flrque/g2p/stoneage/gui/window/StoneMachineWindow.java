@@ -97,6 +97,13 @@ public class StoneMachineWindow extends Window {
             player.performCommand("dropstat");
         }
 
+        //Stone machine's README / usage instructions
+        else if(clickedPoint.getSlotNumber() == 26) {
+            player.closeInventory();
+
+            player.performCommand("drophelp");
+        }
+
     }
 
 }
