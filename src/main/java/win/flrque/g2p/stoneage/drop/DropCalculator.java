@@ -79,7 +79,13 @@ public class DropCalculator {
         //No tool was used to break a block
         if(tool == null) return null;
 
-        //TODO: Check pickaxe material (config: minimalPickaxe: <0; 2> = {wood, stone, iron})
+        //Not applicable tool was used, means no drops
+        if(!plugin.getApplicableTools().isApplicableTool(tool.getType())) {
+            return null;
+        }
+
+        final int usedToolLevel = plugin.getApplicableTools().getToolLevel(tool);
+
         //Checking tool properties
         boolean hasSilkTouch = false;
         int fortuneLevel = 0;
@@ -111,6 +117,10 @@ public class DropCalculator {
 
             //Check for requirements for this drop
             if(playerStats.getMinerLvl() < dropEntry.getNeededMinerLevel()) {
+                continue;
+            }
+
+            if(usedToolLevel < dropEntry.getNeededMinerLevel()) {
                 continue;
             }
 

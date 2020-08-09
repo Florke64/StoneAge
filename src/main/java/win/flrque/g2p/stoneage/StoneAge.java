@@ -26,10 +26,12 @@ import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.drop.ExperienceCalculator;
 import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
+import win.flrque.g2p.stoneage.machine.ApplicableTools;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
 import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
 import win.flrque.g2p.stoneage.util.ConfigSectionDropEntry;
 import win.flrque.g2p.stoneage.util.ConfigSectionGeneral;
+import win.flrque.g2p.stoneage.util.ConfigSectionTools;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +40,7 @@ import java.util.logging.Level;
 public final class StoneAge extends JavaPlugin {
 
     private StoneMachine stoneMachine;
+    private ApplicableTools applicableTools;
     private PlayerSetupManager playerSetup;
 
     private WindowManager windowManager;
@@ -123,6 +126,10 @@ public final class StoneAge extends JavaPlugin {
 
         getDropCalculator().setDropMultiplier(new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier()));
         //TODO: Apply general config fully
+
+        //Reading applicable tools (pickaxes and their levels)
+        final ConfigSectionTools toolsConfig = new ConfigSectionTools(getConfig().getConfigurationSection("tools"));
+        toolsConfig.compile();
 
         //Reading Primitive Stone drop
         if(!getConfig().isConfigurationSection("primitive_drop")) {
@@ -214,6 +221,10 @@ public final class StoneAge extends JavaPlugin {
 
     public StoneMachine getStoneMachine() {
         return this.stoneMachine;
+    }
+
+    public ApplicableTools getApplicableTools() {
+        return applicableTools;
     }
 
     public WindowManager getWindowManager() {
