@@ -14,7 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 
 import java.util.*;
 
@@ -97,15 +99,23 @@ public class DropCalculator {
 
         final DropLoot dropLoot = new DropLoot();
 
-        //Checks if cobble wasn't disabled by the player
         final PlayerSetupManager playerSetup = plugin.getPlayerSetup();
-        if(playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(primitiveDrop))
+        final PersonalDropConfig dropConfig = playerSetup.getPersonalDropConfig(player.getUniqueId());
+        final PlayerStats playerStats = playerSetup.getPlayerStoneMachineStats(player.getUniqueId());
+
+        //Checks if cobble wasn't disabled by the player
+        if(dropConfig.isDropping(primitiveDrop))
             dropLoot.addLoot(primitiveDrop, primitiveDrop.getDrop(hasSilkTouch, fortuneLevel));
 
         for (DropEntry dropEntry : dropEntries.values()) {
 
+            //Check for requirements for this drop
+            if(playerStats.getMinerLvl() < dropEntry.getNeededMinerLevel()) {
+                continue;
+            }
+
             //Checks for player's personalised drop entry settings
-            if(!playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(dropEntry)) {
+            if(!dropConfig.isDropping(dropEntry)) {
                 continue;
             }
 

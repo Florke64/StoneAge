@@ -32,6 +32,8 @@ public class DropEntry {
 
     private int minerExp;
 
+    private int neededMinerLevel;
+
     private ItemStack silkTouchItemStack;
     //TODO: Store type of item to reduce ItemStack#getType() calls count
 
@@ -50,6 +52,8 @@ public class DropEntry {
         maxExp = 5;
 
         minerExp = 0;
+
+        neededMinerLevel = 0;
 
         silkTouchItemStack = itemStack;
     }
@@ -153,6 +157,14 @@ public class DropEntry {
         final Random random = new Random();
 
         return random.nextInt(maxExp - minExp) + (minAmount);
+    }
+
+    public int getNeededMinerLevel() {
+        return neededMinerLevel;
+    }
+
+    public void setNeededMinerLevel(int neededMinerLevel) {
+        this.neededMinerLevel = neededMinerLevel;
     }
 
     public boolean isMultipliable() {
