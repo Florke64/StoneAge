@@ -6,7 +6,6 @@
 
 package win.flrque.g2p.stoneage.listener;
 
-import org.bukkit.Material;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,9 +41,8 @@ public class StoneMachineInteractListener implements Listener {
             return;
 
         final ItemStack tool = player.getInventory().getItemInMainHand();
-        if(tool != null && tool.getType() == Material.GOLDEN_PICKAXE) {
-            if(player.isOp())
-                return;
+        if(plugin.getApplicableTools().isMachineDestroyTool(tool) && player.isOp()) {
+            return;
         }
 
         event.setCancelled(true);
