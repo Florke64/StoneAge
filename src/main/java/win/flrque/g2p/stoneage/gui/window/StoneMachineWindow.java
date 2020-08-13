@@ -16,6 +16,7 @@ import win.flrque.g2p.stoneage.gui.InventoryPoint;
 import win.flrque.g2p.stoneage.gui.ItemButtonFactory;
 import win.flrque.g2p.stoneage.gui.ItemButtonFactory.ItemButtonType;
 import win.flrque.g2p.stoneage.gui.Window;
+import win.flrque.g2p.stoneage.util.Message;
 
 public class StoneMachineWindow extends Window {
 
@@ -41,7 +42,7 @@ public class StoneMachineWindow extends Window {
     @Override
     public boolean open(Player player) {
         if(!super.open(player)) {
-            player.sendMessage("Nie udało się otworzyć okna stoniarki!");
+            new Message("&cNie udało się otworzyć okna stoniarki!").send(player);
             return false;
         }
 
@@ -84,9 +85,9 @@ public class StoneMachineWindow extends Window {
             player.closeInventory();
 
             if(plugin.getStoneMachine().repairStoneMachine(stoneMachine)) {
-                player.sendMessage("Naprawiono stoniarke!");
+                new Message("&7Naprawiono stoniarke!").send(player);
             } else {
-                player.sendMessage("Nie udalo sie naprawic tej stoniarki, sprobuj ponownie pozniej...");
+                new Message("&cNie udalo sie naprawic tej stoniarki, sprobuj ponownie pozniej...").send(player);
             }
         }
 
