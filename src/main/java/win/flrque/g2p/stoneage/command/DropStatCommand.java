@@ -20,12 +20,15 @@ import win.flrque.g2p.stoneage.util.Message;
 public class DropStatCommand implements CommandExecutor {
 
     private final StoneAge plugin;
+    private final CommandExecutionController executionController;
 
     private final PlayerSetupManager playerSetupManager;
     private final DropCalculator dropCalculator;
 
     public DropStatCommand() {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
+        this.executionController = plugin.getCommandExecutionController();
+
         this.playerSetupManager = plugin.getPlayerSetup();
         this.dropCalculator = plugin.getDropCalculator();
     }
@@ -45,10 +48,13 @@ public class DropStatCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(!(sender instanceof Player)) {
-            final Message errorMessage = new Message("&cTa komende moze wykonac tylko gracz.");
-            errorMessage.send(sender);
-
+            new Message("&cTa komende moze wykonac tylko gracz.").send(sender);
             return false;
+        }
+
+        if(!executionController.onCommandExecute(sender)) {
+            new Message("&cOdczekaj chwile przed wykonaniem kolejnej komendy.").send(sender);
+            return true;
         }
 
         final PlayerStats playerStatistics = playerSetupManager.getPlayerStoneMachineStats(((Player) sender).getUniqueId());

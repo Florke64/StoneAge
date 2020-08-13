@@ -14,10 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import win.flrque.g2p.stoneage.command.DropCommand;
-import win.flrque.g2p.stoneage.command.DropHelpCommand;
-import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
-import win.flrque.g2p.stoneage.command.DropStatCommand;
+import win.flrque.g2p.stoneage.command.*;
 import win.flrque.g2p.stoneage.database.SQLManager;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
@@ -42,6 +39,7 @@ public final class StoneAge extends JavaPlugin {
 
     private StoneMachine stoneMachine;
     private ApplicableTools applicableTools;
+    private CommandExecutionController commandExecutionController;
     private PlayerSetupManager playerSetup;
 
     private WindowManager windowManager;
@@ -124,6 +122,7 @@ public final class StoneAge extends JavaPlugin {
         getStoneMachine().setDropItemsToFeet(generalConfig.isDropItemsToFeet());
         getStoneMachine().setDropExpToFeet(generalConfig.isDropExpToFeet());
         getStoneMachine().setAllowHopperOutput(generalConfig.isAllowHopperDropOutput());
+        this.commandExecutionController = new CommandExecutionController(generalConfig.getCommandsCoolDown());
 
         getDropCalculator().setDropMultiplier(new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier()));
         //TODO: Apply general config fully
@@ -227,6 +226,10 @@ public final class StoneAge extends JavaPlugin {
 
     public StoneMachine getStoneMachine() {
         return this.stoneMachine;
+    }
+
+    public CommandExecutionController getCommandExecutionController() {
+        return commandExecutionController;
     }
 
     public ApplicableTools getApplicableTools() {

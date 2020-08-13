@@ -13,13 +13,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.gui.window.DropInfoWindow;
+import win.flrque.g2p.stoneage.util.Message;
 
 public class DropCommand implements CommandExecutor {
 
     private final StoneAge plugin;
+    private final CommandExecutionController executionController;
 
     public DropCommand() {
         plugin = StoneAge.getPlugin(StoneAge.class);
+        executionController = plugin.getCommandExecutionController();
     }
 
     /**
@@ -34,7 +37,12 @@ public class DropCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage("Tylko Gracz moze wykonac te komende!");
+            new Message("&cTylko Gracz moze wykonac te komende!").send(sender);
+            return true;
+        }
+
+        if(!executionController.onCommandExecute(sender)) {
+            new Message("&cOdczekaj chwile przed wykonaniem kolejnej komendy.").send(sender);
             return true;
         }
 

@@ -10,13 +10,21 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.util.Message;
 
 public class DropHelpCommand implements CommandExecutor {
 
+    private final StoneAge plugin;
+    private final CommandExecutionController executionController;
+
     private final Message pluginHelpMessage = new Message();
 
     public DropHelpCommand() {
+        this.plugin = StoneAge.getPlugin(StoneAge.class);
+
+        this.executionController = plugin.getCommandExecutionController();
+
         pluginHelpMessage.addLines(Message.EMPTY);
         pluginHelpMessage.addLines("&6&l== &5Stoniarki &6Go2Play &6&l==");
         pluginHelpMessage.addLines("&7Postaw stoniarke w wybranym przez siebie");
@@ -43,6 +51,11 @@ public class DropHelpCommand implements CommandExecutor {
      */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if(!executionController.onCommandExecute(sender)) {
+            new Message("&cOdczekaj chwile przed wykonaniem kolejnej komendy.").send(sender);
+            return true;
+        }
+
         this.pluginHelpMessage.send(sender);
 
         return true;

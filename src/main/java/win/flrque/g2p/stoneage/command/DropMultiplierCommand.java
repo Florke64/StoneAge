@@ -24,8 +24,10 @@ public class DropMultiplierCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, String label, String[] args) {
-        if(!sender.hasPermission(command.getPermission()))
+        if(!sender.hasPermission(command.getPermission())) {
+            new Message("&cNie posiadasz wystarczajacych uprawnien do wykonania tej komendy.");
             return false;
+        }
 
         if(args.length == 0) {
             DropMultiplier multiplier = plugin.getDropCalculator().getDropMultiplier();
