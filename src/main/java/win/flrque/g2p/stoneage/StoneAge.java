@@ -7,6 +7,7 @@
 package win.flrque.g2p.stoneage;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -130,6 +131,11 @@ public final class StoneAge extends JavaPlugin {
         //Reading applicable tools (pickaxes and their levels)
         final ConfigSectionTools toolsConfig = new ConfigSectionTools(getConfig().getConfigurationSection("tools"));
         toolsConfig.compile();
+
+        applicableTools = new ApplicableTools(toolsConfig.getMachineDestroyTool());
+        for(final Material tool: toolsConfig.getMiningTools()) {
+            this.applicableTools.addApplicableTool(tool, applicableTools.getToolLevel(tool));
+        }
 
         //Reading Primitive Stone drop
         if(!getConfig().isConfigurationSection("primitive_drop")) {
