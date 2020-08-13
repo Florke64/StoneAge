@@ -10,11 +10,11 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
-import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
 
 import java.sql.*;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class SQLManager {
@@ -260,13 +260,13 @@ public class SQLManager {
         }
     }
 
-    public void insertDropMultiplierRecord(DropMultiplier dropMultiplier) throws SQLException {
+    public void insertDropMultiplierRecord(String callerName, UUID callerUniqueId, float value, long start, long end) throws SQLException {
 
         try (Connection conn = connectionPool.getConnection()){
             if(conn == null) return;
 
-            final Timestamp startTime = new Timestamp(dropMultiplier.getMultiplierStartTime());
-            final Timestamp timeoutTime = new Timestamp(dropMultiplier.getMultiplierTimeout());
+            final Timestamp startTime = new Timestamp(start);
+            final Timestamp timeoutTime = new Timestamp(end);
 
             final StringBuilder query = new StringBuilder();
             query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_STATS+ "` ");
@@ -274,9 +274,9 @@ public class SQLManager {
             query.append(" (`MultiplierId`, `SetOn`, `Timeout`, `MultiplierValue`) VALUES (NULL,");
             query.append(" '" +startTime+ "',");
             query.append(" '" +timeoutTime+ "',");
-            query.append(" '" +dropMultiplier.getCurrentDropMultiplier()+ "');");
-            query.append(" '" +dropMultiplier.getCallerName()+ "');");
-            query.append(" '" +dropMultiplier.getCallerUniqueId()+ "');");
+            query.append(" '" +value+ "');");
+            query.append(" '" +callerName+ "');");
+            query.append(" '" +callerUniqueId.toString()+ "');");
 
             PreparedStatement ps = conn.prepareStatement(query.toString());
 
