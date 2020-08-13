@@ -56,12 +56,12 @@ public class StoneMachineWindow extends Window {
         final ItemButtonFactory buttonFactory = new ItemButtonFactory(windowOwner);
 
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_FILTER));
-        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0,1).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_INFO));
+//        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0,1).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_INFO));
 
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_MULTIPLIER));
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4,2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_REPAIR));
 
-        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_UPGRADE));
+//        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_UPGRADE));
 
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 7,2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.STONE_STATISTICS));
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_INFO));
@@ -74,7 +74,7 @@ public class StoneMachineWindow extends Window {
 //        }
 
         //Drop info / selector
-        if(clickedPoint.getSlotNumber() == 9) {
+        if(clickedPoint.getSlotNumber() == 0) {
             player.closeInventory();
             player.performCommand("drop");
         }
