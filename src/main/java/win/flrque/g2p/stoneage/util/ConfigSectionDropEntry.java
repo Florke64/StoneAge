@@ -89,6 +89,10 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
         final int neededMinerLevel = rootSection.getInt("minimal_miner_lvl", 1);
         dropEntry.setNeededMinerLevel(neededMinerLevel);
 
+        //Needed level to drop
+        final int neededToolLevel = rootSection.getInt("minimal_tool_lvl", 1);
+        dropEntry.setNeededToolLevel(neededToolLevel);
+
         return dropEntry;
     }
 

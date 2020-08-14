@@ -6,14 +6,14 @@
 
 package win.flrque.g2p.stoneage.listener;
 
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
-
-import java.util.logging.Level;
 
 public class StoneMachineHopperInteractListener implements Listener {
 
@@ -33,12 +33,22 @@ public class StoneMachineHopperInteractListener implements Listener {
 
         //Blocking hopper output
         if(plugin.getStoneMachine().isStoneMachine(sourceInventory)) {
-            plugin.getLogger().log(Level.INFO, "InventoryMoveItemEvent: source inventory is a stone machine!");
+//            plugin.getLogger().log(Level.INFO, "InventoryMoveItemEvent: source inventory is a stone machine!");
             event.setCancelled(true);
         }
 
         if(plugin.getStoneMachine().isStoneMachine(destinationInventory)) {
-            plugin.getLogger().log(Level.INFO, "InventoryMoveItemEvent: destination inventory is a stone machine!");
+//            plugin.getLogger().log(Level.INFO, "InventoryMoveItemEvent: destination inventory is a stone machine!");
+            final ItemStack fuelItem = event.getItem();
+            if(fuelItem.getType() == Material.COAL) {
+                final int fuelAmount = fuelItem.getAmount() * 8;
+
+                plugin.getStoneMachine().getItemSmelter().addAutoSmeltingUse(destinationInventory, fuelAmount);
+
+                event.setItem(new ItemStack(Material.AIR, 1));
+                return;
+            }
+
             event.setCancelled(true);
         }
 

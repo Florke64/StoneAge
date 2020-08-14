@@ -133,7 +133,7 @@ public final class StoneAge extends JavaPlugin {
 
         applicableTools = new ApplicableTools(toolsConfig.getMachineDestroyTool());
         for(final Material tool: toolsConfig.getMiningTools()) {
-            this.applicableTools.addApplicableTool(tool, applicableTools.getToolLevel(tool));
+            this.applicableTools.addApplicableTool(tool, toolsConfig.getToolLevel(tool));
         }
 
         //Reading Primitive Stone drop

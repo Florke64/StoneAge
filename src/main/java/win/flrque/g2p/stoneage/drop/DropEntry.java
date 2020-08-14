@@ -33,6 +33,7 @@ public class DropEntry {
     private int minerExp;
 
     private int neededMinerLevel;
+    private int neededToolLevel;
 
     private ItemStack silkTouchItemStack;
     //TODO: Store type of item to reduce ItemStack#getType() calls count
@@ -54,6 +55,7 @@ public class DropEntry {
         minerExp = 0;
 
         neededMinerLevel = 0;
+        neededToolLevel = 1;
 
         silkTouchItemStack = itemStack;
     }
@@ -165,6 +167,14 @@ public class DropEntry {
 
     public void setNeededMinerLevel(int neededMinerLevel) {
         this.neededMinerLevel = neededMinerLevel;
+    }
+
+    public int getNeededToolLevel() {
+        return neededToolLevel;
+    }
+
+    public void setNeededToolLevel(int neededToolLevel) {
+        this.neededToolLevel = neededToolLevel;
     }
 
     public boolean isMultipliable() {

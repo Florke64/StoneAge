@@ -31,6 +31,8 @@ public class StoneMachine {
 
     private final StoneAge plugin;
 
+    private final ItemAutoSmelter itemSmelter;
+
     private final String machineName;
     private final List<String> machineLore;
 
@@ -49,6 +51,8 @@ public class StoneMachine {
 
     public StoneMachine(String machineName, List<String> machineLore) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
+
+        this.itemSmelter = new ItemAutoSmelter();
 
         this.machineName = Message.color(machineName);
 
@@ -80,7 +84,7 @@ public class StoneMachine {
         return true;
     }
 
-    public boolean isStoneMachine(Block block) {
+    public boolean isStoneMachine(@NotNull final Block block) {
         if(block.getState() instanceof Dispenser) {
             return isStoneMachine((Dispenser) block.getState());
         }
@@ -88,7 +92,7 @@ public class StoneMachine {
         return false;
     }
 
-    public boolean isStoneMachine(Dispenser dispenserBlock) {
+    public boolean isStoneMachine(@NotNull final Dispenser dispenserBlock) {
         if(dispenserBlock.getCustomName() == null)
             return false;
 
@@ -137,7 +141,7 @@ public class StoneMachine {
         generateStone(location, stoneRespawnFrequency);
     }
 
-    public void generateStone(final Location location, final long delay) {
+    public void generateStone(@NotNull final Location location, final long delay) {
         final Block block = location.getWorld().getBlockAt(location);
 
         new BukkitRunnable() {
@@ -165,6 +169,7 @@ public class StoneMachine {
         return stoneMachineParent.clone();
     }
 
+    @NotNull
     private ItemStack createStoneMachineItem(Material material) {
         final ItemStack item = new ItemStack(material);
         final ItemMeta meta = item.getItemMeta();
@@ -219,6 +224,10 @@ public class StoneMachine {
         craftingRecipe.setIngredient('P', Material.PISTON);
 
         Bukkit.addRecipe(craftingRecipe);
+    }
+
+    public ItemAutoSmelter getItemSmelter() {
+        return itemSmelter;
     }
 
     public void setStoneRespawnFrequency(long stoneRespawnFrequency) {

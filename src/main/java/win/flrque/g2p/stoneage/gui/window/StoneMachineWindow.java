@@ -60,6 +60,7 @@ public class StoneMachineWindow extends Window {
 //        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0,1).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_INFO));
 
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_MULTIPLIER));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.AUTO_SMELTING_STATUS));
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4,2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_REPAIR));
 
 //        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_UPGRADE));
@@ -78,6 +79,17 @@ public class StoneMachineWindow extends Window {
         if(clickedPoint.getSlotNumber() == 0) {
             player.closeInventory();
             player.performCommand("drop");
+        }
+
+        //Automatic smelting info
+        if(clickedPoint.getSlotNumber() == 8) {
+            player.closeInventory();
+            final Message msg = new Message();
+            msg.addLines("&6Wprowadz wegiel hopperem, a stoniarka bedzie przepalac automatycznie!");
+            msg.addLines("&7Pozostalo &6$_1 &7uzyc automatycznego przepalania.");
+            final int usesLeft = plugin.getStoneMachine().getItemSmelter().getAutoSmeltingUsesLeft(stoneMachine);
+            msg.setVariable(1, Integer.toString(usesLeft));
+            msg.send(player);
         }
 
         //Repair Stone Machine

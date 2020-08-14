@@ -74,10 +74,12 @@ public class StoneBreakListener implements Listener {
     private void customizeStoneDrop(@NotNull Player player, Dispenser stoneMachine, Block brokenBlock) {
         final GameMode playerGameMode = player.getGameMode();
         final DropLoot finalDrop;
-        if(!playerGameMode.equals(GameMode.CREATIVE) && !playerGameMode.equals(GameMode.SPECTATOR)) {
+        if(playerGameMode != GameMode.CREATIVE && playerGameMode != GameMode.SPECTATOR) {
             final ItemStack usedTool = player.getInventory().getItemInMainHand();
             //TODO: Async calculation
             finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
+
+            if(finalDrop == null) System.out.println("DropLoot calculated is null");
 
             dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
         } else {
@@ -99,6 +101,10 @@ public class StoneBreakListener implements Listener {
     }
 
     private void dropLoot(Player player, Location stoneLoc, @Nullable Dispenser stoneMachine, DropLoot dropLoot) {
+        if(dropLoot == null) {
+            return;
+        }
+
         boolean hasHopper = false;
         Block blockUnderStoneMachine = null;
         //Verifying plugin's config and using hopper output if allowed
@@ -121,6 +127,9 @@ public class StoneBreakListener implements Listener {
         //Looping through all loots and dropping them for the player to pickup.
         for (DropEntry drop : dropLoot.getActiveDropEntries()) {
             final ItemStack itemLoot = dropLoot.getItemLoot(drop);
+            if(itemLoot == null)
+                continue;
+
             final int totalAmount = itemLoot.getAmount();
 
             //Calling API Event

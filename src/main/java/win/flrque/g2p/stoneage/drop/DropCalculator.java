@@ -17,6 +17,7 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
+import win.flrque.g2p.stoneage.machine.ItemAutoSmelter;
 
 import java.util.*;
 
@@ -109,9 +110,22 @@ public class DropCalculator {
         final PersonalDropConfig dropConfig = playerSetup.getPersonalDropConfig(player.getUniqueId());
         final PlayerStats playerStats = playerSetup.getPlayerStoneMachineStats(player.getUniqueId());
 
+        final ItemAutoSmelter autoSmelter = plugin.getStoneMachine().getItemSmelter();
+
         //Checks if cobble wasn't disabled by the player
-        if(dropConfig.isDropping(primitiveDrop))
-            dropLoot.addLoot(primitiveDrop, primitiveDrop.getDrop(hasSilkTouch, fortuneLevel));
+        if(dropConfig.isDropping(primitiveDrop)) {
+            ItemStack primitiveItemStack = primitiveDrop.getDrop(hasSilkTouch, fortuneLevel);
+
+            //TODO: Autosmelting primitive drop
+//            if(autoSmelter.getAutoSmeltingUsesLeft(stoneMachine) >= 1) {
+//                final ItemStack smelted = autoSmelter.getSmelted(stoneMachine, primitiveItemStack);
+//                if(smelted != null) {
+//                    primitiveItemStack = smelted;
+//                }
+//            }
+
+            dropLoot.addLoot(primitiveDrop, primitiveItemStack);
+        }
 
         for (DropEntry dropEntry : dropEntries.values()) {
 
@@ -120,7 +134,7 @@ public class DropCalculator {
                 continue;
             }
 
-            if(usedToolLevel < dropEntry.getNeededMinerLevel()) {
+            if(usedToolLevel < dropEntry.getNeededToolLevel()) {
                 continue;
             }
 
@@ -135,7 +149,15 @@ public class DropCalculator {
             final float currentDropMultiplier = this.getDropMultiplier().getCurrentDropMultiplier();
 
             if (luck <  itemChanceWeight * currentDropMultiplier) {
-                final ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
+                ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
+
+                //Auto smelting feature
+                if(autoSmelter.getAutoSmeltingUsesLeft(stoneMachine) >= itemDrop.getAmount()) {
+                    final ItemStack smelted = autoSmelter.getSmelted(stoneMachine, itemDrop);
+                    if(smelted != null) {
+                        itemDrop = smelted;
+                    }
+                }
 
                 dropLoot.addLoot(dropEntry, itemDrop);
             }
