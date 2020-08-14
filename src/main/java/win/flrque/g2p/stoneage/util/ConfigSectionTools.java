@@ -39,16 +39,20 @@ public class ConfigSectionTools extends ConfigSectionReader {
         }
 
         final ConfigurationSection applicableToolsSection = rootSection.getConfigurationSection("levels");
-        if(applicableToolsSection == null) return;
+        if(applicableToolsSection == null) {
+            this.plugin.getLogger().log(Level.WARNING, "No applicable tools found. Please, check config file!");
+            return;
+        }
 
-        for(String key : applicableToolsSection.getKeys(false)) {
-            final Material toolMaterial = Material.getMaterial(machineDestroyToolName);
+        for(final String key : applicableToolsSection.getKeys(false)) {
+            final Material toolMaterial = Material.getMaterial(key);
             if(toolMaterial == null) {
                 this.plugin.getLogger().log(Level.WARNING, "Invalid \"" + key + "\" in tool levels configuration! Skipping...");
                 continue;
             }
 
             final int level = applicableToolsSection.getInt(key, 1);
+            plugin.getLogger().log(Level.INFO, "Added applicable tool " + toolMaterial.toString() + " (" + level + ")");
             miningTools.put(toolMaterial, level);
         }
     }
