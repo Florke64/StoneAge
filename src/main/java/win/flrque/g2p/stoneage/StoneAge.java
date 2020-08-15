@@ -15,6 +15,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.command.*;
+import win.flrque.g2p.stoneage.config.DatabaseConfigReader;
+import win.flrque.g2p.stoneage.config.DropEntryConfigReader;
+import win.flrque.g2p.stoneage.config.GeneralConfigReader;
+import win.flrque.g2p.stoneage.config.ToolsConfigReader;
 import win.flrque.g2p.stoneage.database.SQLManager;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
@@ -26,10 +30,6 @@ import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.ApplicableTools;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
-import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
-import win.flrque.g2p.stoneage.util.ConfigSectionDropEntry;
-import win.flrque.g2p.stoneage.util.ConfigSectionGeneral;
-import win.flrque.g2p.stoneage.util.ConfigSectionTools;
 
 import java.util.List;
 import java.util.UUID;
@@ -115,7 +115,7 @@ public final class StoneAge extends JavaPlugin {
             return;
         }
 
-        final ConfigSectionGeneral generalConfig = new ConfigSectionGeneral(getConfig().getConfigurationSection("machines"));
+        final GeneralConfigReader generalConfig = new GeneralConfigReader(getConfig().getConfigurationSection("machines"));
         generalConfig.compile();
 
         getStoneMachine().setStoneRespawnFrequency(generalConfig.getStoneFrequency());
@@ -128,7 +128,7 @@ public final class StoneAge extends JavaPlugin {
         //TODO: Apply general config fully
 
         //Reading applicable tools (pickaxes and their levels)
-        final ConfigSectionTools toolsConfig = new ConfigSectionTools(getConfig().getConfigurationSection("tools"));
+        final ToolsConfigReader toolsConfig = new ToolsConfigReader(getConfig().getConfigurationSection("tools"));
         toolsConfig.compile();
 
         applicableTools = new ApplicableTools(toolsConfig.getMachineDestroyTool());
@@ -144,7 +144,7 @@ public final class StoneAge extends JavaPlugin {
             return;
         }
 
-        final ConfigSectionDropEntry primitiveDropEntry = new ConfigSectionDropEntry(getConfig().getConfigurationSection("primitive_drop"));
+        final DropEntryConfigReader primitiveDropEntry = new DropEntryConfigReader(getConfig().getConfigurationSection("primitive_drop"));
         dropCalculator.setPrimitiveDrop(primitiveDropEntry.compileDropEntry());
 
         //Reading Custom Stone drop
@@ -160,7 +160,7 @@ public final class StoneAge extends JavaPlugin {
 
             getLogger().log(Level.INFO, "Attempting to load drop entry: "+ entryName);
 
-            final ConfigSectionDropEntry customDropEntry = new ConfigSectionDropEntry(customDropsSection.getConfigurationSection(entryName));
+            final DropEntryConfigReader customDropEntry = new DropEntryConfigReader(customDropsSection.getConfigurationSection(entryName));
 
             if(customDropEntry == null) {
                 getLogger().log(Level.SEVERE, "Custom Drop Entry equals null value! Skipping...");
@@ -179,7 +179,7 @@ public final class StoneAge extends JavaPlugin {
             getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"database\" section)!");
             getLogger().log(Level.SEVERE, "Skipping, database won't work.");
         } else {
-            final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
+            final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(getConfig().getConfigurationSection("database"));
             databaseConfig.readDatabaseConnectionDetails();
             sqlManager = new SQLManager(databaseConfig);
 

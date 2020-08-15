@@ -4,7 +4,7 @@
  * Author: FlrQue
  */
 
-package win.flrque.g2p.stoneage.util;
+package win.flrque.g2p.stoneage.config;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,14 +16,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-public class ConfigSectionTools extends ConfigSectionReader {
+public class ToolsConfigReader extends ConfigSectionReader {
 
     private final StoneAge plugin;
 
     private Map<Material, Integer> miningTools = new HashMap<>();
     private Material machineDestroyTool;
 
-    public ConfigSectionTools(ConfigurationSection configurationSection) {
+    public ToolsConfigReader(ConfigurationSection configurationSection) {
         super(configurationSection);
 
         this.plugin = StoneAge.getPlugin(StoneAge.class);

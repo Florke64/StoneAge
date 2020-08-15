@@ -7,10 +7,10 @@
 package win.flrque.g2p.stoneage.database;
 
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.config.DatabaseConfigReader;
 import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
-import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
 
 import java.sql.*;
 import java.util.Set;
@@ -26,7 +26,7 @@ public class SQLManager {
     public static final String TABLE_PLAYER_DROP_CONFIG = "StoneAge_Config";
     public static final String TABLE_DROP_MULTIPLIER = "StoneAge_DropMultiplier";
 
-    public SQLManager(ConfigSectionDatabase databaseConfig) {
+    public SQLManager(DatabaseConfigReader databaseConfig) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
         connectionPool = new ConnectionPoolManager(databaseConfig);
 

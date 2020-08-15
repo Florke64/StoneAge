@@ -4,11 +4,11 @@
  * Author: FlrQue
  */
 
-package win.flrque.g2p.stoneage.util;
+package win.flrque.g2p.stoneage.config;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-public class ConfigSectionDatabase extends ConfigSectionReader {
+public class DatabaseConfigReader extends ConfigSectionReader {
 
     private String serverAddress;
     private int serverPort;
@@ -17,7 +17,7 @@ public class ConfigSectionDatabase extends ConfigSectionReader {
     private String username;
     private String password;
 
-    public ConfigSectionDatabase(ConfigurationSection configurationSection) {
+    public DatabaseConfigReader(ConfigurationSection configurationSection) {
         super(configurationSection);
     }
 

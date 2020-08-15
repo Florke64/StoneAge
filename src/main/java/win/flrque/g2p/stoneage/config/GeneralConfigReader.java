@@ -4,11 +4,11 @@
  * Author: FlrQue
  */
 
-package win.flrque.g2p.stoneage.util;
+package win.flrque.g2p.stoneage.config;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-public class ConfigSectionGeneral extends ConfigSectionReader {
+public class GeneralConfigReader extends ConfigSectionReader {
 
     //Drop multiplier settings
     private float defaultDropMultiplier, maxDropMultiplier;
@@ -26,7 +26,7 @@ public class ConfigSectionGeneral extends ConfigSectionReader {
     private boolean allowHopperDropOutput;
     private boolean allowCoalUpgradesByHopper;
 
-    public ConfigSectionGeneral(ConfigurationSection section) {
+    public GeneralConfigReader(ConfigurationSection section) {
         super(section);
     }
 

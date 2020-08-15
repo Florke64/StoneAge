@@ -4,7 +4,7 @@
  * Author: FlrQue
  */
 
-package win.flrque.g2p.stoneage.util;
+package win.flrque.g2p.stoneage.config;
 
 import org.bukkit.configuration.ConfigurationSection;
 import win.flrque.g2p.stoneage.StoneAge;

@@ -9,7 +9,7 @@ package win.flrque.g2p.stoneage.database;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import win.flrque.g2p.stoneage.StoneAge;
-import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
+import win.flrque.g2p.stoneage.config.DatabaseConfigReader;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,7 +19,7 @@ import java.sql.SQLException;
 public class ConnectionPoolManager {
 
     private final StoneAge plugin;
-    private final ConfigSectionDatabase databaseConfig;
+    private final DatabaseConfigReader databaseConfig;
 
     private HikariDataSource dataSource;
 
@@ -29,7 +29,7 @@ public class ConnectionPoolManager {
     private String username;
     private String password;
 
-    public ConnectionPoolManager(ConfigSectionDatabase databaseConfig) {
+    public ConnectionPoolManager(DatabaseConfigReader databaseConfig) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
         this.databaseConfig = databaseConfig;
 
@@ -77,7 +77,7 @@ public class ConnectionPoolManager {
         }
     }
 
-    public ConfigSectionDatabase getDatabaseConfig() {
+    public DatabaseConfigReader getDatabaseConfig() {
         return databaseConfig;
     }
 }
