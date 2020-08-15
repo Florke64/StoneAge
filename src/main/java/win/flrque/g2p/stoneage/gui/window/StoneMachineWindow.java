@@ -16,6 +16,7 @@ import win.flrque.g2p.stoneage.gui.InventoryPoint;
 import win.flrque.g2p.stoneage.gui.ItemButtonFactory;
 import win.flrque.g2p.stoneage.gui.ItemButtonFactory.ItemButtonType;
 import win.flrque.g2p.stoneage.gui.Window;
+import win.flrque.g2p.stoneage.machine.ItemAutoSmelter;
 import win.flrque.g2p.stoneage.util.Message;
 
 public class StoneMachineWindow extends Window {
@@ -84,11 +85,18 @@ public class StoneMachineWindow extends Window {
         //Automatic smelting info
         if(clickedPoint.getSlotNumber() == 8) {
             player.closeInventory();
+
+            final ItemAutoSmelter autoSmelter = plugin.getStoneMachine().getItemSmelter();
+            final int usesLeft = autoSmelter.getAutoSmeltingUsesLeft(stoneMachine);
+
             final Message msg = new Message();
-            msg.addLines("&6Wprowadz wegiel hopperem, a stoniarka bedzie przepalac automatycznie!");
-            msg.addLines("&7Pozostalo &6$_1 &7uzyc automatycznego przepalania.");
-            final int usesLeft = plugin.getStoneMachine().getItemSmelter().getAutoSmeltingUsesLeft(stoneMachine);
-            msg.setVariable(1, Integer.toString(usesLeft));
+            if(usesLeft > 0) {
+                msg.addLines("&7Pozostalo &6$_1 &7uzyc automatycznego przepalania.");
+                msg.setVariable(1, Integer.toString(usesLeft));
+            } else {
+                msg.addLines("&6Wprowadz wegiel hopperem, a stoniarka bedzie przepalac automatycznie!");
+            }
+
             msg.send(player);
         }
 
