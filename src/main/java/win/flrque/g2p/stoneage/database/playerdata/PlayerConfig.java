@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class PersonalDropConfig {
+public class PlayerConfig {
 
     private final StoneAge plugin;
 
@@ -25,7 +25,7 @@ public class PersonalDropConfig {
 
     private final Map<DropEntry, Boolean> customDropEntries = new HashMap<>();
 
-    public PersonalDropConfig(final UUID uuid, final String playerName) {
+    public PlayerConfig(final UUID uuid, final String playerName) {
         plugin = StoneAge.getPlugin(StoneAge.class);
 
         this.uuid = uuid;

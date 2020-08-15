@@ -14,9 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
-import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
-import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.PlayersData;
 import win.flrque.g2p.stoneage.machine.ItemAutoSmelter;
 
 import java.util.*;
@@ -106,8 +106,8 @@ public class DropCalculator {
 
         final DropLoot dropLoot = new DropLoot();
 
-        final PlayerSetupManager playerSetup = plugin.getPlayerSetup();
-        final PersonalDropConfig dropConfig = playerSetup.getPersonalDropConfig(player.getUniqueId());
+        final PlayersData playerSetup = plugin.getPlayerSetup();
+        final PlayerConfig dropConfig = playerSetup.getPersonalDropConfig(player.getUniqueId());
         final PlayerStats playerStats = playerSetup.getPlayerStoneMachineStats(player.getUniqueId());
 
         final ItemAutoSmelter autoSmelter = plugin.getStoneMachine().getItemSmelter();

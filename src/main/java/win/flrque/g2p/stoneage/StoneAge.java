@@ -20,9 +20,9 @@ import win.flrque.g2p.stoneage.config.DropEntryConfigReader;
 import win.flrque.g2p.stoneage.config.GeneralConfigReader;
 import win.flrque.g2p.stoneage.config.ToolsConfigReader;
 import win.flrque.g2p.stoneage.database.SQLManager;
-import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
-import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.PlayersData;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.drop.ExperienceCalculator;
@@ -40,7 +40,7 @@ public final class StoneAge extends JavaPlugin {
     private StoneMachine stoneMachine;
     private ApplicableTools applicableTools;
     private CommandExecutionController commandExecutionController;
-    private PlayerSetupManager playerSetup;
+    private PlayersData playerSetup;
 
     private WindowManager windowManager;
     private DropCalculator dropCalculator;
@@ -55,7 +55,7 @@ public final class StoneAge extends JavaPlugin {
         windowManager = new WindowManager();
         dropCalculator = new DropCalculator();
         expCalculator = new ExperienceCalculator();
-        playerSetup = new PlayerSetupManager();
+        playerSetup = new PlayersData();
 
         initStoneMachines();
         stoneMachine.registerCraftingRecipe();
@@ -205,7 +205,7 @@ public final class StoneAge extends JavaPlugin {
 
                 for(Player player : Bukkit.getServer().getOnlinePlayers()) {
                     final UUID playerUUID = player.getUniqueId();
-                    final PersonalDropConfig dropConfig = getPlayerSetup().getPersonalDropConfig(playerUUID);
+                    final PlayerConfig dropConfig = getPlayerSetup().getPersonalDropConfig(playerUUID);
                     final PlayerStats dropStats = getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
 
                     getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
@@ -220,7 +220,7 @@ public final class StoneAge extends JavaPlugin {
         };
     }
 
-    public PlayerSetupManager getPlayerSetup() {
+    public PlayersData getPlayerSetup() {
         return playerSetup;
     }
 

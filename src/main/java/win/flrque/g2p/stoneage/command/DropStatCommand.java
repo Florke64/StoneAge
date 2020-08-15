@@ -12,8 +12,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
-import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.PlayersData;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.util.Message;
 
@@ -22,7 +22,7 @@ public class DropStatCommand implements CommandExecutor {
     private final StoneAge plugin;
     private final CommandExecutionController executionController;
 
-    private final PlayerSetupManager playerSetupManager;
+    private final PlayersData playerSetupManager;
     private final DropCalculator dropCalculator;
 
     public DropStatCommand() {

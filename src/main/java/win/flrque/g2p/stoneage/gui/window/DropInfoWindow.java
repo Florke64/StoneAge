@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropEntry;
@@ -28,7 +28,7 @@ import java.util.List;
 public class DropInfoWindow extends Window  {
 
     private final Player windowContentOwner;
-    private final PersonalDropConfig personalDropConfig;
+    private final PlayerConfig personalDropConfig;
 
     final DecimalFormat df = new DecimalFormat("0.00");
 

@@ -8,7 +8,7 @@ package win.flrque.g2p.stoneage.database;
 
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.config.DatabaseConfigReader;
-import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 
@@ -38,7 +38,7 @@ public class SQLManager {
         }
     }
 
-    public int runUpdateForPersonalDropConfig(PersonalDropConfig config) throws SQLException {
+    public int runUpdateForPersonalDropConfig(PlayerConfig config) throws SQLException {
         try (Connection conn = connectionPool.getConnection()){
             if(conn == null) return -1;
 
