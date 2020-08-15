@@ -108,7 +108,7 @@ public class ItemAutoSmelter {
         magicCoal.setItemMeta(coalIm);
     }
 
-    public void addAutoSmeltingUse(@NotNull final Inventory machineInventory, final int usesToAdd) {
+    public boolean addAutoSmeltingUse(@NotNull final Inventory machineInventory, final int usesToAdd) {
         if(!hasAutoSmelting(machineInventory)) {
             final ItemStack magicCoal = new ItemStack(Material.COAL, 1);
             final ItemMeta im = magicCoal.getItemMeta();
@@ -125,13 +125,18 @@ public class ItemAutoSmelter {
                 availableSmeltingUses = Integer.parseInt(coalCustomName);
             } catch (final NumberFormatException ex) {
                 ex.printStackTrace();
-                return;
+                return false;
             }
+
+            if(availableSmeltingUses >= 16_777_216)
+                return false;
 
             final ItemMeta coalIm = magicCoal.getItemMeta();
             coalIm.setDisplayName(Integer.toString(availableSmeltingUses + usesToAdd));
             magicCoal.setItemMeta(coalIm);
         }
+
+        return true;
     }
 
     private boolean hasAutoSmelting(@NotNull final Inventory machineInventory) {

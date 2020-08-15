@@ -14,17 +14,20 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.machine.ItemAutoSmelter;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
 
 public class StoneMachineHopperInteractListener implements Listener {
 
     private final StoneAge plugin;
     private final StoneMachine stoneMachine;
+    private final ItemAutoSmelter autoSmelter;
 
     public StoneMachineHopperInteractListener() {
         plugin = StoneAge.getPlugin(StoneAge.class);
 
         this.stoneMachine = plugin.getStoneMachine();
+        this.autoSmelter = plugin.getStoneMachine().getItemSmelter();
     }
 
     @EventHandler
@@ -47,9 +50,10 @@ public class StoneMachineHopperInteractListener implements Listener {
             if(stoneMachine.isHopperInputAllowed() && fuelItem.getType() == Material.COAL) {
                 final int fuelAmount = fuelItem.getAmount() * 8;
 
-                plugin.getStoneMachine().getItemSmelter().addAutoSmeltingUse(destinationInventory, fuelAmount);
+                final boolean success = autoSmelter.addAutoSmeltingUse(destinationInventory, fuelAmount);
 
-                event.setItem(new ItemStack(Material.AIR, 1));
+                if(success) event.setItem(new ItemStack(Material.AIR, 1));
+
                 return;
             }
 
