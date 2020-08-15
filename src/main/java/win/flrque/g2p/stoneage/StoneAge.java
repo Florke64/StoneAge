@@ -72,7 +72,6 @@ public final class StoneAge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StoneMachineRedstoneInteractListener(), this);
         getServer().getPluginManager().registerEvents(new StoneBreakListener(), this);
 
-        //TODO: Consider creating PersonalConfig and StoneMachineStats on Player Join?
         getServer().getPluginManager().registerEvents(new PlayerSaveDataOnLeaveListener(), this);
         getServer().getPluginManager().registerEvents(new WindowClickListener(), this);
 
