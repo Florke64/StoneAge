@@ -79,7 +79,7 @@ public final class StoneAge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StatisticsIncreaseListener(), this);
         getServer().getPluginManager().registerEvents(new MinerLevelUpListener(), this);
 
-        getServer().getPluginManager().registerEvents(new DebugGameJoin(), this);
+//        getServer().getPluginManager().registerEvents(new DebugGameJoin(), this);
 
         //Registering Plugin Commands
         getCommand("drop").setExecutor(new DropCommand());
