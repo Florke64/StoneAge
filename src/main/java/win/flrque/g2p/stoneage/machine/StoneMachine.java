@@ -42,6 +42,7 @@ public class StoneMachine {
     private int repairCooldown = 5;
 
     private boolean allowHopperOutput = false;
+    private boolean allowHopperInput = false;
 
     private boolean dropItemsToFeet = false;
     private boolean dropExpToFeet = false;
@@ -240,6 +241,14 @@ public class StoneMachine {
 
     public void setAllowHopperOutput(boolean allow) {
         this.allowHopperOutput = allow;
+    }
+
+    public boolean isHopperInputAllowed() {
+        return allowHopperInput;
+    }
+
+    public void setAllowHopperInput(boolean allowHopperInput) {
+        this.allowHopperInput = allowHopperInput;
     }
 
     public boolean isDropItemsToFeet() {

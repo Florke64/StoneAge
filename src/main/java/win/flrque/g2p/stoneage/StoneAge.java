@@ -122,10 +122,10 @@ public final class StoneAge extends JavaPlugin {
         getStoneMachine().setDropItemsToFeet(generalConfig.isDropItemsToFeet());
         getStoneMachine().setDropExpToFeet(generalConfig.isDropExpToFeet());
         getStoneMachine().setAllowHopperOutput(generalConfig.isAllowHopperDropOutput());
+        getStoneMachine().setAllowHopperInput(generalConfig.isAllowCoalUpgradesByHopper());
         this.commandExecutionController = new CommandExecutionController(generalConfig.getCommandsCoolDown());
 
         getDropCalculator().setDropMultiplier(new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier()));
-        //TODO: Apply general config fully
 
         //Reading applicable tools (pickaxes and their levels)
         final ToolsConfigReader toolsConfig = new ToolsConfigReader(getConfig().getConfigurationSection("tools"));

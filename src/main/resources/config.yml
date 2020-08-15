@@ -19,7 +19,7 @@ machines:
   drop_items_to_feet: true # drops exp orbs under player
 
   allow_hopper_output: true # pass stone machine drops to hopper under it
-  allow_hopper_input: true # allow upgrading stone machines with hopper input (Coal & Redstone Blocks)
+  allow_hopper_input: true # allow upgrading stone machines with hopper input (Coal)
 
 tools:
   machine_destroy: GOLDEN_PICKAXE
