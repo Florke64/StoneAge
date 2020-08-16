@@ -18,18 +18,18 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class PlayerSetupManager {
+public class PlayersData {
 
     private final StoneAge plugin;
 
-    private final Map<UUID, PersonalDropConfig> playerPersonalDropConfig = new HashMap<>();
-    private final Map<UUID, StoneMachinePlayerStats> stoneMachinePlayerStats = new HashMap<>();
+    private final Map<UUID, PlayerConfig> playerPersonalDropConfig = new HashMap<>();
+    private final Map<UUID, PlayerStats> stoneMachinePlayerStats = new HashMap<>();
 
-    public PlayerSetupManager() {
+    public PlayersData() {
         plugin = StoneAge.getPlugin(StoneAge.class);
     }
 
-    public StoneMachinePlayerStats getPlayerStoneMachineStats(UUID uuid) {
+    public PlayerStats getPlayerStoneMachineStats(UUID uuid) {
         if(!stoneMachinePlayerStats.containsKey(uuid)) {
             stoneMachinePlayerStats.put(uuid, createStoneMachinePlayerStats(uuid));
         }
@@ -37,15 +37,15 @@ public class PlayerSetupManager {
         return stoneMachinePlayerStats.get(uuid);
     }
 
-    private StoneMachinePlayerStats createStoneMachinePlayerStats(UUID uuid) {
+    private PlayerStats createStoneMachinePlayerStats(UUID uuid) {
         final String playerName = Bukkit.getOfflinePlayer(uuid).getName();
-        final StoneMachinePlayerStats stats = new StoneMachinePlayerStats(uuid, playerName);
+        final PlayerStats stats = new PlayerStats(uuid, playerName);
         stoneMachinePlayerStats.put(uuid, stats);
 
         return stoneMachinePlayerStats.get(uuid);
     }
 
-    public PersonalDropConfig getPersonalDropConfig(UUID uuid) {
+    public PlayerConfig getPersonalDropConfig(UUID uuid) {
         if(!playerPersonalDropConfig.containsKey(uuid)) {
             createPersonalDropConfig(uuid);
         }
@@ -70,13 +70,18 @@ public class PlayerSetupManager {
             return;
         }
 
-        final PlayerSetupManager playerSetup = plugin.getPlayerSetup();
+        final PlayersData playerSetup = plugin.getPlayerSetup();
 
         try {
             while (result.next()) {
                 final ResultSetMetaData metaData = result.getMetaData();
                 final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
-                final StoneMachinePlayerStats stats = playerSetup.getPlayerStoneMachineStats(uuid);
+                final long minerExp = result.getLong("MinerExp");
+                final int minerLvl = result.getInt("MinerLvl");
+
+                final PlayerStats stats = playerSetup.getPlayerStoneMachineStats(uuid);
+                stats.setMinerExp(minerExp);
+                stats.setMinerLvl(minerLvl);
 
                 plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
 
@@ -84,6 +89,8 @@ public class PlayerSetupManager {
                 for(int i=1; i<=columnCount; i++) {
                     final String columnName = metaData.getColumnName(i);
                     if(columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
+                        continue;
+                    else if(columnName.contentEquals("MinerExp") || columnName.contentEquals("MinerLvl"))
                         continue;
 
                     stats.setStatistic(columnName, result.getInt(columnName));
@@ -113,13 +120,13 @@ public class PlayerSetupManager {
             return;
         }
 
-        final PlayerSetupManager playerSetup = plugin.getPlayerSetup();
+        final PlayersData playerSetup = plugin.getPlayerSetup();
 
         try {
             while (result.next()) {
                 final ResultSetMetaData metaData = result.getMetaData();
                 final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
-                final PersonalDropConfig config = playerSetup.getPersonalDropConfig(uuid);
+                final PlayerConfig config = playerSetup.getPersonalDropConfig(uuid);
 
                 plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
 
@@ -140,7 +147,7 @@ public class PlayerSetupManager {
 
     }
 
-    public void savePersonalDropConfigInDatabase(PersonalDropConfig config) {
+    public void savePersonalDropConfigInDatabase(PlayerConfig config) {
         try {
             plugin.getDatabaseController().runUpdateForPersonalDropConfig(config);
         } catch (SQLException e) {
@@ -151,7 +158,7 @@ public class PlayerSetupManager {
         config.onDatabaseSave();
     }
 
-    public void savePersonalStoneStatsInDatabase(StoneMachinePlayerStats stats) {
+    public void savePersonalStoneStatsInDatabase(PlayerStats stats) {
         try {
             plugin.getDatabaseController().runUpdateForPersonalStoneStats(stats);
         } catch (SQLException e) {
@@ -162,9 +169,11 @@ public class PlayerSetupManager {
         stats.onDatabaseSave();
     }
 
-    public void saveAllUnsavedDropConfigs() {
+    public void saveAllUnsavedDropData() {
+        plugin.getLogger().log(Level.INFO, "saveAllUnsavedDropData()");
+
         int saved = 0, skipped = 0;
-        for(PersonalDropConfig config : playerPersonalDropConfig.values()) {
+        for(PlayerConfig config : playerPersonalDropConfig.values()) {
             if(config.hasUnsavedEdits()) {
                 savePersonalDropConfigInDatabase(config);
                 saved++;
@@ -178,7 +187,7 @@ public class PlayerSetupManager {
         plugin.getLogger().log(Level.INFO, "Saved "+saved+" personal configs (skipped: "+skipped+")");
 
         saved = 0; skipped = 0;
-        for(StoneMachinePlayerStats playerStats : stoneMachinePlayerStats.values()) {
+        for(PlayerStats playerStats : stoneMachinePlayerStats.values()) {
             if(playerStats.hasUnsavedEdits()) {
                 savePersonalStoneStatsInDatabase(playerStats);
                 saved++;
@@ -193,12 +202,13 @@ public class PlayerSetupManager {
     }
 
     public void onDisable() {
-        saveAllUnsavedDropConfigs();
+        plugin.getLogger().log(Level.INFO, "PlayerSetupManager#onDisable()");
+        saveAllUnsavedDropData();
     }
 
-    private PersonalDropConfig createPersonalDropConfig(UUID uuid) {
+    private PlayerConfig createPersonalDropConfig(UUID uuid) {
         final String playerName = Bukkit.getOfflinePlayer(uuid).getName();
-        final PersonalDropConfig config = new PersonalDropConfig(uuid, playerName);
+        final PlayerConfig config = new PlayerConfig(uuid, playerName);
         playerPersonalDropConfig.put(uuid, config);
 
         return playerPersonalDropConfig.get(uuid);

@@ -4,7 +4,7 @@
  * Author: FlrQue
  */
 
-package win.flrque.g2p.stoneage.util;
+package win.flrque.g2p.stoneage.config;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -12,9 +12,9 @@ import win.flrque.g2p.stoneage.drop.DropEntry;
 
 import java.util.logging.Level;
 
-public class ConfigSectionDropEntry extends ConfigSectionReader {
+public class DropEntryConfigReader extends ConfigSectionReader {
 
-    public ConfigSectionDropEntry(ConfigurationSection section) {
+    public DropEntryConfigReader(ConfigurationSection section) {
         super(section);
     }
 
@@ -31,7 +31,7 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
         //Reading drops for default tool
         final ConfigurationSection defaultToolSection = rootSection.getConfigurationSection("default_tool");
         if(defaultToolSection != null) {
-            final ConfigSectionItemStack defaultToolConfig = new ConfigSectionItemStack(defaultToolSection);
+            final ItemStackConfigReader defaultToolConfig = new ItemStackConfigReader(defaultToolSection);
 
             defaultToolItem = defaultToolConfig.getItemStack();
         }
@@ -39,7 +39,7 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
         //Reading drops for tools with Silk Touch enchantment
         final ConfigurationSection silkToolSection = rootSection.getConfigurationSection("silk_touch_tool");
         if(silkToolSection != null) {
-            final ConfigSectionItemStack silkToolConfig = new ConfigSectionItemStack(silkToolSection);
+            final ItemStackConfigReader silkToolConfig = new ItemStackConfigReader(silkToolSection);
 
             silkToolItem = silkToolConfig.getItemStack();
         }
@@ -80,6 +80,18 @@ public class ConfigSectionDropEntry extends ConfigSectionReader {
         final int maxExp = rootSection.getInt("maximal_exp", -1);
         dropEntry.setMinimalExp(minExp);
         dropEntry.setMaximalExp(maxExp);
+
+        //Mining Experience
+        final int minerExp = rootSection.getInt("miner_exp", 0);
+        dropEntry.setMinerExp(minerExp);
+
+        //Needed level to drop
+        final int neededMinerLevel = rootSection.getInt("minimal_miner_lvl", 1);
+        dropEntry.setNeededMinerLevel(neededMinerLevel);
+
+        //Needed level to drop
+        final int neededToolLevel = rootSection.getInt("minimal_tool_lvl", 1);
+        dropEntry.setNeededToolLevel(neededToolLevel);
 
         return dropEntry;
     }

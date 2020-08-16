@@ -6,45 +6,59 @@
 
 package win.flrque.g2p.stoneage;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import win.flrque.g2p.stoneage.command.DropCommand;
-import win.flrque.g2p.stoneage.command.DropHelpCommand;
-import win.flrque.g2p.stoneage.command.DropMultiplierCommand;
+import win.flrque.g2p.stoneage.command.*;
+import win.flrque.g2p.stoneage.config.DatabaseConfigReader;
+import win.flrque.g2p.stoneage.config.DropEntryConfigReader;
+import win.flrque.g2p.stoneage.config.GeneralConfigReader;
+import win.flrque.g2p.stoneage.config.ToolsConfigReader;
 import win.flrque.g2p.stoneage.database.SQLManager;
-import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.PlayersData;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
+import win.flrque.g2p.stoneage.drop.ExperienceCalculator;
 import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
+import win.flrque.g2p.stoneage.machine.ApplicableTools;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
-import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
-import win.flrque.g2p.stoneage.util.ConfigSectionDropEntry;
-import win.flrque.g2p.stoneage.util.ConfigSectionGeneral;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public final class StoneAge extends JavaPlugin {
 
     private StoneMachine stoneMachine;
-    private PlayerSetupManager playerSetup;
+    private ApplicableTools applicableTools;
+    private CommandExecutionController commandExecutionController;
+    private PlayersData playerSetup;
 
     private WindowManager windowManager;
     private DropCalculator dropCalculator;
+    private ExperienceCalculator expCalculator;
 
     private SQLManager sqlManager;
+    private BukkitRunnable autosaveRunnable;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         windowManager = new WindowManager();
         dropCalculator = new DropCalculator();
-        playerSetup = new PlayerSetupManager();
+        expCalculator = new ExperienceCalculator();
+        playerSetup = new PlayersData();
 
         initStoneMachines();
+        stoneMachine.registerCraftingRecipe();
 
         //Saving and reloading config
         saveDefaultConfig();
@@ -58,18 +72,26 @@ public final class StoneAge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StoneMachineRedstoneInteractListener(), this);
         getServer().getPluginManager().registerEvents(new StoneBreakListener(), this);
 
-        //TODO: Consider creating PersonalConfig and StoneMachineStats on Player Join?
         getServer().getPluginManager().registerEvents(new PlayerSaveDataOnLeaveListener(), this);
         getServer().getPluginManager().registerEvents(new WindowClickListener(), this);
 
         getServer().getPluginManager().registerEvents(new StatisticsIncreaseListener(), this);
+        getServer().getPluginManager().registerEvents(new MinerLevelUpListener(), this);
 
-        getServer().getPluginManager().registerEvents(new DebugGameJoin(), this);
+//        getServer().getPluginManager().registerEvents(new DebugGameJoin(), this);
 
         //Registering Plugin Commands
         getCommand("drop").setExecutor(new DropCommand());
         getCommand("drophelp").setExecutor(new DropHelpCommand());
+        getCommand("dropstat").setExecutor(new DropStatCommand());
         getCommand("multiplier").setExecutor(new DropMultiplierCommand());
+
+        final long minute = 60 * 20;
+        final long period = 15;
+
+        initAsyncAutosave(period);
+        if(autosaveRunnable != null)
+            autosaveRunnable.runTaskTimerAsynchronously(this, period * minute, period * minute);
     }
 
     private void initStoneMachines() {
@@ -92,16 +114,26 @@ public final class StoneAge extends JavaPlugin {
             return;
         }
 
-        final ConfigSectionGeneral generalConfig = new ConfigSectionGeneral(getConfig().getConfigurationSection("machines"));
+        final GeneralConfigReader generalConfig = new GeneralConfigReader(getConfig().getConfigurationSection("machines"));
         generalConfig.compile();
 
         getStoneMachine().setStoneRespawnFrequency(generalConfig.getStoneFrequency());
         getStoneMachine().setDropItemsToFeet(generalConfig.isDropItemsToFeet());
         getStoneMachine().setDropExpToFeet(generalConfig.isDropExpToFeet());
         getStoneMachine().setAllowHopperOutput(generalConfig.isAllowHopperDropOutput());
+        getStoneMachine().setAllowHopperInput(generalConfig.isAllowCoalUpgradesByHopper());
+        this.commandExecutionController = new CommandExecutionController(generalConfig.getCommandsCoolDown());
 
         getDropCalculator().setDropMultiplier(new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier()));
-        //TODO: Apply general config fully
+
+        //Reading applicable tools (pickaxes and their levels)
+        final ToolsConfigReader toolsConfig = new ToolsConfigReader(getConfig().getConfigurationSection("tools"));
+        toolsConfig.compile();
+
+        applicableTools = new ApplicableTools(toolsConfig.getMachineDestroyTool());
+        for(final Material tool: toolsConfig.getMiningTools()) {
+            this.applicableTools.addApplicableTool(tool, toolsConfig.getToolLevel(tool));
+        }
 
         //Reading Primitive Stone drop
         if(!getConfig().isConfigurationSection("primitive_drop")) {
@@ -111,7 +143,7 @@ public final class StoneAge extends JavaPlugin {
             return;
         }
 
-        final ConfigSectionDropEntry primitiveDropEntry = new ConfigSectionDropEntry(getConfig().getConfigurationSection("primitive_drop"));
+        final DropEntryConfigReader primitiveDropEntry = new DropEntryConfigReader(getConfig().getConfigurationSection("primitive_drop"));
         dropCalculator.setPrimitiveDrop(primitiveDropEntry.compileDropEntry());
 
         //Reading Custom Stone drop
@@ -127,7 +159,7 @@ public final class StoneAge extends JavaPlugin {
 
             getLogger().log(Level.INFO, "Attempting to load drop entry: "+ entryName);
 
-            final ConfigSectionDropEntry customDropEntry = new ConfigSectionDropEntry(customDropsSection.getConfigurationSection(entryName));
+            final DropEntryConfigReader customDropEntry = new DropEntryConfigReader(customDropsSection.getConfigurationSection(entryName));
 
             if(customDropEntry == null) {
                 getLogger().log(Level.SEVERE, "Custom Drop Entry equals null value! Skipping...");
@@ -146,7 +178,7 @@ public final class StoneAge extends JavaPlugin {
             getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"database\" section)!");
             getLogger().log(Level.SEVERE, "Skipping, database won't work.");
         } else {
-            final ConfigSectionDatabase databaseConfig = new ConfigSectionDatabase(getConfig().getConfigurationSection("database"));
+            final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(getConfig().getConfigurationSection("database"));
             databaseConfig.readDatabaseConnectionDetails();
             sqlManager = new SQLManager(databaseConfig);
 
@@ -160,12 +192,47 @@ public final class StoneAge extends JavaPlugin {
         getLogger().log(Level.INFO, "Loaded "+ customDropsCount +" custom drop entries.");
     }
 
-    public PlayerSetupManager getPlayerSetup() {
+    private void initAsyncAutosave(final long period) {
+
+        getLogger().log(Level.INFO, "Initialized Async Autosave.");
+
+        autosaveRunnable = new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                int a = 0;
+
+                for(Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    final UUID playerUUID = player.getUniqueId();
+                    final PlayerConfig dropConfig = getPlayerSetup().getPersonalDropConfig(playerUUID);
+                    final PlayerStats dropStats = getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
+
+                    getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
+                    getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+
+                    a++;
+                }
+
+                System.out.println("Saved " + a + " players data into the database. Next Save in " + period + " minutes");
+            }
+
+        };
+    }
+
+    public PlayersData getPlayerSetup() {
         return playerSetup;
     }
 
     public StoneMachine getStoneMachine() {
         return this.stoneMachine;
+    }
+
+    public CommandExecutionController getCommandExecutionController() {
+        return commandExecutionController;
+    }
+
+    public ApplicableTools getApplicableTools() {
+        return applicableTools;
     }
 
     public WindowManager getWindowManager() {
@@ -174,6 +241,10 @@ public final class StoneAge extends JavaPlugin {
 
     public DropCalculator getDropCalculator() {
         return dropCalculator;
+    }
+
+    public ExperienceCalculator getExpCalculator() {
+        return expCalculator;
     }
 
     public SQLManager getDatabaseController() {
@@ -189,10 +260,14 @@ public final class StoneAge extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        this.getLogger().log(Level.INFO, "onDisable()");
 
+        this.getLogger().log(Level.INFO, "closing windows");
         getWindowManager().closeAllWindows(); //TODO: NullPointer Exception <- onDisable?
 
+        this.getLogger().log(Level.INFO, "saving...");
         playerSetup.onDisable();
+        this.getLogger().log(Level.INFO, "closing db");
         sqlManager.onDisable();
     }
 }

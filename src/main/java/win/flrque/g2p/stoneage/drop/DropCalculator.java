@@ -14,7 +14,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
-import win.flrque.g2p.stoneage.database.playerdata.PlayerSetupManager;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.PlayersData;
+import win.flrque.g2p.stoneage.machine.ItemAutoSmelter;
 
 import java.util.*;
 
@@ -77,7 +80,13 @@ public class DropCalculator {
         //No tool was used to break a block
         if(tool == null) return null;
 
-        //TODO: Check pickaxe material (config: minimalPickaxe: <0; 2> = {wood, stone, iron})
+        //Not applicable tool was used, means no drops
+        if(!plugin.getApplicableTools().isApplicableTool(tool.getType())) {
+            return null;
+        }
+
+        final int usedToolLevel = plugin.getApplicableTools().getToolLevel(tool);
+
         //Checking tool properties
         boolean hasSilkTouch = false;
         int fortuneLevel = 0;
@@ -93,30 +102,62 @@ public class DropCalculator {
         }
 
         //Calculating final drop
-        final DropCalculator calculator = plugin.getDropCalculator();
         final Random randomizer = new Random();
 
         final DropLoot dropLoot = new DropLoot();
 
+        final PlayersData playerSetup = plugin.getPlayerSetup();
+        final PlayerConfig dropConfig = playerSetup.getPersonalDropConfig(player.getUniqueId());
+        final PlayerStats playerStats = playerSetup.getPlayerStoneMachineStats(player.getUniqueId());
+
+        final ItemAutoSmelter autoSmelter = plugin.getStoneMachine().getItemSmelter();
+
         //Checks if cobble wasn't disabled by the player
-        final PlayerSetupManager playerSetup = plugin.getPlayerSetup();
-        if(playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(primitiveDrop))
-            dropLoot.addLoot(primitiveDrop, primitiveDrop.getDrop(hasSilkTouch, fortuneLevel));
+        if(dropConfig.isDropping(primitiveDrop)) {
+            ItemStack primitiveItemStack = primitiveDrop.getDrop(hasSilkTouch, fortuneLevel);
+
+            //TODO: Autosmelting primitive drop
+//            if(autoSmelter.getAutoSmeltingUsesLeft(stoneMachine) >= 1) {
+//                final ItemStack smelted = autoSmelter.getSmelted(stoneMachine, primitiveItemStack);
+//                if(smelted != null) {
+//                    primitiveItemStack = smelted;
+//                }
+//            }
+
+            dropLoot.addLoot(primitiveDrop, primitiveItemStack);
+        }
 
         for (DropEntry dropEntry : dropEntries.values()) {
 
+            //Check for requirements for this drop
+            if(playerStats.getMinerLvl() < dropEntry.getNeededMinerLevel()) {
+                continue;
+            }
+
+            if(usedToolLevel < dropEntry.getNeededToolLevel()) {
+                continue;
+            }
+
             //Checks for player's personalised drop entry settings
-            if(!playerSetup.getPersonalDropConfig(player.getUniqueId()).isDropping(dropEntry)) {
+            if(!dropConfig.isDropping(dropEntry)) {
                 continue;
             }
 
             final float luck = randomizer.nextFloat() * totalWeight;
 
             final float itemChanceWeight = dropEntry.getChanceWeight();
-            final float currentDropMultiplier = calculator.getDropMultiplier().getCurrentDropMultiplier();
+            final float currentDropMultiplier = this.getDropMultiplier().getCurrentDropMultiplier();
 
             if (luck <  itemChanceWeight * currentDropMultiplier) {
-                final ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
+                ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
+
+                //Auto smelting feature
+                if(autoSmelter.getAutoSmeltingUsesLeft(stoneMachine) >= itemDrop.getAmount()) {
+                    final ItemStack smelted = autoSmelter.getSmelted(stoneMachine, itemDrop);
+                    if(smelted != null) {
+                        itemDrop = smelted;
+                    }
+                }
 
                 dropLoot.addLoot(dropEntry, itemDrop);
             }

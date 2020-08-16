@@ -27,6 +27,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropLoot;
 import win.flrque.g2p.stoneage.event.StoneDropLootEvent;
@@ -73,10 +74,12 @@ public class StoneBreakListener implements Listener {
     private void customizeStoneDrop(@NotNull Player player, Dispenser stoneMachine, Block brokenBlock) {
         final GameMode playerGameMode = player.getGameMode();
         final DropLoot finalDrop;
-        if(!playerGameMode.equals(GameMode.CREATIVE) && !playerGameMode.equals(GameMode.SPECTATOR)) {
+        if(playerGameMode != GameMode.CREATIVE && playerGameMode != GameMode.SPECTATOR) {
             final ItemStack usedTool = player.getInventory().getItemInMainHand();
             //TODO: Async calculation
             finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
+
+            if(finalDrop == null) System.out.println("DropLoot calculated is null");
 
             dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
         } else {
@@ -98,6 +101,10 @@ public class StoneBreakListener implements Listener {
     }
 
     private void dropLoot(Player player, Location stoneLoc, @Nullable Dispenser stoneMachine, DropLoot dropLoot) {
+        if(dropLoot == null) {
+            return;
+        }
+
         boolean hasHopper = false;
         Block blockUnderStoneMachine = null;
         //Verifying plugin's config and using hopper output if allowed
@@ -120,14 +127,21 @@ public class StoneBreakListener implements Listener {
         //Looping through all loots and dropping them for the player to pickup.
         for (DropEntry drop : dropLoot.getActiveDropEntries()) {
             final ItemStack itemLoot = dropLoot.getItemLoot(drop);
+            if(itemLoot == null)
+                continue;
+
             final int totalAmount = itemLoot.getAmount();
 
-            final StoneDropLootEvent lootEvent = new StoneDropLootEvent(itemLoot);
+            //Calling API Event
+            final StoneDropLootEvent lootEvent = new StoneDropLootEvent(player, itemLoot);
             Bukkit.getServer().getPluginManager().callEvent(lootEvent);
 
             if(lootEvent.isCancelled()) {
                 continue;
             }
+
+            final PlayerStats stats = this.plugin.getPlayerSetup().getPlayerStoneMachineStats(player.getUniqueId());
+            stats.addMinerExp(drop.getMinerExp());
 
             //Drop to hopper under the Stone Machine
             ItemStack hopperLeftItem = null;
@@ -148,7 +162,7 @@ public class StoneBreakListener implements Listener {
             final Message dropMessage = new Message("&7Udalo ci sie wykopac &c$_1 &7x&6$_2");
             dropMessage.setVariable(1, drop.getCustomName());
             dropMessage.setVariable(2, Integer.toString(totalAmount));
-            dropMessage.send(player);
+            dropMessage.sendActionMessage(player);
         }
     }
 

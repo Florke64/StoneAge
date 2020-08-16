@@ -12,8 +12,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
-import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
@@ -28,7 +28,7 @@ import java.util.List;
 public class DropInfoWindow extends Window  {
 
     private final Player windowContentOwner;
-    private final PersonalDropConfig personalDropConfig;
+    private final PlayerConfig personalDropConfig;
 
     final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -44,7 +44,7 @@ public class DropInfoWindow extends Window  {
     public void updateInventoryContent() {
 
         final DropCalculator calculator = plugin.getDropCalculator();
-        final StoneMachinePlayerStats stats = plugin.getPlayerSetup().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
+        final PlayerStats stats = plugin.getPlayerSetup().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
 
         for(int i=0; i<=calculator.getDropEntries().size(); i++) {
             if(i >= inventory.getSize()) {
@@ -63,7 +63,7 @@ public class DropInfoWindow extends Window  {
     }
 
     @NotNull
-    private ItemStack createIconItem(@NotNull DropEntry drop, @NotNull StoneMachinePlayerStats stats) {
+    private ItemStack createIconItem(@NotNull DropEntry drop, @NotNull PlayerStats stats) {
         //Preparing data to be placed on the item
         final DropCalculator calculator = plugin.getDropCalculator();
         final float currentDropMultiplier = calculator.getDropMultiplier().getCurrentDropMultiplier();
@@ -76,6 +76,7 @@ public class DropInfoWindow extends Window  {
         meta.setDisplayName(ChatColor.GREEN + Message.simplePrepare(drop.getCustomName()) + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
 
         final List<String> lore = new ArrayList<>();
+        lore.add(Message.color("  &8+" + drop.getMinerExp() + "xp"));
         final String dropEntryStatus = personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony";
         lore.add(Message.color("&7Status: " + dropEntryStatus));
         lore.add(Message.color("&7(Kliknij aby zmienic)"));
@@ -112,7 +113,7 @@ public class DropInfoWindow extends Window  {
     @Override
     public boolean open(Player player) {
         if(!super.open(player)) {
-            player.sendMessage("Nie udało się otworzyć okna dropu!");
+            new Message("&cNie udało się otworzyć okna dropu!").send(player);
             return false;
         }
 
@@ -141,7 +142,11 @@ public class DropInfoWindow extends Window  {
         player.closeInventory();
 
         boolean isDropping = plugin.getPlayerSetup().getPersonalDropConfig(player.getUniqueId()).switchDropEntry(dropEntry);
-        player.sendMessage("Ustawiono drop " + dropEntry.getCustomName() + " na " + (isDropping? "wlaczony" : "wylaczony"));
+
+        final Message infoMessage = new Message("&7Ustawiono drop &c$_1 &7na $_2&7.");
+        infoMessage.setVariable(1, dropEntry.getCustomName());
+        infoMessage.setVariable(2, (isDropping? "&2wlaczony" : "&cwylaczony"));
+        infoMessage.send(player);
     }
 
 }

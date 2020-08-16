@@ -8,13 +8,14 @@ package win.flrque.g2p.stoneage.database.playerdata;
 
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.drop.DropEntry;
+import win.flrque.g2p.stoneage.event.MinerLevelUpEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class StoneMachinePlayerStats {
+public class PlayerStats {
 
     private final StoneAge plugin;
 
@@ -23,13 +24,19 @@ public class StoneMachinePlayerStats {
 
     private boolean unsavedEdits = false;
 
+    private long minerExp;
+    private int minerLvl;
+
     private final Map<String, Integer> statistics = new HashMap<>();
 
-    public StoneMachinePlayerStats(final UUID uuid, final String playerName) {
+    public PlayerStats(final UUID uuid, final String playerName) {
         plugin = StoneAge.getPlugin(StoneAge.class);
 
         this.uuid = uuid;
         this.playerName = playerName;
+
+        this.minerExp = 0;
+        this.minerLvl = 1;
 
         statistics.put(plugin.getDropCalculator().getPrimitiveDropEntry().getEntryName(), 0);
         for(DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
@@ -76,4 +83,41 @@ public class StoneMachinePlayerStats {
     public void onDatabaseSave() {
         unsavedEdits = false;
     }
+
+    public void addMinerExp(final long expAmount) {
+        setMinerExp(this.minerExp + expAmount);
+    }
+
+    public void setMinerExp(final long minerExp) {
+        final int updatedLevel = plugin.getExpCalculator().expToLevel(minerExp);
+
+        if(updatedLevel > this.minerLvl) {
+            setMinerLvl(updatedLevel);
+        }
+
+        this.minerExp = minerExp;
+
+        this.unsavedEdits = true;
+    }
+
+    public long getMinerExp() {
+        return this.minerExp;
+    }
+
+    public void setMinerLvl(final int minerLvl) {
+        final MinerLevelUpEvent event = new MinerLevelUpEvent(this, minerLvl);
+        this.plugin.getServer().getPluginManager().callEvent(event);
+
+        if(event.isCancelled())
+            return;
+
+        this.minerLvl = minerLvl;
+
+        this.unsavedEdits = true;
+    }
+
+    public int getMinerLvl() {
+        return minerLvl;
+    }
+
 }

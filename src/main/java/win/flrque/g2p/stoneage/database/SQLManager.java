@@ -7,14 +7,14 @@
 package win.flrque.g2p.stoneage.database;
 
 import win.flrque.g2p.stoneage.StoneAge;
-import win.flrque.g2p.stoneage.database.playerdata.PersonalDropConfig;
-import win.flrque.g2p.stoneage.database.playerdata.StoneMachinePlayerStats;
+import win.flrque.g2p.stoneage.config.DatabaseConfigReader;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
-import win.flrque.g2p.stoneage.drop.DropMultiplier;
-import win.flrque.g2p.stoneage.util.ConfigSectionDatabase;
 
 import java.sql.*;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class SQLManager {
@@ -26,7 +26,7 @@ public class SQLManager {
     public static final String TABLE_PLAYER_DROP_CONFIG = "StoneAge_Config";
     public static final String TABLE_DROP_MULTIPLIER = "StoneAge_DropMultiplier";
 
-    public SQLManager(ConfigSectionDatabase databaseConfig) {
+    public SQLManager(DatabaseConfigReader databaseConfig) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
         connectionPool = new ConnectionPoolManager(databaseConfig);
 
@@ -38,7 +38,7 @@ public class SQLManager {
         }
     }
 
-    public int runUpdateForPersonalDropConfig(PersonalDropConfig config) throws SQLException {
+    public int runUpdateForPersonalDropConfig(PlayerConfig config) throws SQLException {
         try (Connection conn = connectionPool.getConnection()){
             if(conn == null) return -1;
 
@@ -99,7 +99,7 @@ public class SQLManager {
         }
     }
 
-    public int runUpdateForPersonalStoneStats(StoneMachinePlayerStats stats) throws SQLException {
+    public int runUpdateForPersonalStoneStats(PlayerStats stats) throws SQLException {
         try (Connection conn = connectionPool.getConnection()){
             if(conn == null) return -1;
 
@@ -109,6 +109,8 @@ public class SQLManager {
 
             fields.append("`PlayerUUID`, ");
             fields.append("`PlayerName`, ");
+            fields.append("`MinerExp`, ");
+            fields.append("`MinerLvl`, ");
 
             final Set<String> entries = stats.getStatisticKeys();
 
@@ -129,6 +131,8 @@ public class SQLManager {
             query.append(") VALUES (");
             query.append("'" +stats.getUniqueId()+ "', ");
             query.append("'" +stats.getPlayerName()+ "', ");
+            query.append("'" +stats.getMinerExp()+ "', ");
+            query.append("'" +stats.getMinerLvl()+ "', ");
             for(String key : entries) {
                 i++;
                 if(key == null) continue;
@@ -140,6 +144,9 @@ public class SQLManager {
                 }
             }
             query.append(") ON DUPLICATE KEY UPDATE ");
+
+            query.append("`MinerExp`=VALUES(`MinerExp`), ");
+            query.append("`MinerLvl`=VALUES(`MinerLvl`), ");
 
             i = 0;
             for(String key : entries) {
@@ -183,12 +190,12 @@ public class SQLManager {
 
         for(DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
             final String dropEntryName = entry.getEntryName();
-            addTableColumnInNotExist(TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
-            addTableColumnInNotExist(TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
+            addTableColumnIfNotExist(TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
+            addTableColumnIfNotExist(TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
 
-        addTableColumnInNotExist(TABLE_PLAYER_STATS, "primitive_drop", "INT", "0");
-        addTableColumnInNotExist(TABLE_PLAYER_DROP_CONFIG, "primitive_drop", "BOOLEAN", "true");
+        addTableColumnIfNotExist(TABLE_PLAYER_STATS, "primitive_drop", "INT", "0");
+        addTableColumnIfNotExist(TABLE_PLAYER_DROP_CONFIG, "primitive_drop", "BOOLEAN", "true");
     }
 
     private void makeDatabase(final String databaseName) {
@@ -205,7 +212,7 @@ public class SQLManager {
         }
     }
 
-    private void addTableColumnInNotExist(final String tableName, final String columnName, final String columnType, final String defaultValue) {
+    private void addTableColumnIfNotExist(final String tableName, final String columnName, final String columnType, final String defaultValue) {
         final String databaseName = getDatabaseName();
 
         try (Connection conn = connectionPool.getConnection()) {
@@ -253,13 +260,13 @@ public class SQLManager {
         }
     }
 
-    public void insertDropMultiplierRecord(DropMultiplier dropMultiplier) throws SQLException {
+    public void insertDropMultiplierRecord(String callerName, UUID callerUniqueId, float value, long start, long end) throws SQLException {
 
         try (Connection conn = connectionPool.getConnection()){
             if(conn == null) return;
 
-            final Timestamp startTime = new Timestamp(dropMultiplier.getMultiplierStartTime());
-            final Timestamp timeoutTime = new Timestamp(dropMultiplier.getMultiplierTimeout());
+            final Timestamp startTime = new Timestamp(start);
+            final Timestamp timeoutTime = new Timestamp(end);
 
             final StringBuilder query = new StringBuilder();
             query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_STATS+ "` ");
@@ -267,9 +274,9 @@ public class SQLManager {
             query.append(" (`MultiplierId`, `SetOn`, `Timeout`, `MultiplierValue`) VALUES (NULL,");
             query.append(" '" +startTime+ "',");
             query.append(" '" +timeoutTime+ "',");
-            query.append(" '" +dropMultiplier.getCurrentDropMultiplier()+ "');");
-            query.append(" '" +dropMultiplier.getCallerName()+ "');");
-            query.append(" '" +dropMultiplier.getCallerUniqueId()+ "');");
+            query.append(" '" +value+ "');");
+            query.append(" '" +callerName+ "');");
+            query.append(" '" +callerUniqueId.toString()+ "');");
 
             PreparedStatement ps = conn.prepareStatement(query.toString());
 
@@ -288,8 +295,8 @@ public class SQLManager {
 
             query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." +TABLE_PLAYER_DROP_CONFIG);
             query.append(" (");
-            query.append(" PlayerUUID VARCHAR(36),");
-            query.append(" PlayerName VARCHAR(16),");
+            query.append(" `PlayerUUID` VARCHAR(36),");
+            query.append(" `PlayerName` VARCHAR(16),");
             query.append(" PRIMARY KEY (`PlayerUUID`)");
             query.append(") ");
 
@@ -312,8 +319,10 @@ public class SQLManager {
 
             query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." +TABLE_PLAYER_STATS);
             query.append(" (");
-            query.append(" PlayerUUID VARCHAR(36),");
-            query.append(" PlayerName VARCHAR(16),");
+            query.append(" `PlayerUUID` VARCHAR(36),");
+            query.append(" `PlayerName` VARCHAR(16),");
+            query.append(" `MinerExp` BIGINT UNSIGNED NOT NULL DEFAULT '0',");
+            query.append(" `MinerLvl` INT UNSIGNED NOT NULL DEFAULT '1',");
             query.append(" PRIMARY KEY (`PlayerUUID`)");
             query.append(") ");
 

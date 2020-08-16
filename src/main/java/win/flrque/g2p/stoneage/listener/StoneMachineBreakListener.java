@@ -8,7 +8,6 @@ package win.flrque.g2p.stoneage.listener;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
@@ -50,8 +49,7 @@ public class StoneMachineBreakListener implements Listener {
         event.setDropItems(false);
 
         final ItemStack tool = destroyer.getInventory().getItemInMainHand();
-        //TODO: Flexible machine pickup tool
-        if(tool.getType() == Material.GOLDEN_PICKAXE || gameMode == GameMode.CREATIVE) {
+        if(plugin.getApplicableTools().isMachineDestroyTool(tool) || gameMode == GameMode.CREATIVE) {
             final Location brokenBlockLocation = brokenBlock.getLocation();
 
             //TODO: Maybe do not clear all drops? Clearing only the machine's label should be enough.

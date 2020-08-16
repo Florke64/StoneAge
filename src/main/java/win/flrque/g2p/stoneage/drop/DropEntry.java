@@ -30,6 +30,11 @@ public class DropEntry {
     private int minExp;
     private int maxExp;
 
+    private int minerExp;
+
+    private int neededMinerLevel;
+    private int neededToolLevel;
+
     private ItemStack silkTouchItemStack;
     //TODO: Store type of item to reduce ItemStack#getType() calls count
 
@@ -46,6 +51,11 @@ public class DropEntry {
 
         minExp = 1;
         maxExp = 5;
+
+        minerExp = 0;
+
+        neededMinerLevel = 0;
+        neededToolLevel = 1;
 
         silkTouchItemStack = itemStack;
     }
@@ -91,15 +101,15 @@ public class DropEntry {
     }
 
     public void setMinAmount(int amount) {
-        minAmount = (amount < 1)? 1 : minAmount;
+        this.minAmount = (amount < 1)? 1 : amount;
     }
 
     public int getMinAmount() {
-        return minAmount;
+        return this.minAmount;
     }
 
     public void setMaxAmount(int amount) {
-        maxAmount = (amount > minAmount)? amount : minAmount;
+        this.maxAmount = (amount > this.minAmount)? amount : this.minAmount;
     }
 
     public int getMaxAmount() {
@@ -151,6 +161,22 @@ public class DropEntry {
         return random.nextInt(maxExp - minExp) + (minAmount);
     }
 
+    public int getNeededMinerLevel() {
+        return neededMinerLevel;
+    }
+
+    public void setNeededMinerLevel(int neededMinerLevel) {
+        this.neededMinerLevel = neededMinerLevel;
+    }
+
+    public int getNeededToolLevel() {
+        return neededToolLevel;
+    }
+
+    public void setNeededToolLevel(int neededToolLevel) {
+        this.neededToolLevel = neededToolLevel;
+    }
+
     public boolean isMultipliable() {
         return multipliable;
     }
@@ -159,4 +185,11 @@ public class DropEntry {
         this.multipliable = multipliable;
     }
 
+    public int getMinerExp() {
+        return minerExp;
+    }
+
+    public void setMinerExp(int minerExp) {
+        this.minerExp = minerExp;
+    }
 }

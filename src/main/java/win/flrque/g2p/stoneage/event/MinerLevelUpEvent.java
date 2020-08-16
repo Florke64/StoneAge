@@ -6,30 +6,29 @@
 
 package win.flrque.g2p.stoneage.event;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
+import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 
-public class StoneDropLootEvent extends Event implements Cancellable {
+public class MinerLevelUpEvent extends Event implements Cancellable {
 
     private boolean isCancelled = false;
 
-    private final ItemStack itemDrop;
-    private final Player player;
+    private final PlayerStats playerStats;
+    private final int upToLevel;
 
-    public StoneDropLootEvent(final Player player, final ItemStack drop) {
-        this.itemDrop = drop;
-        this.player = player;
+    public MinerLevelUpEvent(PlayerStats stats, int level) {
+        this.playerStats = stats;
+        this.upToLevel = level;
     }
 
-    public ItemStack getDrop() {
-        return this.itemDrop;
+    public int getUpToLevel() {
+        return upToLevel;
     }
 
-    public Player getPlayer() {
-        return player;
+    public PlayerStats getPlayerStats() {
+        return playerStats;
     }
 
     @Override

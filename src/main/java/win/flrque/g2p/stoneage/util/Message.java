@@ -6,9 +6,13 @@
 
 package win.flrque.g2p.stoneage.util;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -34,9 +38,21 @@ public class Message {
 
     private boolean usePrefixOnSend = false;
 
+    public Message() {
+        this.rawMessage.clear();
+    }
+
     public Message(@NotNull String ...message) {
         for(final String line : message) {
-           this.rawMessage.add(line);
+            this.rawMessage.add(line);
+        }
+
+        prepare();
+    }
+
+    public Message(@NotNull List<String> message) {
+        for(final String line : message) {
+            this.rawMessage.add(line);
         }
 
         prepare();
@@ -54,7 +70,22 @@ public class Message {
         }
     }
 
+    public void sendActionMessage(@NotNull Player target) {
+        for(final String line : this.message) {
+            final BaseComponent chatComponent = new TextComponent((usePrefixOnSend? linePrefix : "") + line);
+            target.spigot().sendMessage(ChatMessageType.ACTION_BAR, chatComponent);
+        }
+    }
+
     public void addLines(@NotNull final String ...lines) {
+        for(final String line : lines) {
+            this.rawMessage.add(line);
+        }
+
+        prepare();
+    }
+
+    public void addLines(@NotNull final List<String> lines) {
         for(final String line : lines) {
             this.rawMessage.add(line);
         }

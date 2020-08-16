@@ -4,7 +4,7 @@
  * Author: FlrQue
  */
 
-package win.flrque.g2p.stoneage.util;
+package win.flrque.g2p.stoneage.config;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class ConfigSectionItemStack extends ConfigSectionReader{
+public class ItemStackConfigReader extends ConfigSectionReader{
 
     private ItemStack cachedItemStack;
 
-    public ConfigSectionItemStack(ConfigurationSection section) {
+    public ItemStackConfigReader(ConfigurationSection section) {
         super(section);
     }
 

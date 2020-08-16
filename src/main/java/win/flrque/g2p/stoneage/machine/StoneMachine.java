@@ -6,14 +6,13 @@
 
 package win.flrque.g2p.stoneage.machine;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dispenser;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Directional;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -32,8 +31,10 @@ public class StoneMachine {
 
     private final StoneAge plugin;
 
+    private final ItemAutoSmelter itemSmelter;
+
     private final String machineName;
-    private final List<String> machineLore = new ArrayList<>();
+    private final List<String> machineLore;
 
     private final Map<Dispenser, Long> lastStoneMachineRepair = new HashMap<>();
 
@@ -41,6 +42,7 @@ public class StoneMachine {
     private int repairCooldown = 5;
 
     private boolean allowHopperOutput = false;
+    private boolean allowHopperInput = false;
 
     private boolean dropItemsToFeet = false;
     private boolean dropExpToFeet = false;
@@ -48,14 +50,15 @@ public class StoneMachine {
     private final ItemStack stoneMachineParent;
     private final ItemStack machineLabel;
 
-    public StoneMachine(String machineName, List<String> lore) {
+    public StoneMachine(String machineName, List<String> machineLore) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
+
+        this.itemSmelter = new ItemAutoSmelter();
 
         this.machineName = Message.color(machineName);
 
-        for(String line : lore) {
-            this.machineLore.add(Message.color(line));
-        }
+        final Message lore = new Message(machineLore);
+        this.machineLore = lore.getPreparedMessage();
         
         this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
 
@@ -82,7 +85,7 @@ public class StoneMachine {
         return true;
     }
 
-    public boolean isStoneMachine(Block block) {
+    public boolean isStoneMachine(@NotNull final Block block) {
         if(block.getState() instanceof Dispenser) {
             return isStoneMachine((Dispenser) block.getState());
         }
@@ -90,7 +93,7 @@ public class StoneMachine {
         return false;
     }
 
-    public boolean isStoneMachine(Dispenser dispenserBlock) {
+    public boolean isStoneMachine(@NotNull final Dispenser dispenserBlock) {
         if(dispenserBlock.getCustomName() == null)
             return false;
 
@@ -139,7 +142,7 @@ public class StoneMachine {
         generateStone(location, stoneRespawnFrequency);
     }
 
-    public void generateStone(final Location location, final long delay) {
+    public void generateStone(@NotNull final Location location, final long delay) {
         final Block block = location.getWorld().getBlockAt(location);
 
         new BukkitRunnable() {
@@ -167,6 +170,7 @@ public class StoneMachine {
         return stoneMachineParent.clone();
     }
 
+    @NotNull
     private ItemStack createStoneMachineItem(Material material) {
         final ItemStack item = new ItemStack(material);
         final ItemMeta meta = item.getItemMeta();
@@ -209,6 +213,24 @@ public class StoneMachine {
         return machineLore;
     }
 
+    public void registerCraftingRecipe() {
+        final NamespacedKey namespacedKey = new NamespacedKey(this.plugin, "stone_machine");
+        final ShapedRecipe craftingRecipe = new ShapedRecipe(namespacedKey, this.stoneMachineParent);
+        craftingRecipe.shape("OLO", "RDR", "OPO");
+
+        craftingRecipe.setIngredient('O', Material.OBSIDIAN);
+        craftingRecipe.setIngredient('L', Material.LAVA_BUCKET);
+        craftingRecipe.setIngredient('R', Material.REDSTONE);
+        craftingRecipe.setIngredient('D', StoneMachine.STONE_MACHINE_MATERIAL);
+        craftingRecipe.setIngredient('P', Material.PISTON);
+
+        Bukkit.addRecipe(craftingRecipe);
+    }
+
+    public ItemAutoSmelter getItemSmelter() {
+        return itemSmelter;
+    }
+
     public void setStoneRespawnFrequency(long stoneRespawnFrequency) {
         this.stoneRespawnFrequency = stoneRespawnFrequency;
     }
@@ -219,6 +241,14 @@ public class StoneMachine {
 
     public void setAllowHopperOutput(boolean allow) {
         this.allowHopperOutput = allow;
+    }
+
+    public boolean isHopperInputAllowed() {
+        return allowHopperInput;
+    }
+
+    public void setAllowHopperInput(boolean allowHopperInput) {
+        this.allowHopperInput = allowHopperInput;
     }
 
     public boolean isDropItemsToFeet() {
