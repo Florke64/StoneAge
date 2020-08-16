@@ -24,16 +24,16 @@ public class DropMultiplierCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, String label, String[] args) {
-        if(!sender.hasPermission(command.getPermission())) {
-            new Message("&cNie posiadasz wystarczajacych uprawnien do wykonania tej komendy.");
-            return false;
-        }
-
         if(args.length == 0) {
             DropMultiplier multiplier = plugin.getDropCalculator().getDropMultiplier();
             printMultiplierInfo(sender, multiplier, false);
 
             return true;
+        }
+
+        if(!sender.hasPermission("g2p.stone.admin")) {
+            new Message("&cNie posiadasz wystarczajacych uprawnien do wykonania tej komendy.");
+            return false;
         }
 
         float multiplierValue;
@@ -72,16 +72,16 @@ public class DropMultiplierCommand implements CommandExecutor {
 
         if(!multiplier.isActive()) {
             multiplierMessage.addLines("  &cMnoznik dropu nie jest aktywowany.");
+        } else {
+            multiplierMessage.addLines("  &2Mnoznik dropu z kamienia aktywowany przez: &8$_1&2.");
+            multiplierMessage.addLines("  &2Drop surowcow, teraz &7x&6$_2&2!");
+            multiplierMessage.addLines("  &2Aktywny przez &6$_3 &7minut&2.");
+            multiplierMessage.addLines(Message.EMPTY);
+
+            multiplierMessage.setVariable(1, multiplier.getCallerName());
+            multiplierMessage.setVariable(2, Float.toString(multiplier.getCurrentDropMultiplier()));
+            multiplierMessage.setVariable(3, Integer.toString(multiplier.getMinutesLeft()));
         }
-
-        multiplierMessage.addLines("  &2Mnoznik dropu z kamienia aktywowany przez: &8$_1&2.");
-        multiplierMessage.addLines("  &2Drop surowcow, teraz &7x&6$_2&2!");
-        multiplierMessage.addLines("  &2Aktywny przez &6$_3 &7minut&2.");
-        multiplierMessage.addLines(Message.EMPTY);
-
-        multiplierMessage.setVariable(1, multiplier.getCallerName());
-        multiplierMessage.setVariable(2, Float.toString(multiplier.getCurrentDropMultiplier()));
-        multiplierMessage.setVariable(3, Integer.toString(multiplier.getMinutesLeft()));
 
         if(broadcast) multiplierMessage.broadcastToTheServer();
         else multiplierMessage.send(commandSender);
