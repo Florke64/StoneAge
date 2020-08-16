@@ -152,7 +152,7 @@ public class DropCalculator {
                 ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
 
                 //Auto smelting feature
-                if(autoSmelter.getAutoSmeltingUsesLeft(stoneMachine) >= itemDrop.getAmount()) {
+                if(stoneMachine != null && autoSmelter.getAutoSmeltingUsesLeft(stoneMachine) >= itemDrop.getAmount()) {
                     final ItemStack smelted = autoSmelter.getSmelted(stoneMachine, itemDrop);
                     if(smelted != null) {
                         itemDrop = smelted;
