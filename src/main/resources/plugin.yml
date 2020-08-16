@@ -12,6 +12,10 @@ commands:
     description: Sprawdzanie i ustawianie preferencji dropu ze stoniarek
     aliases: [dropinfo, dropy, drops, stone, dropstat]
     permission: g2p.stone.drop
+  dropstat:
+    description: Statystyki gornictwa / stone
+    aliases: [dropstatystyki, gornictwo]
+    permission: g2p.stone.drop
   drophelp:
     description: Wyswietla instrukcje obslugi stoniarek.
     permission: g2p.stone.drop
