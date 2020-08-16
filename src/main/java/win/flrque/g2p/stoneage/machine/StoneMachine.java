@@ -216,9 +216,9 @@ public class StoneMachine {
     public void registerCraftingRecipe() {
         final NamespacedKey namespacedKey = new NamespacedKey(this.plugin, "stone_machine");
         final ShapedRecipe craftingRecipe = new ShapedRecipe(namespacedKey, this.stoneMachineParent);
-        craftingRecipe.shape("OLO", "RDR", "OPO");
+        craftingRecipe.shape("CLC", "RDR", "CPC");
 
-        craftingRecipe.setIngredient('O', Material.OBSIDIAN);
+        craftingRecipe.setIngredient('C', Material.COAL_BLOCK);
         craftingRecipe.setIngredient('L', Material.LAVA_BUCKET);
         craftingRecipe.setIngredient('R', Material.REDSTONE);
         craftingRecipe.setIngredient('D', StoneMachine.STONE_MACHINE_MATERIAL);
