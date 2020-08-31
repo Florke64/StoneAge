@@ -12,6 +12,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dispenser;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Directional;
@@ -20,10 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.util.Message;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Level;
 
 public class StoneMachine {
 
@@ -215,6 +214,18 @@ public class StoneMachine {
 
     public void registerCraftingRecipe() {
         final NamespacedKey namespacedKey = new NamespacedKey(this.plugin, "stone_machine");
+
+        final Iterator<Recipe> registeredRecipes = Bukkit.recipeIterator();
+        while(registeredRecipes.hasNext()) {
+            final Recipe recipe = registeredRecipes.next();
+            if(!(recipe instanceof ShapedRecipe)) continue;
+
+            if(((ShapedRecipe) recipe).getKey().getKey().contentEquals(namespacedKey.getKey())) {
+                plugin.getLogger().log(Level.WARNING, "Skipping crafting recipe registration, as the same NamespaceKey was already reserved.");
+                return;
+            }
+        }
+
         final ShapedRecipe craftingRecipe = new ShapedRecipe(namespacedKey, this.stoneMachineParent);
         craftingRecipe.shape("CLC", "RDR", "CPC");
 
