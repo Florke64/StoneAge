@@ -43,69 +43,76 @@ public class SQLManager {
     }
 
     public int runUpdateForPersonalDropConfig(PlayerConfig config) throws SQLException {
-            final Connection conn = connectionPool.getConnection();
 
-            if(conn == null) return -1;
+        final StringBuilder query = new StringBuilder();
+        final StringBuilder fields = new StringBuilder();
+        query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_DROP_CONFIG+ "` (");
 
-            final StringBuilder query = new StringBuilder();
-            final StringBuilder fields = new StringBuilder();
-            query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_DROP_CONFIG+ "` (");
+        fields.append("`PlayerUUID`, ");
+        fields.append("`PlayerName`, ");
 
-            fields.append("`PlayerUUID`, ");
-            fields.append("`PlayerName`, ");
+        final Set<DropEntry> entries = config.getCustomDropEntries();
 
-            final Set<DropEntry> entries = config.getCustomDropEntries();
+        int i = 0;
+        for(DropEntry entry : entries) {
+            i++;
+            if(entry == null) continue;
 
-            int i = 0;
-            for(DropEntry entry : entries) {
-                i++;
-                if(entry == null) continue;
-
-                fields.append("`" +entry.getEntryName()+ "`");
-                if(i < entries.size()) {
-                    fields.append(", ");
-                }
+            fields.append("`" +entry.getEntryName()+ "`");
+            if(i < entries.size()) {
+                fields.append(", ");
             }
+        }
 
-            query.append(fields);
+        query.append(fields);
 
-            i = 0;
-            query.append(") VALUES (");
-            query.append("'" +config.getUniqueId()+ "', ");
-            query.append("'" +config.getPlayerName()+ "', ");
-            for(DropEntry entry : entries) {
-                i++;
-                if(entry == null) continue;
+        i = 0;
+        query.append(") VALUES (");
+        query.append("'" +config.getUniqueId()+ "', ");
+        query.append("'" +config.getPlayerName()+ "', ");
+        for(DropEntry entry : entries) {
+            i++;
+            if(entry == null) continue;
 
-                int dropSwitchStatus = config.isDropping(entry)? 1 : 0;
-                query.append("'" +dropSwitchStatus+ "'");
-                if(i < entries.size()) {
-                    query.append(", ");
-                }
+            int dropSwitchStatus = config.isDropping(entry)? 1 : 0;
+            query.append("'" +dropSwitchStatus+ "'");
+            if(i < entries.size()) {
+                query.append(", ");
             }
-            query.append(") ON DUPLICATE KEY UPDATE ");
+        }
+        query.append(") ON DUPLICATE KEY UPDATE ");
 
-            i = 0;
-            for(DropEntry entry : entries) {
-                i++;
-                if(entry == null) continue;
+        i = 0;
+        for(DropEntry entry : entries) {
+            i++;
+            if(entry == null) continue;
 
-                query.append("`" +entry.getEntryName()+ "`=VALUES(`" +entry.getEntryName()+ "`)");
-                if(i < entries.size()) {
-                    query.append(", ");
-                }
+            query.append("`" +entry.getEntryName()+ "`=VALUES(`" +entry.getEntryName()+ "`)");
+            if(i < entries.size()) {
+                query.append(", ");
             }
+        }
 
-            final PreparedStatement ps = conn.prepareStatement(query.toString());
+        try (final Connection conn = connectionPool.getConnection();
+         final PreparedStatement ps = conn.prepareStatement(query.toString()) ) {
+
+            if (conn == null || ps == null) return -1;
 
             final int response = ps.executeUpdate();
 
+            if (ps != null && !ps.isClosed()) {
+                ps.close();
+            }
+
             return response;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return -1;
     }
 
     public int runUpdateForPersonalStoneStats(PlayerStats stats) throws SQLException {
-        final Connection conn = connectionPool.getConnection();
-        if(conn == null) return -1;
 
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();
@@ -163,11 +170,22 @@ public class SQLManager {
             }
         }
 
-        final PreparedStatement ps = conn.prepareStatement(query.toString());
+        try (final Connection conn = connectionPool.getConnection();
+         final PreparedStatement ps = conn.prepareStatement(query.toString()) ) {
+            if (conn == null || ps == null) return -1;
 
-        final int response = ps.executeUpdate();
+            final int response = ps.executeUpdate();
 
-        return response;
+            if (ps != null && !ps.isClosed()) {
+                ps.close();
+            }
+
+            return response;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return -1;
     }
 
     private void init() {

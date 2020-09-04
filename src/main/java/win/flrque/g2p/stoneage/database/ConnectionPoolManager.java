@@ -53,8 +53,6 @@ public class ConnectionPoolManager {
         config.setJdbcUrl("jdbc:mysql://" + hostname + "/" + database + "?user=" + username + "&password=" + password + "&useUnicode=true&characterEncoding=UTF-8&verifyServerCertificate=false&useSSL=false&requireSSL=false");
         config.setUsername(username);
         config.setPassword(password);
-        config.setMaxLifetime(60000);
-        config.setIdleTimeout(45000);
         config.setPoolName("StoneAgeDatabasePool");
         config.setConnectionTestQuery("SELECT 1;");
         config.addDataSourceProperty("autoReconnect", true);
@@ -68,7 +66,7 @@ public class ConnectionPoolManager {
     }
 
     public Connection getConnection() throws SQLException {
-        return dataSource != null? dataSource.getConnection() : null;
+        return (dataSource != null) ? dataSource.getConnection() : null;
     }
 
     public void close(Connection connection, Statement statement, ResultSet resultSet) {
