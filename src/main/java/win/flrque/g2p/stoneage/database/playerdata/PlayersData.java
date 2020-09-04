@@ -89,7 +89,7 @@ public class PlayersData {
                     stats.setStatistic(columnName, result.getInt(columnName));
                 }
             }
-        } catch (SQLException | NullPointerException ex) {
+        } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, "Couldn't query results!");
             ex.printStackTrace();
         }
