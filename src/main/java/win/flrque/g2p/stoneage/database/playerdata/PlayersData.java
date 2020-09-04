@@ -51,7 +51,7 @@ public class PlayersData {
         return playerPersonalDropConfig.get(uuid);
     }
 
-    public void loadPersonalStoneStatsFromDatabase() {
+    public int loadPersonalStoneStatsFromDatabase() {
         final String databaseName = plugin.getDatabaseController().getDatabaseName();
         final String queryStatement = "SELECT * FROM " +databaseName+ ".`" + SQLManager.TABLE_PLAYER_STATS + "`";
 
@@ -63,9 +63,10 @@ public class PlayersData {
 
             if(result == null) {
                 plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
-                return;
+                return -1;
             }
 
+            int loadCount = 0;
             while (result.next()) {
                 final ResultSetMetaData metaData = result.getMetaData();
                 final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
@@ -76,7 +77,7 @@ public class PlayersData {
                 stats.setMinerExp(minerExp);
                 stats.setMinerLvl(minerLvl);
 
-                plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
+                //plugin.getLogger().log(Level.INFO, "Loading drop stats for " + result.getString("PlayerUUID"));
 
                 final int columnCount = metaData.getColumnCount();
                 for(int i=1; i<=columnCount; i++) {
@@ -88,15 +89,20 @@ public class PlayersData {
 
                     stats.setStatistic(columnName, result.getInt(columnName));
                 }
+
+                loadCount++;
             }
+
+            return loadCount;
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, "Couldn't query results!");
             ex.printStackTrace();
         }
 
+        return 0;
     }
 
-    public void loadPersonalDropConfigFromDatabase() {
+    public int loadPersonalDropConfigFromDatabase() {
         final String databaseName = plugin.getDatabaseController().getDatabaseName();
         final String queryStatement = "SELECT * FROM " +databaseName+ ".`" + SQLManager.TABLE_PLAYER_DROP_CONFIG + "`";
 
@@ -108,15 +114,16 @@ public class PlayersData {
 
             if(result == null) {
                 plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
-                return;
+                return -1;
             }
 
+            int loadCount = 0;
             while (result.next()) {
                 final ResultSetMetaData metaData = result.getMetaData();
                 final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
                 final PlayerConfig config = playerSetup.getPersonalDropConfig(uuid);
 
-                plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
+                //plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
 
                 final int columnCount = metaData.getColumnCount();
                 for(int i=1; i<=columnCount; i++) {
@@ -127,12 +134,17 @@ public class PlayersData {
                     config.setDropEntry(columnName, result.getBoolean(columnName));
 
                 }
+
+                loadCount++;
             }
+
+            return loadCount;
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Couldn't query results!");
             e.printStackTrace();
         }
 
+        return 0;
     }
 
     public int savePersonalDropConfigInDatabase(PlayerConfig config) throws SQLException {

@@ -185,8 +185,21 @@ public final class StoneAge extends JavaPlugin {
             databaseConfig.readDatabaseConnectionDetails();
             sqlManager = new SQLManager(databaseConfig);
 
-            playerSetup.loadPersonalStoneStatsFromDatabase();
-            playerSetup.loadPersonalDropConfigFromDatabase();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    final long dbLoadStartTime = System.currentTimeMillis();
+
+                    //Loading data of all players from database
+                    final int statsCount = playerSetup.loadPersonalStoneStatsFromDatabase();
+                    final int configsCount = playerSetup.loadPersonalDropConfigFromDatabase();
+
+                    final long dbLoadFinishTime = System.currentTimeMillis();
+
+                    getLogger().log(Level.INFO, "Loaded drop stats and config from database (in number of "+ statsCount +" and "+ configsCount + ")");
+                    getLogger().log(Level.INFO, "Loading from database took " + (dbLoadFinishTime - dbLoadStartTime) + "ms");
+                }
+            }.runTaskAsynchronously(this);
 
             getDropCalculator().getDropMultiplier().readPreviousMultiplierFromDatabase();
         }
