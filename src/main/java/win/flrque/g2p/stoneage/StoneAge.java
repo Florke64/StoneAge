@@ -31,6 +31,7 @@ import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.ApplicableTools;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -77,6 +78,8 @@ public final class StoneAge extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new StatisticsIncreaseListener(), this);
         getServer().getPluginManager().registerEvents(new MinerLevelUpListener(), this);
+
+        getServer().getPluginManager().registerEvents(new DropMultiplierCallListener(), this);
 
 //        getServer().getPluginManager().registerEvents(new DebugGameJoin(), this);
 
@@ -207,8 +210,12 @@ public final class StoneAge extends JavaPlugin {
                     final PlayerConfig dropConfig = getPlayerSetup().getPersonalDropConfig(playerUUID);
                     final PlayerStats dropStats = getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
 
-                    getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
-                    getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+                    try {
+                        getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
+                        getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
 
                     a++;
                 }

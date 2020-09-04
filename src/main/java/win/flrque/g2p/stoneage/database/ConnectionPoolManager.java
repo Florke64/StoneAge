@@ -12,9 +12,9 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.config.DatabaseConfigReader;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ConnectionPoolManager {
 
@@ -47,11 +47,17 @@ public class ConnectionPoolManager {
 
     private void setupPool() {
         HikariConfig config = new HikariConfig();
-        config.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
+//        config.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
 
-        config.setJdbcUrl("jdbc:mysql://" +hostname+ ":" +port+ "/" +database);
+//        config.setJdbcUrl("jdbc:mysql://" +hostname+ ":" +port+ "/" +database);
+        config.setJdbcUrl("jdbc:mysql://" + hostname + "/" + database + "?user=" + username + "&password=" + password + "&useUnicode=true&characterEncoding=UTF-8&verifyServerCertificate=false&useSSL=false&requireSSL=false");
         config.setUsername(username);
         config.setPassword(password);
+        config.setMaxLifetime(60000);
+        config.setIdleTimeout(45000);
+        config.setPoolName("StoneAgeDatabasePool");
+        config.setConnectionTestQuery("SELECT 1;");
+        config.addDataSourceProperty("autoReconnect", true);
 
         try {
             dataSource = new HikariDataSource(config);
@@ -65,10 +71,10 @@ public class ConnectionPoolManager {
         return dataSource != null? dataSource.getConnection() : null;
     }
 
-    public void close(Connection conn, PreparedStatement ps, ResultSet res) {
-        if (conn != null) try { conn.close(); } catch (SQLException ignored) {}
-        if (ps != null) try { ps.close(); } catch (SQLException ignored) {}
-        if (res != null) try { res.close(); } catch (SQLException ignored) {}
+    public void close(Connection connection, Statement statement, ResultSet resultSet) {
+        if (connection != null) try { connection.close(); } catch (SQLException ignored) {}
+        if (statement != null) try { statement.close(); } catch (SQLException ignored) {}
+        if (resultSet != null) try { resultSet.close(); } catch (SQLException ignored) {}
     }
 
     public void closePool() {
