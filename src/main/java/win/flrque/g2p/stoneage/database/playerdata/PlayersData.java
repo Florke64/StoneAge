@@ -59,7 +59,8 @@ public class PlayersData {
 
         try (final Connection conn = plugin.getDatabaseController().getConnection();
          final PreparedStatement ps = conn.prepareStatement(queryStatement);
-         final ResultSet result = ps.executeQuery()) {
+         final ResultSet result = ps.executeQuery() ) {
+
             if(result == null) {
                 plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
                 return;
@@ -101,10 +102,10 @@ public class PlayersData {
 
         final PlayersData playerSetup = plugin.getPlayerSetup();
 
-
         try (final Connection conn = plugin.getDatabaseController().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
              final ResultSet result = ps.executeQuery()) {
+
             if(result == null) {
                 plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
                 return;
