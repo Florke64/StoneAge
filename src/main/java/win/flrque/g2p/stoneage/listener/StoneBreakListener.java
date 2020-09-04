@@ -34,6 +34,8 @@ import win.flrque.g2p.stoneage.event.StoneDropLootEvent;
 import win.flrque.g2p.stoneage.event.StoneMachineStoneBreakEvent;
 import win.flrque.g2p.stoneage.util.Message;
 
+import java.util.logging.Level;
+
 public class StoneBreakListener implements Listener {
 
     private final StoneAge plugin;
@@ -79,7 +81,9 @@ public class StoneBreakListener implements Listener {
             //TODO: Async calculation
             finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
 
-            if(finalDrop == null) System.out.println("DropLoot calculated is null");
+            if(finalDrop == null) {
+                plugin.getLogger().log(Level.INFO, "DropLoot calculated is null (Player: "+ player.getName() +", Location: "+ player.getLocation().toString() +")");
+            }
 
             dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
         } else {

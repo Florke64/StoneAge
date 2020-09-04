@@ -233,7 +233,7 @@ public final class StoneAge extends JavaPlugin {
                     a++;
                 }
 
-                System.out.println("Saved " + a + " players data into the database. Next Save in " + period + " minutes");
+                StoneAge.this.getLogger().log(Level.INFO, "Saved " + a + " players data into the database. Next Save in " + period + " minutes");
             }
 
         };
@@ -280,14 +280,15 @@ public final class StoneAge extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        this.getLogger().log(Level.INFO, "onDisable()");
+        this.getLogger().log(Level.INFO, "Called plugin's onDisable() method. Bye cruel world!");
 
-        this.getLogger().log(Level.INFO, "closing windows");
-        getWindowManager().closeAllWindows(); //TODO: NullPointer Exception <- onDisable?
+        this.getLogger().log(Level.INFO, "Closing all Window Manager's GUIs... ");
+        getWindowManager().closeAllWindows();
 
-        this.getLogger().log(Level.INFO, "saving...");
+        this.getLogger().log(Level.INFO, "Syncing all unsaved data with the databasse...");
         playerSetup.onDisable();
-        this.getLogger().log(Level.INFO, "closing db");
+
+        this.getLogger().log(Level.INFO, "Disconnecting database, closing connection pool...");
         sqlManager.onDisable();
     }
 }

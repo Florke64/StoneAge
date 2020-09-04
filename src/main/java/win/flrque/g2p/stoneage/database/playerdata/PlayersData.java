@@ -168,8 +168,6 @@ public class PlayersData {
     }
 
     public void saveAllUnsavedDropData() throws SQLException {
-        plugin.getLogger().log(Level.INFO, "saveAllUnsavedDropData()");
-
         int saved = 0, skipped = 0;
         for(PlayerConfig config : playerPersonalDropConfig.values()) {
             if(config.hasUnsavedEdits()) {
@@ -200,8 +198,6 @@ public class PlayersData {
     }
 
     public void onDisable() {
-        plugin.getLogger().log(Level.INFO, "PlayerSetupManager#onDisable()");
-
         try {
             saveAllUnsavedDropData();
         } catch (SQLException ex) {
