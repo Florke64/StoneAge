@@ -25,7 +25,7 @@ tools:
   machine_destroy: GOLDEN_PICKAXE
   levels:
     WOODEN_PICKAXE: 1
-    SONE_PICKAXE: 2
+    STONE_PICKAXE: 2
     IRON_PICKAXE: 3
     GOLDEN_PICKAXE: 2
     DIAMOND_PICKAXE: 4
