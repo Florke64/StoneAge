@@ -163,23 +163,12 @@ public class SQLManager {
             }
         }
 
-        PreparedStatement ps = conn.prepareStatement(query.toString());
+        final PreparedStatement ps = conn.prepareStatement(query.toString());
 
         final int response = ps.executeUpdate();
 
         return response;
     }
-
-//    public ResultSet runQuery(final String query) throws SQLException {
-//        final Connection conn = connectionPool.getConnection();
-//        if(conn == null) return null;
-//
-//        PreparedStatement ps = conn.prepareStatement(query);
-//
-//        final ResultSet rs = ps.executeQuery();
-//
-//        return rs;
-//    }
 
     private void init() {
         final String databaseName = getDatabaseName();
