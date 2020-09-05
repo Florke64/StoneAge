@@ -266,16 +266,29 @@ public final class StoneAge extends JavaPlugin {
 
         multiplierBossBarRunnable = new BukkitRunnable() {
 
+            private boolean activeCheck = false;
             private boolean textSwitch = false;
 
             @Override
             public void run() {
                 multiplierBossBar.removeAll();
                 if(!multiplier.isActive()) {
+                    // Broadcast multiplier end message to the server
+                    if(activeCheck == true) {
+                        new Message("&cMnoznik dropu zakonczyl sie!").broadcastToTheServer();
+                        activeCheck = false;
+                    }
+
                     multiplierBossBar.setVisible(false);
                     return;
                 }
 
+                activeCheck = true;
+
+                updateBossBar();
+            }
+
+            private void updateBossBar() {
                 final long fullTime = ((multiplier.getMultiplierTimeout() - multiplier.getMultiplierStartTime()) / 1000) / 60;
                 final int leftTime = multiplier.getMinutesLeft();
                 final float value = multiplier.getCurrentDropMultiplier();
@@ -285,9 +298,10 @@ public final class StoneAge extends JavaPlugin {
                 final Message bossBarTitle = new Message();
                 bossBarTitle.addLines("&6Mnoznik dropu: &7x&c$_1 &6(aktywny przez &c$_2&7min&6)");
                 bossBarTitle.addLines("&5Mnoznik dropu z kamienia aktywny, nie przegap okazji!");
+                bossBarTitle.addLines("&cMnoznik dropu z kamienia zaraz sie skonczy!");
                 bossBarTitle.setVariable(1, Float.toString(value));
                 bossBarTitle.setVariable(2, Integer.toString(leftTime));
-                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(textSwitch? 0 : 1));
+                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(textSwitch? (leftTime==0? 2 : 0) : 1));
 
                 multiplierBossBar.setProgress(percentage);
                 multiplierBossBar.setColor(percentage < 0.2d? BarColor.RED : BarColor.BLUE);
