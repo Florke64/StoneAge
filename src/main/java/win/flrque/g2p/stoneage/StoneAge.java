@@ -7,7 +7,12 @@
 package win.flrque.g2p.stoneage;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -30,6 +35,7 @@ import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.ApplicableTools;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
+import win.flrque.g2p.stoneage.util.Message;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -49,6 +55,8 @@ public final class StoneAge extends JavaPlugin {
 
     private SQLManager sqlManager;
     private BukkitRunnable autosaveRunnable;
+    private BukkitRunnable multiplierBossBarRunnable;
+    private BossBar multiplierBossBar;
 
     @Override
     public void onEnable() {
@@ -95,6 +103,10 @@ public final class StoneAge extends JavaPlugin {
         initAsyncAutosave(period);
         if(autosaveRunnable != null)
             autosaveRunnable.runTaskTimerAsynchronously(this, period * minute, period * minute);
+
+        initMultiplierBossBar();
+        if(multiplierBossBarRunnable != null)
+            multiplierBossBarRunnable.runTaskTimerAsynchronously(this, 10*20, minute/4);
     }
 
     private void initStoneMachines() {
@@ -233,9 +245,56 @@ public final class StoneAge extends JavaPlugin {
                     a++;
                 }
 
-                StoneAge.this.getLogger().log(Level.INFO, "Saved " + a + " players data into the database. Next Save in " + period + " minutes");
+                StoneAge.this.getLogger().log(Level.INFO, "Saved " + a + " players data into the database. Next Auto-Save in " + period + " minutes");
             }
+        };
+    }
 
+    private void initMultiplierBossBar() {
+
+        getLogger().log(Level.INFO, "Initialized Multiplier visualization via Boss Bar.");
+
+        final DropMultiplier multiplier = StoneAge.this.getDropCalculator().getDropMultiplier();
+
+        final NamespacedKey bossBarKey = new NamespacedKey(this, "multiplier_bossbar");
+        multiplierBossBar = Bukkit.createBossBar(bossBarKey, ChatColor.RED + "Go2Play", BarColor.BLUE, BarStyle.SEGMENTED_10);
+        multiplierBossBar.setVisible(false);
+
+        multiplierBossBarRunnable = new BukkitRunnable() {
+
+            private boolean textSwitch = false;
+
+            @Override
+            public void run() {
+                multiplierBossBar.removeAll();
+                if(!multiplier.isActive()) {
+                    multiplierBossBar.setVisible(false);
+                    return;
+                }
+
+                final long fullTime = ((multiplier.getMultiplierTimeout() - multiplier.getMultiplierStartTime()) / 1000) / 60;
+                final int leftTime = multiplier.getMinutesLeft();
+                final float value = multiplier.getCurrentDropMultiplier();
+
+                final double percentage = ((double) leftTime / (double) fullTime);
+
+                final Message bossBarTitle = new Message();
+                bossBarTitle.addLines("&6Mnoznik dropu: &7x&c$_1 &6(aktywny przez &c$_2&7min&6)");
+                bossBarTitle.addLines("&5Mnoznik dropu z kamienia aktywny, nie przegap okazji!");
+                bossBarTitle.setVariable(1, Float.toString(value));
+                bossBarTitle.setVariable(2, Integer.toString(leftTime));
+                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(textSwitch? 0 : 1));
+
+                multiplierBossBar.setProgress(percentage);
+                multiplierBossBar.setColor(percentage < 0.2d? BarColor.RED : BarColor.BLUE);
+
+                for(final Player player : playerSetup.getMinersFromLast(60*1000)) {
+                    multiplierBossBar.addPlayer(player);
+                }
+
+                multiplierBossBar.setVisible(true);
+                this.textSwitch = !this.textSwitch;
+            }
         };
     }
 
@@ -291,4 +350,9 @@ public final class StoneAge extends JavaPlugin {
         this.getLogger().log(Level.INFO, "Disconnecting database, closing connection pool...");
         sqlManager.onDisable();
     }
+
+    public BossBar getMultiplierBossBar() {
+        return multiplierBossBar;
+    }
+
 }
