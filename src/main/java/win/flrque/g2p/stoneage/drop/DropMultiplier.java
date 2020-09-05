@@ -6,12 +6,20 @@
 
 package win.flrque.g2p.stoneage.drop;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.SQLManager;
 import win.flrque.g2p.stoneage.event.DropMultiplierStartEvent;
+import win.flrque.g2p.stoneage.util.Message;
 
 import java.sql.*;
 import java.util.UUID;
@@ -27,6 +35,9 @@ public class DropMultiplier {
     private float currentDropMultiplier;
     private long multiplierTimeout = 0;
     private long multiplierSetOn = 0;
+
+    private BukkitRunnable multiplierBossBarRunnable;
+    private BossBar multiplierBossBar;
 
     private String callerName;
     private UUID callerUniqueId;
@@ -171,6 +182,66 @@ public class DropMultiplier {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void updateBossBar() {
+        if(multiplierBossBarRunnable != null)
+            multiplierBossBarRunnable.run();
+    }
+
+    public void initMultiplierBossBar() {
+
+        plugin.getLogger().log(Level.INFO, "Initialized Multiplier visualization via Boss Bar.");
+
+        final DropMultiplier multiplier = plugin.getDropCalculator().getDropMultiplier();
+
+        final NamespacedKey bossBarKey = new NamespacedKey(plugin, "multiplier_bossbar");
+        multiplierBossBar = Bukkit.createBossBar(bossBarKey, ChatColor.RED + "Go2Play", BarColor.BLUE, BarStyle.SEGMENTED_10);
+        multiplierBossBar.setVisible(false);
+
+        multiplierBossBarRunnable = new BukkitRunnable() {
+
+            private boolean textSwitch = false;
+
+            @Override
+            public void run() {
+                multiplierBossBar.removeAll();
+                if(!multiplier.isActive()) {
+                    multiplierBossBar.setVisible(false);
+                    return;
+                }
+
+                final long fullTime = ((multiplier.getMultiplierTimeout() - multiplier.getMultiplierStartTime()) / 1000) / 60;
+                final int leftTime = multiplier.getMinutesLeft();
+                final float value = multiplier.getCurrentDropMultiplier();
+
+                final double percentage = ((double) leftTime / (double) fullTime);
+
+                final Message bossBarTitle = new Message();
+                bossBarTitle.addLines("&6Mnoznik dropu: &7x&c$_1 &6(aktywny przez &c$_2&7min&6)");
+                bossBarTitle.addLines("&5Mnoznik dropu z kamienia aktywny, nie przegap okazji!");
+                bossBarTitle.setVariable(1, Float.toString(value));
+                bossBarTitle.setVariable(2, Integer.toString(leftTime));
+                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(textSwitch? 0 : 1));
+
+                multiplierBossBar.setProgress(percentage);
+                multiplierBossBar.setColor(percentage < 0.2d? BarColor.RED : BarColor.BLUE);
+
+                for(final Player player : Bukkit.getOnlinePlayers()) {
+                    multiplierBossBar.addPlayer(player);
+                }
+
+                multiplierBossBar.setVisible(true);
+                this.textSwitch = !this.textSwitch;
+            }
+        };
+
+        if(multiplierBossBarRunnable != null)
+            multiplierBossBarRunnable.runTaskTimerAsynchronously(plugin, 10*20, (60*20)/4);
+    }
+
+    public BossBar getMultiplierBossBar() {
+        return multiplierBossBar;
     }
 
 }
