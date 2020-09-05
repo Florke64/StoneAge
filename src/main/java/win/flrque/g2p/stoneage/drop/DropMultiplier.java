@@ -220,9 +220,10 @@ public class DropMultiplier {
                 final Message bossBarTitle = new Message();
                 bossBarTitle.addLines("&6Mnoznik dropu: &7x&c$_1 &6(aktywny przez &c$_2&7min&6)");
                 bossBarTitle.addLines("&5Mnoznik dropu z kamienia aktywny, nie przegap okazji!");
+                bossBarTitle.addLines("&cMnoznik dropu za chwile sie skonczy!");
                 bossBarTitle.setVariable(1, Float.toString(value));
                 bossBarTitle.setVariable(2, Integer.toString(leftTime));
-                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(textSwitch? 0 : 1));
+                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(textSwitch? (leftTime==0? 2 : 0) : 1));
 
                 multiplierBossBar.setProgress(percentage);
                 multiplierBossBar.setColor(percentage < 0.2d? BarColor.RED : BarColor.BLUE);
