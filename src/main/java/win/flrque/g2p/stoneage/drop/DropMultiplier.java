@@ -209,6 +209,7 @@ public class DropMultiplier {
                 multiplierBossBar.removeAll();
                 if(!multiplier.isActive()) {
                     if(activeCheck == true) {
+                        activeCheck = false;
                         new Message("&cMnoznik dropu zakonczyl sie...").broadcastToTheServer();
                     }
 
@@ -237,7 +238,7 @@ public class DropMultiplier {
                 bossBarTitle.addLines("&cMnoznik dropu za chwile sie skonczy!");
                 bossBarTitle.setVariable(1, Float.toString(value));
                 bossBarTitle.setVariable(2, Integer.toString(leftTime));
-                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(textSwitch? (leftTime==0? 2 : 0) : 1));
+                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(leftTime==0? 2 : textSwitch? 0 : 1));
 
                 multiplierBossBar.setProgress(percentage);
                 multiplierBossBar.setColor(percentage < 0.2d? BarColor.RED : BarColor.BLUE);
@@ -249,7 +250,7 @@ public class DropMultiplier {
         };
 
         if(multiplierBossBarRunnable != null)
-            multiplierBossBarRunnable.runTaskTimerAsynchronously(plugin, 10*20, (60*20)/4);
+            multiplierBossBarRunnable.runTaskTimerAsynchronously(plugin, 10*20, 15*20);
     }
 
     public BossBar getMultiplierBossBar() {

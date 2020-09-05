@@ -58,8 +58,10 @@ public class StoneBreakListener implements Listener {
         if(!brokenBlock.getType().equals(Material.STONE)) return;
 
         final DropMultiplier dropMultiplier = plugin.getDropCalculator().getDropMultiplier();
-        if(dropMultiplier.isActive() && !dropMultiplier.getMultiplierBossBar().getPlayers().contains(player))
-            plugin.getDropCalculator().getDropMultiplier().updateBossBar();
+        if(dropMultiplier.isActive() && !dropMultiplier.getMultiplierBossBar().getPlayers().contains(player)) {
+            dropMultiplier.getMultiplierBossBar().addPlayer(player);
+            dropMultiplier.getMultiplierBossBar().setVisible(true);
+        }
 
         @SuppressWarnings("deprecation")
         byte stoneType = brokenBlock.getState().getData().getData();
