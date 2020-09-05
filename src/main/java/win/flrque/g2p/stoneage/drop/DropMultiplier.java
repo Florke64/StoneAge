@@ -201,16 +201,30 @@ public class DropMultiplier {
 
         multiplierBossBarRunnable = new BukkitRunnable() {
 
+            private boolean activeCheck = false;
             private boolean textSwitch = false;
 
             @Override
             public void run() {
                 multiplierBossBar.removeAll();
                 if(!multiplier.isActive()) {
+                    if(activeCheck == true) {
+                        new Message("&cMnoznik dropu zakonczyl sie...").broadcastToTheServer();
+                    }
+
                     multiplierBossBar.setVisible(false);
                     return;
                 }
 
+                activeCheck = true;
+
+                updateBossBar();
+
+                multiplierBossBar.setVisible(true);
+                this.textSwitch = !this.textSwitch;
+            }
+
+            private void updateBossBar() {
                 final long fullTime = ((multiplier.getMultiplierTimeout() - multiplier.getMultiplierStartTime()) / 1000) / 60;
                 final int leftTime = multiplier.getMinutesLeft();
                 final float value = multiplier.getCurrentDropMultiplier();
@@ -231,9 +245,6 @@ public class DropMultiplier {
                 for(final Player player : Bukkit.getOnlinePlayers()) {
                     multiplierBossBar.addPlayer(player);
                 }
-
-                multiplierBossBar.setVisible(true);
-                this.textSwitch = !this.textSwitch;
             }
         };
 
