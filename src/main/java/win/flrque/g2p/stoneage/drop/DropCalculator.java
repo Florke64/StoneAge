@@ -146,7 +146,12 @@ public class DropCalculator {
             final float luck = randomizer.nextFloat() * totalWeight;
 
             final float itemChanceWeight = dropEntry.getChanceWeight();
-            final float currentDropMultiplier = this.getDropMultiplier().getCurrentDropMultiplier();
+            final float currentDropMultiplier;
+            if(dropMultiplier.isActive()) {
+                currentDropMultiplier = this.getDropMultiplier().getCurrentDropMultiplier();
+            } else {
+                currentDropMultiplier = getDropMultiplier().getDefaultDropMultiplier();
+            }
 
             if (luck <  itemChanceWeight * currentDropMultiplier) {
                 ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
