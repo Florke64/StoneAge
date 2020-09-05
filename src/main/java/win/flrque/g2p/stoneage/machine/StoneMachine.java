@@ -70,8 +70,8 @@ public class StoneMachine {
     }
 
     public boolean repairStoneMachine(Dispenser machine) {
-        final long repairCooldownLimit = (System.currentTimeMillis() - (1000 * repairCooldown));
-        if(lastStoneMachineRepair.containsKey(machine) && lastStoneMachineRepair.get(machine) >= repairCooldownLimit ) {
+        final long repairCooldownLimit = (System.currentTimeMillis() - (1000 * getRepairCooldown()));
+        if(lastStoneMachineRepair.containsKey(machine) && lastStoneMachineRepair.get(machine) >= repairCooldownLimit) {
             //Player is trying to repair stone machine too frequently
             return false;
         }
@@ -244,6 +244,14 @@ public class StoneMachine {
 
     public void setStoneRespawnFrequency(long stoneRespawnFrequency) {
         this.stoneRespawnFrequency = stoneRespawnFrequency;
+    }
+
+    public void setRepairCooldown(int repairCooldown) {
+        this.repairCooldown = repairCooldown;
+    }
+
+    public int getRepairCooldown() {
+        return repairCooldown;
     }
 
     public boolean isHopperOutputAllowed() {

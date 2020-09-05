@@ -133,6 +133,7 @@ public final class StoneAge extends JavaPlugin {
         generalConfig.compile();
 
         getStoneMachine().setStoneRespawnFrequency(generalConfig.getStoneFrequency());
+        getStoneMachine().setRepairCooldown(generalConfig.getRepairCoolDown());
         getStoneMachine().setDropItemsToFeet(generalConfig.isDropItemsToFeet());
         getStoneMachine().setDropExpToFeet(generalConfig.isDropExpToFeet());
         getStoneMachine().setAllowHopperOutput(generalConfig.isAllowHopperDropOutput());
