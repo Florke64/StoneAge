@@ -56,6 +56,8 @@ public class DropCommand implements CommandExecutor {
             return true;
         }
 
+        executionController.recordCommandExecution(sender);
+
         final Player player = (Player) sender;
         final DropInfoWindow window = new DropInfoWindow(player);
 

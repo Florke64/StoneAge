@@ -56,6 +56,8 @@ public class DropHelpCommand implements CommandExecutor {
             return true;
         }
 
+        executionController.recordCommandExecution(sender);
+
         this.pluginHelpMessage.send(sender);
 
         return true;

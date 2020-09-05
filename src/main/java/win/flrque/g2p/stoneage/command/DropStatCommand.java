@@ -57,6 +57,8 @@ public class DropStatCommand implements CommandExecutor {
             return true;
         }
 
+        executionController.recordCommandExecution(sender);
+
         final PlayerStats playerStatistics = playerSetupManager.getPlayerStoneMachineStats(((Player) sender).getUniqueId());
         printPlayerStatistics(sender, playerStatistics);
 
