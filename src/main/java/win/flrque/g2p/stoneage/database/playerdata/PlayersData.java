@@ -7,20 +7,19 @@
 package win.flrque.g2p.stoneage.database.playerdata;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.SQLManager;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.sql.*;
+import java.util.*;
 import java.util.logging.Level;
 
 public class PlayersData {
 
     private final StoneAge plugin;
+
+    private final Map<Player, Long> stoneBreakingHistory = new HashMap<>();
 
     private final Map<UUID, PlayerConfig> playerPersonalDropConfig = new HashMap<>();
     private final Map<UUID, PlayerStats> stoneMachinePlayerStats = new HashMap<>();
@@ -53,26 +52,22 @@ public class PlayersData {
         return playerPersonalDropConfig.get(uuid);
     }
 
-    public void loadPersonalStoneStatsFromDatabase() {
+    public int loadPersonalStoneStatsFromDatabase() {
         final String databaseName = plugin.getDatabaseController().getDatabaseName();
         final String queryStatement = "SELECT * FROM " +databaseName+ ".`" + SQLManager.TABLE_PLAYER_STATS + "`";
 
-        ResultSet result = null;
-
-        try {
-            result = plugin.getDatabaseController().runQuery(queryStatement);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if(result == null) {
-            plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
-            return;
-        }
-
         final PlayersData playerSetup = plugin.getPlayerSetup();
 
-        try {
+        try (final Connection conn = plugin.getDatabaseController().getConnection();
+         final PreparedStatement ps = conn.prepareStatement(queryStatement);
+         final ResultSet result = ps.executeQuery() ) {
+
+            if(result == null) {
+                plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
+                return -1;
+            }
+
+            int loadCount = 0;
             while (result.next()) {
                 final ResultSetMetaData metaData = result.getMetaData();
                 final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
@@ -80,10 +75,10 @@ public class PlayersData {
                 final int minerLvl = result.getInt("MinerLvl");
 
                 final PlayerStats stats = playerSetup.getPlayerStoneMachineStats(uuid);
-                stats.setMinerExp(minerExp);
-                stats.setMinerLvl(minerLvl);
+                stats.setMinerExp(minerExp, false);
+                stats.setMinerLvl(minerLvl, false);
 
-                plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
+                //plugin.getLogger().log(Level.INFO, "Loading drop stats for " + result.getString("PlayerUUID"));
 
                 final int columnCount = metaData.getColumnCount();
                 for(int i=1; i<=columnCount; i++) {
@@ -95,40 +90,41 @@ public class PlayersData {
 
                     stats.setStatistic(columnName, result.getInt(columnName));
                 }
+
+                loadCount++;
             }
-        } catch (SQLException e) {
+
+            return loadCount;
+        } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, "Couldn't query results!");
-            e.printStackTrace();
+            ex.printStackTrace();
         }
 
+        return 0;
     }
 
-    public void loadPersonalDropConfigFromDatabase() {
+    public int loadPersonalDropConfigFromDatabase() {
         final String databaseName = plugin.getDatabaseController().getDatabaseName();
         final String queryStatement = "SELECT * FROM " +databaseName+ ".`" + SQLManager.TABLE_PLAYER_DROP_CONFIG + "`";
 
-        ResultSet result = null;
-
-        try {
-            result = plugin.getDatabaseController().runQuery(queryStatement);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if(result == null) {
-            plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Drop Config on start!");
-            return;
-        }
-
         final PlayersData playerSetup = plugin.getPlayerSetup();
 
-        try {
+        try (final Connection conn = plugin.getDatabaseController().getConnection();
+             final PreparedStatement ps = conn.prepareStatement(queryStatement);
+             final ResultSet result = ps.executeQuery()) {
+
+            if(result == null) {
+                plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
+                return -1;
+            }
+
+            int loadCount = 0;
             while (result.next()) {
                 final ResultSetMetaData metaData = result.getMetaData();
                 final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
                 final PlayerConfig config = playerSetup.getPersonalDropConfig(uuid);
 
-                plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
+                //plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
 
                 final int columnCount = metaData.getColumnCount();
                 for(int i=1; i<=columnCount; i++) {
@@ -139,39 +135,40 @@ public class PlayersData {
                     config.setDropEntry(columnName, result.getBoolean(columnName));
 
                 }
+
+                loadCount++;
             }
+
+            return loadCount;
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Couldn't query results!");
             e.printStackTrace();
         }
 
+        return 0;
     }
 
-    public void savePersonalDropConfigInDatabase(PlayerConfig config) {
-        try {
-            plugin.getDatabaseController().runUpdateForPersonalDropConfig(config);
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Unable to update PersonalDropConfig in database!");
-            e.printStackTrace();
+    public int savePersonalDropConfigInDatabase(PlayerConfig config) throws SQLException {
+        final int response = plugin.getDatabaseController().runUpdateForPersonalDropConfig(config);
+
+        if(response > 0) {
+            config.onDatabaseSave();
         }
 
-        config.onDatabaseSave();
+        return response;
     }
 
-    public void savePersonalStoneStatsInDatabase(PlayerStats stats) {
-        try {
-            plugin.getDatabaseController().runUpdateForPersonalStoneStats(stats);
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Unable to update PersonalStoneStats in database!");
-            e.printStackTrace();
+    public int savePersonalStoneStatsInDatabase(PlayerStats stats) throws SQLException {
+        final int response = plugin.getDatabaseController().runUpdateForPersonalStoneStats(stats);
+
+        if(response > 0) {
+            stats.onDatabaseSave();
         }
 
-        stats.onDatabaseSave();
+        return response;
     }
 
-    public void saveAllUnsavedDropData() {
-        plugin.getLogger().log(Level.INFO, "saveAllUnsavedDropData()");
-
+    public void saveAllUnsavedDropData() throws SQLException {
         int saved = 0, skipped = 0;
         for(PlayerConfig config : playerPersonalDropConfig.values()) {
             if(config.hasUnsavedEdits()) {
@@ -202,8 +199,11 @@ public class PlayersData {
     }
 
     public void onDisable() {
-        plugin.getLogger().log(Level.INFO, "PlayerSetupManager#onDisable()");
-        saveAllUnsavedDropData();
+        try {
+            saveAllUnsavedDropData();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private PlayerConfig createPersonalDropConfig(UUID uuid) {
@@ -212,5 +212,23 @@ public class PlayersData {
         playerPersonalDropConfig.put(uuid, config);
 
         return playerPersonalDropConfig.get(uuid);
+    }
+
+    public void addStoneBreakHistoryRecord(final Player player) {
+        stoneBreakingHistory.put(player, System.currentTimeMillis());
+    }
+
+    public List<Player> getMinersFromLast(final long millis) {
+        final long currentTimeMillis = System.currentTimeMillis();
+        final List<Player> response = new ArrayList<>();
+
+        for(final Player player : stoneBreakingHistory.keySet()) {
+            if(!player.isOnline()) continue;
+
+            if(stoneBreakingHistory.get(player) >= currentTimeMillis - millis)
+                response.add(player);
+        }
+
+        return response;
     }
 }

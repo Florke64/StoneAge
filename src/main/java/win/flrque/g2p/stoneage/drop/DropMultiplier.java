@@ -10,9 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.database.SQLManager;
 import win.flrque.g2p.stoneage.event.DropMultiplierStartEvent;
 
+import java.sql.*;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class DropMultiplier {
 
@@ -135,9 +138,39 @@ public class DropMultiplier {
         return defaultDropMultiplier != currentDropMultiplier;
     }
 
-    /* SELECT * FROM `StoneAge_DropMultiplier` WHERE `StoneAge_DropMultiplier`.`Timeout` > CURRENT_TIMESTAMP; */
     public void readPreviousMultiplierFromDatabase() {
-        //TODO: Query database entry and apply if there is anything relatable
+        final StringBuilder query = new StringBuilder();
+
+        query.append("SELECT * FROM `"+ SQLManager.TABLE_DROP_MULTIPLIER +"` ");
+        query.append("ORDER BY `"+ SQLManager.TABLE_DROP_MULTIPLIER +"`.`Timeout` DESC ");
+        query.append("LIMIT 1;");
+
+        try (final Connection conn = plugin.getDatabaseController().getConnection();
+         final PreparedStatement ps = conn.prepareStatement(query.toString());
+         final ResultSet response = ps.executeQuery()) {
+
+            if(response == null) {
+                plugin.getLogger().log(Level.WARNING, "Couldn't recover drop multiplier from database!");
+                return;
+            }
+
+            while (response.next()) {
+                final Timestamp startTime = response.getTimestamp("SetOn");
+                final Timestamp timeoutTime = response.getTimestamp("Timeout");
+                final float multiplierValue = response.getFloat("MultiplierValue");
+                final String callerName = response.getString("CallerName");
+                final String callerUUID = response.getString("CallerUUID");
+
+                setCurrentDropMultiplier(multiplierValue);
+                setMultiplierStartTime(startTime.getTime());
+                setMultiplierTimeout(timeoutTime.getTime());
+
+                setCallerName(callerName);
+                setCallerUniqueId(UUID.fromString(callerUUID));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
 }

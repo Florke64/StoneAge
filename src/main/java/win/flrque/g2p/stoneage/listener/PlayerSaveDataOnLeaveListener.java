@@ -15,6 +15,7 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 
+import java.sql.SQLException;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -45,7 +46,18 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
 
             @Override
             public void run() {
-                plugin.getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
+                try {
+                    final int response = plugin.getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
+
+                    if(response == 0) {
+                        plugin.getLogger().log(Level.WARNING, "Database executeUpdate() successful but responded with 0.");
+                    }
+                } catch (SQLException ex) {
+                    plugin.getLogger().log(Level.SEVERE, "Unable to save Personal Configuration for " + dropConfig.getUniqueId() + ".");
+                    ex.printStackTrace();
+                    return;
+                }
+
                 plugin.getLogger().log(Level.INFO, "Saved Personal Configuration for " + dropConfig.getUniqueId() + ".");
             }
         }.runTaskAsynchronously(plugin);
@@ -60,7 +72,18 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
 
             @Override
             public void run() {
-                plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+                try {
+                    final int response = plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+
+                    if(response == 0) {
+                        plugin.getLogger().log(Level.WARNING, "Database executeUpdate() successful but responded with 0.");
+                    }
+                } catch (SQLException ex) {
+                    plugin.getLogger().log(Level.SEVERE, "Unable to update PersonalStoneStats in database!");
+                    ex.printStackTrace();
+                    return;
+                }
+
                 plugin.getLogger().log(Level.INFO, "Saved Personal Drop Stats for " + dropStats.getUniqueId() + ".");
             }
         }.runTaskAsynchronously(plugin);

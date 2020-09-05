@@ -85,14 +85,14 @@ public class PlayerStats {
     }
 
     public void addMinerExp(final long expAmount) {
-        setMinerExp(this.minerExp + expAmount);
+        setMinerExp(this.minerExp + expAmount, true);
     }
 
-    public void setMinerExp(final long minerExp) {
+    public void setMinerExp(final long minerExp, final boolean updateLevel) {
         final int updatedLevel = plugin.getExpCalculator().expToLevel(minerExp);
 
-        if(updatedLevel > this.minerLvl) {
-            setMinerLvl(updatedLevel);
+        if(updateLevel && updatedLevel > this.minerLvl) {
+            setMinerLvl(updatedLevel, true);
         }
 
         this.minerExp = minerExp;
@@ -104,12 +104,14 @@ public class PlayerStats {
         return this.minerExp;
     }
 
-    public void setMinerLvl(final int minerLvl) {
-        final MinerLevelUpEvent event = new MinerLevelUpEvent(this, minerLvl);
-        this.plugin.getServer().getPluginManager().callEvent(event);
+    public void setMinerLvl(final int minerLvl, final boolean callEvent) {
+        if(callEvent) {
+            final MinerLevelUpEvent event = new MinerLevelUpEvent(this, minerLvl);
+            this.plugin.getServer().getPluginManager().callEvent(event);
 
-        if(event.isCancelled())
-            return;
+            if (event.isCancelled())
+                return;
+        }
 
         this.minerLvl = minerLvl;
 
