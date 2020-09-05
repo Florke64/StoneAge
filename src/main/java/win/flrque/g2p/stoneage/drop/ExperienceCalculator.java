@@ -7,13 +7,19 @@
 package win.flrque.g2p.stoneage.drop;
 
 import win.flrque.g2p.stoneage.StoneAge;
+import win.flrque.g2p.stoneage.util.Message;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class ExperienceCalculator {
 
     private final StoneAge plugin;
+
+    public final long INITIAL_EXP_NEEDED = 300;
+
+    private int maximumMinerLevel = 99;
 
     private final List<Long> experienceTable = new LinkedList<>();
 
@@ -36,106 +42,42 @@ public class ExperienceCalculator {
 
     //TODO: Make config file ?
     private void initExperienceTableValues() {
-        experienceTable.add(300L);
-        experienceTable.add(800L);
-        experienceTable.add(1_500L);
-        experienceTable.add(2_500L);
-        experienceTable.add(4_300L);
-        experienceTable.add(7_200L);
-        experienceTable.add(1_1000L);
-        experienceTable.add(17_000L);
-        experienceTable.add(24_000L);
-        experienceTable.add(33_000L);
-        experienceTable.add(43_000L);
-        experienceTable.add(58_000L);
-        experienceTable.add(76_000L);
-        experienceTable.add(100_000L);
-        experienceTable.add(130_000L);
-        experienceTable.add(169_000L);
-        experienceTable.add(219_000L);
-        experienceTable.add(283_000L);
-        experienceTable.add(365_000L);
-        experienceTable.add(472_000L);
-        experienceTable.add(610_000L);
-        experienceTable.add(705_000L);
-        experienceTable.add(813_000L);
-        experienceTable.add(937_000L);
-        experienceTable.add(1_077_000L);
-        experienceTable.add(1_237_000L);
-        experienceTable.add(1_418_000L);
-        experienceTable.add(1_624_000L);
-        experienceTable.add(1_857_000L);
-        experienceTable.add(2_122_000L);
-        experienceTable.add(2_421_000L);
-        experienceTable.add(2_761_000L);
-        experienceTable.add(3_145_000L);
-        experienceTable.add(3_580_000L);
-        experienceTable.add(4_073_000L);
-        experienceTable.add(4_632_000L);
-        experienceTable.add(5_194_000L);
-        experienceTable.add(5_717_000L);
-        experienceTable.add(6_264_000L);
-        experienceTable.add(6_837_000L);
-        experienceTable.add(7_600_000L);
-        experienceTable.add(8_274_000L);
-        experienceTable.add(8_990_000L);
-        experienceTable.add(9_753_000L);
-        experienceTable.add(10_560_000L);
-        experienceTable.add(11_410_000L);
-        experienceTable.add(12_320_000L);
-        experienceTable.add(13_270_000L);
-        experienceTable.add(14_280_000L);
-        experienceTable.add(15_340_000L);
-        experienceTable.add(16_870_000L);
-        experienceTable.add(18_960_000L);
-        experienceTable.add(19_980_000L);
-        experienceTable.add(21_420_000L);
-        experienceTable.add(22_930_000L);
-        experienceTable.add(24_580_000L);
-        experienceTable.add(26_200_000L);
-        experienceTable.add(27_960_000L);
-        experienceTable.add(29_800_000L);
-        experienceTable.add(32_780_000L);
-        experienceTable.add(36_060_000L);
-        experienceTable.add(39_670_000L);
-        experienceTable.add(43_640_000L);
-        experienceTable.add(48_000_000L);
-        experienceTable.add(52_800_000L);
-        experienceTable.add(58_080_000L);
-        experienceTable.add(63_890_000L);
-        experienceTable.add(70_280_000L);
-        experienceTable.add(77_310_000L);
-        experienceTable.add(85_040_000L);
-        experienceTable.add(93_540_000L);
-        experienceTable.add(102_900_000L);
-        experienceTable.add(113_200_000L);
-        experienceTable.add(124_500_000L);
-        experienceTable.add(137_000_000L);
-        experienceTable.add(150_700_000L);
-        experienceTable.add(165_700_000L);
-        experienceTable.add(236_990_000L);
-        experienceTable.add(260_650_000L);
-        experienceTable.add(286_780_000L);
-        experienceTable.add(315_000_000L);
-        experienceTable.add(346_970_000L);
-        experienceTable.add(381_680_000L);
-        experienceTable.add(419_770_000L);
-        experienceTable.add(461_760_000L);
-        experienceTable.add(508_040_000L);
-        experienceTable.add(558_740_000L);
-        experienceTable.add(614_640_000L);
-        experienceTable.add(676_130_000L);
-        experienceTable.add(743_730_000L);
-        experienceTable.add(1_041_222_000L);
-        experienceTable.add(1_145_344_200L);
-        experienceTable.add(1_259_878_620L);
-        experienceTable.add(1_385_866_482L);
-        experienceTable.add(1_524_453_130L);
-        experienceTable.add(1_676_898_443L);
-        experienceTable.add(1_844_588_288L);
-        experienceTable.add(2_029_047_116L);
-        experienceTable.add(2_050_000_000L);
-        experienceTable.add(2_150_000_000L);
+        final int start_i = 1;
+        final int maxLevel = getMaximumMinerLevel();
+
+        experienceTable.clear();
+
+        for(int i = start_i; i <= (maxLevel); i++) {
+            if(i == start_i) {
+                experienceTable.add(INITIAL_EXP_NEEDED);
+            } else {
+                final long previousLevelExp = experienceTable.get(i-start_i-1);
+                final double nextLevelGap = Math.ceil( (previousLevelExp*0.12d)+(previousLevelExp/(i-1)) );
+
+                experienceTable.add(previousLevelExp + (long) nextLevelGap);
+            }
+        }
+
+        final Message success = new Message("ExperienceTable: Generated new Experience Table ($_1 level(s)) from the math formula.");
+        success.setVariable(1, Integer.toString(experienceTable.size()));
+        plugin.getLogger().log(Level.INFO, success.getPreparedMessage().get(0));
+
+//        int level = 2;
+//        for(final long exp : experienceTable) {
+//            plugin.getLogger().log(Level.INFO, "Level " + level + " - Exp needed: " + exp);
+//            level++;
+//        }
+    }
+
+    public void setMaximumMinerLevel(int maximumMinerLevel) {
+        if(maximumMinerLevel != this.maximumMinerLevel) {
+            this.maximumMinerLevel = maximumMinerLevel;
+            initExperienceTableValues();
+        }
+    }
+
+    public int getMaximumMinerLevel() {
+        return this.maximumMinerLevel;
     }
 
 }
