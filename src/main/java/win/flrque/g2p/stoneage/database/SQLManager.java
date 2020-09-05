@@ -240,7 +240,7 @@ public class SQLManager {
             ps.executeUpdate();
 
         } catch (SQLException | NullPointerException ex) {
-            //TODO: Check error code and maybe skip printing
+            //Checks the error code and skipping exception's stack trace printing
             if(!(ex instanceof SQLException) || ((SQLException)ex).getErrorCode() != 1060) {
                 ex.printStackTrace();
             }
