@@ -39,9 +39,17 @@ public class MinerLevelUpListener implements Listener {
 
         player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f);
 
-        final Message congratulations = new Message("&dGratulacje! &c$_1 &dosiaga &6$_2 &dpoziom gornictwa!");
-        congratulations.setVariable(1, player.getName());
-        congratulations.setVariable(2, Integer.toString(event.getUpToLevel()));
-        congratulations.broadcastToTheServer();
+        final int lvl = event.getUpToLevel();
+        if(lvl > 40 || lvl % 5 == 0 || lvl == 2) {
+            final Message congratulations = new Message("&dGratulacje! &c$_1 &dosiaga &6$_2 &dpoziom gornictwa!");
+            congratulations.setVariable(1, player.getName());
+            congratulations.setVariable(2, Integer.toString(lvl));
+            congratulations.broadcastToTheServer();
+        } else {
+            final Message congratulations = new Message("&dGratulacje! &c$_1 &dosiagasz &6$_2 &dpoziom gornictwa!");
+            congratulations.setVariable(1, player.getName());
+            congratulations.setVariable(2, Integer.toString(lvl));
+            congratulations.send(player);
+        }
     }
 }
