@@ -52,7 +52,7 @@ public class DropMultiplierCallListener implements Listener {
         }.runTaskAsynchronously(plugin);
 
         for(final Player player : Bukkit.getOnlinePlayers()) {
-            plugin.getMultiplierBossBar().addPlayer(player);
+            plugin.getDropCalculator().getDropMultiplier().getMultiplierBossBar().addPlayer(player);
         }
 
     }
