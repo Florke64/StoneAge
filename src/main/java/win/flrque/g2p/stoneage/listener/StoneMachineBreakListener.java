@@ -52,7 +52,6 @@ public class StoneMachineBreakListener implements Listener {
         if(plugin.getApplicableTools().isMachineDestroyTool(tool) || gameMode == GameMode.CREATIVE) {
             final Location brokenBlockLocation = brokenBlock.getLocation();
 
-            //TODO: Maybe do not clear all drops? Clearing only the machine's label should be enough.
             stoneMachine.getInventory().clear();
 
             //Closing all active windows
