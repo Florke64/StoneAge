@@ -230,7 +230,7 @@ public final class StoneAge extends JavaPlugin {
 
             @Override
             public void run() {
-                int a = 0;
+                int savedCount = 0;
 
                 for(Player player : Bukkit.getServer().getOnlinePlayers()) {
                     final UUID playerUUID = player.getUniqueId();
@@ -244,10 +244,14 @@ public final class StoneAge extends JavaPlugin {
                         ex.printStackTrace();
                     }
 
-                    a++;
+                    savedCount++;
                 }
 
-                StoneAge.this.getLogger().log(Level.INFO, "Saved " + a + " players data into the database. Next Auto-Save in " + period + " minutes");
+                final Message success = new Message("Auto-save: Saved $_1 players data into the database | Next Auto-Save in $_2 minutes");
+                success.setVariable(1, Integer.toString(savedCount));
+                success.setVariable(2, Long.toString(period));
+
+                StoneAge.this.getLogger().log(Level.INFO, success.getPreparedMessage().get(0));
             }
         };
     }
