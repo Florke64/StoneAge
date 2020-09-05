@@ -138,6 +138,7 @@ public final class StoneAge extends JavaPlugin {
         getStoneMachine().setAllowHopperOutput(generalConfig.isAllowHopperDropOutput());
         getStoneMachine().setAllowHopperInput(generalConfig.isAllowCoalUpgradesByHopper());
         this.commandExecutionController = new CommandExecutionController(generalConfig.getCommandsCoolDown());
+        this.expCalculator.setMaximumMinerLevel(generalConfig.getMaxMinerLevel());
 
         getDropCalculator().setDropMultiplier(new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier()));
 

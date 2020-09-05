@@ -12,6 +12,7 @@ public class GeneralConfigReader extends ConfigSectionReader {
 
     //Drop multiplier settings
     private float defaultDropMultiplier, maxDropMultiplier;
+    private int maxMinerLevel;
 
     //Values in seconds
     private int commandsCoolDown, repairCoolDown;
@@ -34,6 +35,8 @@ public class GeneralConfigReader extends ConfigSectionReader {
         defaultDropMultiplier = Float.parseFloat(rootSection.getString("default_drop_multiplier", "1.0"));
         maxDropMultiplier = Float.parseFloat(rootSection.getString("max_drop_multiplier", "2.0"));
 
+        maxMinerLevel = rootSection.getInt("max_miner_level", 99);
+
         commandsCoolDown = rootSection.getInt("commands_cooldown", 3);
         repairCoolDown = rootSection.getInt("repair_cooldown", 5);
 
@@ -54,6 +57,10 @@ public class GeneralConfigReader extends ConfigSectionReader {
 
     public int getRepairCoolDown() {
         return repairCoolDown;
+    }
+
+    public int getMaxMinerLevel() {
+        return maxMinerLevel;
     }
 
     public long getStoneFrequency() {

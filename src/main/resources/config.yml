@@ -11,6 +11,8 @@ machines:
   default_drop_multiplier: 1.0
   max_drop_multiplier: 5.0
 
+  max_miner_level: 99
+
   commands_cooldown: 3 # in seconds
   repair_cooldown: 5 # in seconds
   stone_frequency: 40 # number in ticks (20 = 1 second)
