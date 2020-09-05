@@ -42,7 +42,7 @@ public class ExperienceCalculator {
 
     //TODO: Make config file ?
     private void initExperienceTableValues() {
-        final int start_i = 1;
+        final int start_i = 2;
         final int maxLevel = getMaximumMinerLevel();
 
         experienceTable.clear();
@@ -51,10 +51,8 @@ public class ExperienceCalculator {
             if(i == start_i) {
                 experienceTable.add(INITIAL_EXP_NEEDED);
             } else {
-                final long previousLevelExp = experienceTable.get(i-start_i-1);
-                final double nextLevelGap = Math.ceil( (previousLevelExp*0.12d)+(previousLevelExp/(i-1)) );
-
-                experienceTable.add(previousLevelExp + (long) nextLevelGap);
+                final double nextLevelFormula = (i-1) * Math.ceil((double) i/ 3.0d) * (300d * Math.ceil((double) i/150.0d));
+                experienceTable.add((long) nextLevelFormula);
             }
         }
 
