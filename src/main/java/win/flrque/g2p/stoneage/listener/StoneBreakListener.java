@@ -30,6 +30,7 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
 import win.flrque.g2p.stoneage.drop.DropLoot;
+import win.flrque.g2p.stoneage.drop.DropMultiplier;
 import win.flrque.g2p.stoneage.event.StoneDropLootEvent;
 import win.flrque.g2p.stoneage.event.StoneMachineStoneBreakEvent;
 import win.flrque.g2p.stoneage.util.Message;
@@ -56,7 +57,8 @@ public class StoneBreakListener implements Listener {
         final Block brokenBlock = event.getBlock();
         if(!brokenBlock.getType().equals(Material.STONE)) return;
 
-        if(plugin.getDropCalculator().getDropMultiplier().isActive())
+        final DropMultiplier dropMultiplier = plugin.getDropCalculator().getDropMultiplier();
+        if(dropMultiplier.isActive() && !dropMultiplier.getMultiplierBossBar().getPlayers().contains(player))
             plugin.getDropCalculator().getDropMultiplier().updateBossBar();
 
         @SuppressWarnings("deprecation")
