@@ -7,19 +7,18 @@
 package win.flrque.g2p.stoneage.database.playerdata;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.SQLManager;
 
 import java.sql.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class PlayersData {
 
     private final StoneAge plugin;
-
-    private final Map<Player, Long> stoneBreakingHistory = new HashMap<>();
 
     private final Map<UUID, PlayerConfig> playerPersonalDropConfig = new HashMap<>();
     private final Map<UUID, PlayerStats> stoneMachinePlayerStats = new HashMap<>();
@@ -212,23 +211,5 @@ public class PlayersData {
         playerPersonalDropConfig.put(uuid, config);
 
         return playerPersonalDropConfig.get(uuid);
-    }
-
-    public void addStoneBreakHistoryRecord(final Player player) {
-        stoneBreakingHistory.put(player, System.currentTimeMillis());
-    }
-
-    public List<Player> getMinersFromLast(final long millis) {
-        final long currentTimeMillis = System.currentTimeMillis();
-        final List<Player> response = new ArrayList<>();
-
-        for(final Player player : stoneBreakingHistory.keySet()) {
-            if(!player.isOnline()) continue;
-
-            if(stoneBreakingHistory.get(player) >= currentTimeMillis - millis)
-                response.add(player);
-        }
-
-        return response;
     }
 }

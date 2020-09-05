@@ -292,7 +292,7 @@ public final class StoneAge extends JavaPlugin {
                 multiplierBossBar.setProgress(percentage);
                 multiplierBossBar.setColor(percentage < 0.2d? BarColor.RED : BarColor.BLUE);
 
-                for(final Player player : playerSetup.getMinersFromLast(60*1000)) {
+                for(final Player player : Bukkit.getOnlinePlayers()) {
                     multiplierBossBar.addPlayer(player);
                 }
 
