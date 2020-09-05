@@ -163,10 +163,12 @@ public class StoneBreakListener implements Listener {
                 itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, hopperLeftItem);
             }
 
-            final Message dropMessage = new Message("&7Udalo ci sie wykopac &c$_1 &7x&6$_2");
-            dropMessage.setVariable(1, drop.getCustomName());
-            dropMessage.setVariable(2, Integer.toString(totalAmount));
-            dropMessage.sendActionMessage(player);
+            if(drop != plugin.getDropCalculator().getPrimitiveDropEntry()) {
+                final Message dropMessage = new Message("&7Udalo ci sie wykopac &c$_1 &7x&6$_2");
+                dropMessage.setVariable(1, drop.getCustomName());
+                dropMessage.setVariable(2, Integer.toString(totalAmount));
+                dropMessage.sendActionMessage(player);
+            }
         }
     }
 
