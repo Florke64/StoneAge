@@ -234,7 +234,7 @@ public class DropMultiplier {
 
                 final Message bossBarTitle = new Message();
                 bossBarTitle.addLines("&6Mnoznik dropu: &7x&c$_1 &6(aktywny przez &c$_2&7min&6)");
-                bossBarTitle.addLines("&5Mnoznik dropu z kamienia aktywny, nie przegap okazji!");
+                bossBarTitle.addLines("&eMnoznik dropu z kamienia aktywny, nie przegap okazji!");
                 bossBarTitle.addLines("&cMnoznik dropu za chwile sie skonczy!");
                 bossBarTitle.setVariable(1, Float.toString(value));
                 bossBarTitle.setVariable(2, Integer.toString(leftTime));
