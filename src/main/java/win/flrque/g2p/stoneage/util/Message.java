@@ -14,11 +14,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import win.flrque.g2p.stoneage.StoneAge;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Message {
 
@@ -35,6 +39,8 @@ public class Message {
 
     private final List<String> rawMessage = new ArrayList<>();
     private final List<String> message = new ArrayList<>();
+
+    private final Logger logger = StoneAge.getPlugin(StoneAge.class).getLogger();
 
     private boolean usePrefixOnSend = false;
 
@@ -74,6 +80,18 @@ public class Message {
         for(final String line : this.message) {
             final BaseComponent chatComponent = new TextComponent((usePrefixOnSend? linePrefix : "") + line);
             target.spigot().sendMessage(ChatMessageType.ACTION_BAR, chatComponent);
+        }
+    }
+
+    public void logToConsole() {
+        logToConsole(Level.INFO, null);
+    }
+
+    public void logToConsole(@NotNull final Level level, @Nullable final String signature) {
+        final String logPrefixSignature = signature == null? "" : signature + ": ";
+
+        for(final String line : this.message) {
+            logger.log(level, logPrefixSignature + line);
         }
     }
 
