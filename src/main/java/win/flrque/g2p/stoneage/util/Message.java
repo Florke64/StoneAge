@@ -93,7 +93,7 @@ public class Message {
         if(mutedConsoleLogSignatures.contains(signature))
             return;
 
-        final String logPrefixSignature = signature == null ? "" : signature + ": ";
+        final String logPrefixSignature = signature == null ? "" : capitalize(signature) + ": ";
 
         for (final String line : this.message) {
             logger.log(level, logPrefixSignature + line);
