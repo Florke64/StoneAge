@@ -23,3 +23,6 @@ commands:
     description: Komenda dla administratorow. Mnozy przelicznik dropu z kamienia.
     aliases: [multiplier, mnoznik]
     permission: g2p.stone.admin
+  dropspamdb:
+    description: Debug command to create random Player Data entries
+    permission: g2p.stone.admin
