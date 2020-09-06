@@ -55,7 +55,7 @@ public class PlayerStats {
     public int increaseStatistic(String key, int amount) {
         final int value = getStatistic(key) + amount;
         statistics.put(key, value);
-        unsavedEdits = true;
+        markAsUnsaved();
 
         return value;
     }
@@ -97,7 +97,7 @@ public class PlayerStats {
 
         this.minerExp = minerExp;
 
-        this.unsavedEdits = true;
+        markAsUnsaved();
     }
 
     public long getMinerExp() {
@@ -115,11 +115,15 @@ public class PlayerStats {
 
         this.minerLvl = minerLvl;
 
-        this.unsavedEdits = true;
+        markAsUnsaved();
     }
 
     public int getMinerLvl() {
         return minerLvl;
+    }
+
+    public void markAsUnsaved() {
+        this.unsavedEdits = true;
     }
 
 }
