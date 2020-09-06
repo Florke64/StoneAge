@@ -359,28 +359,39 @@ public class SQLManager {
 
             @Override
             public void run() {
-                int savedCount = 0;
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        final int savedCount = saveAllOnlinePlayersData();
 
-                for(Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    final UUID playerUUID = player.getUniqueId();
-                    final PlayerConfig dropConfig = plugin.getPlayerSetup().getPersonalDropConfig(playerUUID);
-                    final PlayerStats dropStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
+                        final Message success = new Message("Auto-save: Saved $_1 players data into the database | Next Auto-Save in $_2 minutes");
+                        success.setVariable(1, Integer.toString(savedCount));
+                        success.setVariable(2, Long.toString(period));
 
-                    plugin.getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
-                    plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
-
-                    savedCount++;
-                }
-
-                final Message success = new Message("Auto-save: Saved $_1 players data into the database | Next Auto-Save in $_2 minutes");
-                success.setVariable(1, Integer.toString(savedCount));
-                success.setVariable(2, Long.toString(period));
-
-                plugin.getLogger().log(Level.INFO, success.getPreparedMessage().get(0));
+                        plugin.getLogger().log(Level.INFO, success.getPreparedMessage().get(0));
+                    }
+                }.runTaskAsynchronously(plugin);
             }
         };
 
-        autosaveRunnable.runTaskTimerAsynchronously(plugin, period * 60 * 20, period * 60 * 20);
+        autosaveRunnable.runTaskTimer(plugin, period * 60 * 20, period * 60 * 20);
+    }
+
+    public int saveAllOnlinePlayersData() {
+        int savedCount = 0;
+
+        for(Player player : Bukkit.getServer().getOnlinePlayers()) {
+            final UUID playerUUID = player.getUniqueId();
+            final PlayerConfig dropConfig = plugin.getPlayerSetup().getPersonalDropConfig(playerUUID);
+            final PlayerStats dropStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
+
+            plugin.getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
+            plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+
+            savedCount++;
+        }
+
+        return savedCount;
     }
 
     public BukkitRunnable getAutosaveRunnable() {
