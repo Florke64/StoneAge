@@ -51,7 +51,12 @@ public class DropCommand implements CommandExecutor {
             return true;
         }
 
-        if(args.length == 1 && (args[0].equalsIgnoreCase("stat") || args[0].equalsIgnoreCase("stats"))) {
+        if(args.length > 0 && (args[0].equalsIgnoreCase("stat") || args[0].equalsIgnoreCase("stats"))) {
+            if(args.length > 1) {
+                ((Player) sender).performCommand("dropstat " + args[1]);
+                return true;
+            }
+
             ((Player) sender).performCommand("dropstat");
             return true;
         }

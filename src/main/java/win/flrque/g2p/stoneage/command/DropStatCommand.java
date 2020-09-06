@@ -6,6 +6,7 @@
 
 package win.flrque.g2p.stoneage.command;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -63,7 +64,21 @@ public class DropStatCommand implements CommandExecutor {
 
         executionController.recordCommandExecution(sender);
 
-        final PlayerStats playerStatistics = playerSetupManager.getPlayerStoneMachineStats(((Player) sender).getUniqueId());
+        Player targetPlayer = null;
+        if (args.length == 1) {
+            targetPlayer = Bukkit.getServer().getPlayerExact(args[0]);
+        } else {
+            targetPlayer = ((Player) sender);
+        }
+
+        if (targetPlayer == null) {
+            final Message error = new Message("&cBlad! Nie znaleziono podanego gracza (Online).");
+            error.send(sender);
+
+            return false;
+        }
+
+        final PlayerStats playerStatistics = playerSetupManager.getPlayerStoneMachineStats(targetPlayer.getUniqueId());
         printPlayerStatistics(sender, playerStatistics);
 
         return true;
@@ -76,7 +91,7 @@ public class DropStatCommand implements CommandExecutor {
 
         final Message message = new Message();
         message.addLines(Message.EMPTY);
-        message.addLines("&6== &5Statystyki &6==");
+        message.addLines("&6== &7Statystyki (&c$_5&7) &6==");
         message.addLines("&7Twoj poziom gornictwa: &6$_1");
         message.addLines("&7Twoje doswiadczenie: &6$_2 &7/ &6$_3");
         message.addLines(Message.EMPTY);
@@ -96,6 +111,7 @@ public class DropStatCommand implements CommandExecutor {
         message.setVariable(2, Long.toString(miningExp));
         message.setVariable(3, Long.toString(nextLevelExperience));
         message.setVariable(4, Integer.toString(summary));
+        message.setVariable(5, playerStats.getPlayerName());
 
         message.send(sender);
     }
