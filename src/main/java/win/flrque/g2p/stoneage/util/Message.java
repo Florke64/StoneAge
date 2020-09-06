@@ -28,6 +28,8 @@ public class Message {
 
     public static final String EMPTY = "";
 
+    private static final List<String> mutedConsoleLogSignatures = new ArrayList<>();
+
     private String linePrefix = "&l&8> ";
 
     //TODO: Automatically color different data types
@@ -88,6 +90,9 @@ public class Message {
     }
 
     public void logToConsole(@NotNull final Level level, @Nullable final String signature) {
+        if(mutedConsoleLogSignatures.contains(signature))
+            return;
+
         final String logPrefixSignature = signature == null ? "" : signature + ": ";
 
         for (final String line : this.message) {
@@ -205,6 +210,16 @@ public class Message {
 
     public List<String> getPreparedMessage() {
         return this.message;
+    }
+
+    @SuppressWarnings("unused")
+    public static void muteConsoleLogSignature(@NotNull final String signature) {
+        mutedConsoleLogSignatures.add(signature);
+    }
+
+    @SuppressWarnings("unused")
+    public static void unmuteConsoleLogSignature(@NotNull final String signature) {
+        mutedConsoleLogSignatures.remove(signature);
     }
 
 }
