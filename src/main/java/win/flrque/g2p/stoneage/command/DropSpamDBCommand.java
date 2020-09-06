@@ -41,12 +41,12 @@ public class DropSpamDBCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(!sender.hasPermission("g2p.stone.admin")) {
-            new Message("&cNie posiadasz wystarczajacych uprawnien do wykonania tej komendy.");
+            new Message("&cNie posiadasz wystarczajacych uprawnien do wykonania tej komendy.").send(sender);
             return false;
         }
 
         if(args.length < 1) {
-            new Message("&cNie wystarczajaca ilosc argumentow do wykonania komendy.");
+            new Message("&cNie wystarczajaca ilosc argumentow do wykonania komendy.").send(sender);
             return false;
         }
 
@@ -54,8 +54,11 @@ public class DropSpamDBCommand implements CommandExecutor {
             final int entries = Integer.parseInt(args[0]);
             createRandomPlayerStats(entries);
 
+            new Message("&2Wykonano!").send(sender);
+            return true;
+
         } catch (NumberFormatException ex) {
-            new Message("&cPodano nie wlasciwy argument.");
+            new Message("&cPodano nie wlasciwy argument.").send(sender);
         }
 
         return true;

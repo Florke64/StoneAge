@@ -32,7 +32,7 @@ public class DropMultiplierCommand implements CommandExecutor {
         }
 
         if(!sender.hasPermission("g2p.stone.admin")) {
-            new Message("&cNie posiadasz wystarczajacych uprawnien do wykonania tej komendy.");
+            new Message("&cNie posiadasz wystarczajacych uprawnien do wykonania tej komendy.").send(sender);
             return false;
         }
 

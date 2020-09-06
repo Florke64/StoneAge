@@ -72,8 +72,7 @@ public class DropStatCommand implements CommandExecutor {
         }
 
         if (targetPlayer == null) {
-            final Message error = new Message("&cBlad! Nie znaleziono podanego gracza (Online).");
-            error.send(sender);
+            new Message("&cBlad! Nie znaleziono podanego gracza (Online).").send(sender);
 
             return false;
         }
