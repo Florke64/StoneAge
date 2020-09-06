@@ -6,12 +6,16 @@
 
 package win.flrque.g2p.stoneage.database;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.config.DatabaseConfigReader;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.drop.DropEntry;
+import win.flrque.g2p.stoneage.util.Message;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,6 +29,8 @@ public class SQLManager {
 
     private final StoneAge plugin;
     private final ConnectionPoolManager connectionPool;
+
+    private BukkitRunnable autosaveRunnable;
 
     public static final String TABLE_PLAYER_STATS = "stoneage_stats";
     public static final String TABLE_PLAYER_DROP_CONFIG = "stoneage_config";
@@ -343,6 +349,42 @@ public class SQLManager {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void initAsyncAutosave(final long period) {
+
+        plugin.getLogger().log(Level.INFO, "Initialized Async Autosave.");
+
+        autosaveRunnable = new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                int savedCount = 0;
+
+                for(Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    final UUID playerUUID = player.getUniqueId();
+                    final PlayerConfig dropConfig = plugin.getPlayerSetup().getPersonalDropConfig(playerUUID);
+                    final PlayerStats dropStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
+
+                    plugin.getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
+                    plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+
+                    savedCount++;
+                }
+
+                final Message success = new Message("Auto-save: Saved $_1 players data into the database | Next Auto-Save in $_2 minutes");
+                success.setVariable(1, Integer.toString(savedCount));
+                success.setVariable(2, Long.toString(period));
+
+                plugin.getLogger().log(Level.INFO, success.getPreparedMessage().get(0));
+            }
+        };
+
+        autosaveRunnable.runTaskTimerAsynchronously(plugin, period * 60 * 20, period * 60 * 20);
+    }
+
+    public BukkitRunnable getAutosaveRunnable() {
+        return autosaveRunnable;
     }
 
     public void onDisable() {

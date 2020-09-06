@@ -6,11 +6,9 @@
 
 package win.flrque.g2p.stoneage;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -20,8 +18,6 @@ import win.flrque.g2p.stoneage.config.DropEntryConfigReader;
 import win.flrque.g2p.stoneage.config.GeneralConfigReader;
 import win.flrque.g2p.stoneage.config.ToolsConfigReader;
 import win.flrque.g2p.stoneage.database.SQLManager;
-import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
-import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.database.playerdata.PlayersData;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
 import win.flrque.g2p.stoneage.drop.DropMultiplier;
@@ -30,10 +26,8 @@ import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.ApplicableTools;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
-import win.flrque.g2p.stoneage.util.Message;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 
 public final class StoneAge extends JavaPlugin {
@@ -48,7 +42,6 @@ public final class StoneAge extends JavaPlugin {
     private ExperienceCalculator expCalculator;
 
     private SQLManager sqlManager;
-    private BukkitRunnable autosaveRunnable;
 
     @Override
     public void onEnable() {
@@ -88,13 +81,10 @@ public final class StoneAge extends JavaPlugin {
         getCommand("multiplier").setExecutor(new DropMultiplierCommand());
         getCommand("dropspamdb").setExecutor(new DropSpamDBCommand());
 
-        final long minute = 60 * 20;
-        final long period = 15;
+        //TODO: Add this setting to the config.yml
+        final long period = 15; // autosave peroid in minutes
 
-        initAsyncAutosave(period);
-        if(autosaveRunnable != null)
-            autosaveRunnable.runTaskTimerAsynchronously(this, period * minute, period * minute);
-
+        getDatabaseController().initAsyncAutosave(period);
         getDropCalculator().getDropMultiplier().initMultiplierBossBar();
     }
 
@@ -209,36 +199,6 @@ public final class StoneAge extends JavaPlugin {
 
         getLogger().log(Level.FINE, "Config reloaded!");
         getLogger().log(Level.INFO, "Loaded "+ customDropsCount +" custom drop entries.");
-    }
-
-    private void initAsyncAutosave(final long period) {
-
-        getLogger().log(Level.INFO, "Initialized Async Autosave.");
-
-        autosaveRunnable = new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                int savedCount = 0;
-
-                for(Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    final UUID playerUUID = player.getUniqueId();
-                    final PlayerConfig dropConfig = getPlayerSetup().getPersonalDropConfig(playerUUID);
-                    final PlayerStats dropStats = getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
-
-                    getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
-                    getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
-
-                    savedCount++;
-                }
-
-                final Message success = new Message("Auto-save: Saved $_1 players data into the database | Next Auto-Save in $_2 minutes");
-                success.setVariable(1, Integer.toString(savedCount));
-                success.setVariable(2, Long.toString(period));
-
-                StoneAge.this.getLogger().log(Level.INFO, success.getPreparedMessage().get(0));
-            }
-        };
     }
 
     public PlayersData getPlayerSetup() {
