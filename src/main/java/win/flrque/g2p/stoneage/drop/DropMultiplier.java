@@ -184,11 +184,6 @@ public class DropMultiplier {
         }
     }
 
-    public void updateBossBar() {
-        if(multiplierBossBarRunnable != null)
-            multiplierBossBarRunnable.run();
-    }
-
     public void initMultiplierBossBar() {
 
         plugin.getLogger().log(Level.INFO, "Initialized Multiplier visualization via Boss Bar.");
