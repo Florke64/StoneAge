@@ -55,7 +55,7 @@ public class PlayerStats {
     public int increaseStatistic(String key, int amount) {
         final int value = getStatistic(key) + amount;
         statistics.put(key, value);
-        markAsUnsaved();
+        markUnsaved(true);
 
         return value;
     }
@@ -81,7 +81,7 @@ public class PlayerStats {
     }
 
     public void onDatabaseSave() {
-        unsavedEdits = false;
+        markUnsaved(false);
     }
 
     public void addMinerExp(final long expAmount) {
@@ -97,7 +97,7 @@ public class PlayerStats {
 
         this.minerExp = minerExp;
 
-        markAsUnsaved();
+        markUnsaved(true);
     }
 
     public long getMinerExp() {
@@ -115,15 +115,15 @@ public class PlayerStats {
 
         this.minerLvl = minerLvl;
 
-        markAsUnsaved();
+        markUnsaved(true);
     }
 
     public int getMinerLvl() {
         return minerLvl;
     }
 
-    public void markAsUnsaved() {
-        this.unsavedEdits = true;
+    public void markUnsaved(final boolean hasUnsavedEdits) {
+        this.unsavedEdits = hasUnsavedEdits;
     }
 
 }

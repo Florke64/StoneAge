@@ -67,7 +67,9 @@ public class DropSpamDBCommand implements CommandExecutor {
     private final void createRandomPlayerStats(final int n) {
         for(int i = 0; i < n; i++) {
             final UUID uuid = UUID.randomUUID();
-            playerSetup.getPlayerStoneMachineStats(uuid).markAsUnsaved();
+
+            playerSetup.getPlayerStoneMachineStats(uuid).markUnsaved(true);
+            playerSetup.getPersonalDropConfig(uuid).markUnsaved(true);
         }
     }
 

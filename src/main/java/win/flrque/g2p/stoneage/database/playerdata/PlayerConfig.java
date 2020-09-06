@@ -53,7 +53,7 @@ public class PlayerConfig {
 
     public boolean switchDropEntry(DropEntry dropEntry) {
         setDropEntry(dropEntry, !isDropping(dropEntry));
-        unsavedEdits = true;
+        markUnsaved(true);
 
         return isDropping(dropEntry);
     }
@@ -67,7 +67,7 @@ public class PlayerConfig {
     }
 
     public void onDatabaseSave() {
-        unsavedEdits = false;
+        markUnsaved(false);
     }
 
     public UUID getUniqueId() {
@@ -76,6 +76,10 @@ public class PlayerConfig {
 
     public String getPlayerName() {
         return playerName;
+    }
+
+    public void markUnsaved(final boolean hasUnsavedEdits) {
+        this.unsavedEdits = hasUnsavedEdits;
     }
 
 }

@@ -90,6 +90,8 @@ public class PlayersData {
                     stats.setStatistic(columnName, result.getInt(columnName));
                 }
 
+                stats.markUnsaved(false);
+
                 loadCount++;
             }
 
@@ -134,6 +136,8 @@ public class PlayersData {
                     config.setDropEntry(columnName, result.getBoolean(columnName));
 
                 }
+
+                config.markUnsaved(false);
 
                 loadCount++;
             }
