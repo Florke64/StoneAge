@@ -15,6 +15,8 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.database.playerdata.PlayersData;
 import win.flrque.g2p.stoneage.drop.DropCalculator;
+import win.flrque.g2p.stoneage.drop.DropEntry;
+import win.flrque.g2p.stoneage.drop.ExperienceCalculator;
 import win.flrque.g2p.stoneage.util.Message;
 
 public class DropStatCommand implements CommandExecutor {
@@ -24,6 +26,7 @@ public class DropStatCommand implements CommandExecutor {
 
     private final PlayersData playerSetupManager;
     private final DropCalculator dropCalculator;
+    private final ExperienceCalculator experienceCalculator;
 
     public DropStatCommand() {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
@@ -31,6 +34,7 @@ public class DropStatCommand implements CommandExecutor {
 
         this.playerSetupManager = plugin.getPlayerSetup();
         this.dropCalculator = plugin.getDropCalculator();
+        this.experienceCalculator = plugin.getExpCalculator();
     }
 
     /**
@@ -75,16 +79,24 @@ public class DropStatCommand implements CommandExecutor {
         message.addLines("&6== &5Statystyki &6==");
         message.addLines("&7Twoj poziom gornictwa: &6$_1");
         message.addLines("&7Twoje doswiadczenie: &6$_2");
+        message.addLines("&7Doswiadczenie wymagane do poziomu &6$_3&7: &6$_4");
         message.addLines(Message.EMPTY);
 
-        for(String statisticKey : playerStats.getStatisticKeys()) {
-            final String dropEntryName = dropCalculator.getDropEntry(statisticKey).getCustomName();
-            final int dropEntryStatValue = playerStats.getStatistic(statisticKey);
-            message.addLines("&7" + Message.capitalize(dropEntryName) + ": &6" + dropEntryStatValue);
+        int summary = 0;
+        for(DropEntry dropEntry : dropCalculator.getDropEntries()) {
+            if(dropEntry == dropCalculator.getPrimitiveDropEntry())
+                continue;
+
+            playerStats.getStatistic(dropEntry.getEntryName());
         }
+
+        message.addLines("&7Wykopano w sumie &6$_5&7 roznych przedmiotow.");
 
         message.setVariable(1, Integer.toString(miningLevel));
         message.setVariable(2, Long.toString(miningExp));
+        message.setVariable(3, Integer.toString(miningLevel + 1));
+        message.setVariable(4, Long.toString(experienceCalculator.getExpNeededToLevel(miningLevel + 1)));
+        message.setVariable(5, Integer.toString(summary));
 
         message.send(sender);
     }
