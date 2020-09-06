@@ -78,8 +78,7 @@ public class DropStatCommand implements CommandExecutor {
         message.addLines(Message.EMPTY);
         message.addLines("&6== &5Statystyki &6==");
         message.addLines("&7Twoj poziom gornictwa: &6$_1");
-        message.addLines("&7Twoje doswiadczenie: &6$_2");
-        message.addLines("&7Doswiadczenie wymagane do poziomu &6$_3&7: &6$_4");
+        message.addLines("&7Twoje doswiadczenie: &6$_2 &7/ &6$_3");
         message.addLines(Message.EMPTY);
 
         int summary = 0;
@@ -87,16 +86,16 @@ public class DropStatCommand implements CommandExecutor {
             if(dropEntry == dropCalculator.getPrimitiveDropEntry())
                 continue;
 
-            playerStats.getStatistic(dropEntry.getEntryName());
+            summary += playerStats.getStatistic(dropEntry.getEntryName());
         }
 
-        message.addLines("&7Wykopano w sumie &6$_5&7 roznych przedmiotow.");
+        message.addLines("&7Wykopano w sumie &6$_4&7 roznych przedmiotow.");
 
+        final long nextLevelExperience = experienceCalculator.getExpNeededToLevel(miningLevel + 1);
         message.setVariable(1, Integer.toString(miningLevel));
         message.setVariable(2, Long.toString(miningExp));
-        message.setVariable(3, Integer.toString(miningLevel + 1));
-        message.setVariable(4, Long.toString(experienceCalculator.getExpNeededToLevel(miningLevel + 1)));
-        message.setVariable(5, Integer.toString(summary));
+        message.setVariable(3, Long.toString(nextLevelExperience));
+        message.setVariable(4, Integer.toString(summary));
 
         message.send(sender);
     }
