@@ -40,6 +40,14 @@ public class ExperienceCalculator {
         return lvl;
     }
 
+    public long getExpNeededToLevel(final int level) {
+        if(level < 2) return 0;
+        else if(level > getMaximumMinerLevel())
+            return experienceTable.get(experienceTable.size());
+
+        return experienceTable.get(level - 2);
+    }
+
     private void initExperienceTableValues() {
         final int start_x = 1;
         final int maxLevel = getMaximumMinerLevel();
