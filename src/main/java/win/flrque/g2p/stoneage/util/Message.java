@@ -86,11 +86,27 @@ public class Message {
     }
 
     public void logToConsole() {
-        logToConsole(Level.INFO, null);
+        logToConsole(Level.INFO, (String) null);
+    }
+
+    public void logToConsole(@Nullable final String signature) {
+        logToConsole(Level.INFO, signature);
+    }
+
+    public void logToConsole(@NotNull final LogTag logTag) {
+        logToConsole(Level.INFO, logTag.toString());
+    }
+
+    public void logToConsole(@NotNull final Level level) {
+        logToConsole(level, (String) null);
+    }
+
+    public void logToConsole(@NotNull final Level level, @NotNull final LogTag logTag) {
+        logToConsole(level, logTag.toString());
     }
 
     public void logToConsole(@NotNull final Level level, @Nullable final String signature) {
-        if(mutedConsoleLogSignatures.contains(signature))
+        if (mutedConsoleLogSignatures.contains(signature))
             return;
 
         final String logPrefixSignature = signature == null ? "" : capitalize(signature) + ": ";
