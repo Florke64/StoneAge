@@ -12,9 +12,7 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.config.DatabaseConfigReader;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class ConnectionPoolManager {
 
@@ -67,12 +65,6 @@ public class ConnectionPoolManager {
 
     public Connection getConnection() throws SQLException {
         return (dataSource != null) ? dataSource.getConnection() : null;
-    }
-
-    public void close(Connection connection, Statement statement, ResultSet resultSet) {
-        if (connection != null) try { connection.close(); } catch (SQLException ignored) {}
-        if (statement != null) try { statement.close(); } catch (SQLException ignored) {}
-        if (resultSet != null) try { resultSet.close(); } catch (SQLException ignored) {}
     }
 
     public void closePool() {

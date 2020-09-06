@@ -42,7 +42,7 @@ public class SQLManager {
         }
     }
 
-    public int runUpdateForPersonalDropConfig(PlayerConfig config) throws SQLException {
+    public int runUpdateForPersonalDropConfig(PlayerConfig config) {
 
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();
@@ -112,7 +112,7 @@ public class SQLManager {
         return -1;
     }
 
-    public int runUpdateForPersonalStoneStats(PlayerStats stats) throws SQLException {
+    public int runUpdateForPersonalStoneStats(PlayerStats stats) {
 
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();

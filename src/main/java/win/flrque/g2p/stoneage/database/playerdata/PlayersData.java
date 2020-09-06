@@ -151,7 +151,7 @@ public class PlayersData {
         return 0;
     }
 
-    public int savePersonalDropConfigInDatabase(PlayerConfig config) throws SQLException {
+    public int savePersonalDropConfigInDatabase(PlayerConfig config) {
         final int response = plugin.getDatabaseController().runUpdateForPersonalDropConfig(config);
 
         if(response > 0) {
@@ -161,7 +161,7 @@ public class PlayersData {
         return response;
     }
 
-    public int savePersonalStoneStatsInDatabase(PlayerStats stats) throws SQLException {
+    public int savePersonalStoneStatsInDatabase(PlayerStats stats) {
         final int response = plugin.getDatabaseController().runUpdateForPersonalStoneStats(stats);
 
         if(response > 0) {
@@ -171,7 +171,7 @@ public class PlayersData {
         return response;
     }
 
-    public void saveAllUnsavedDropData() throws SQLException {
+    public void saveAllUnsavedDropData() {
         int saved = 0, skipped = 0;
         for(PlayerConfig config : playerPersonalDropConfig.values()) {
             if(config.hasUnsavedEdits()) {
@@ -202,11 +202,7 @@ public class PlayersData {
     }
 
     public void onDisable() {
-        try {
-            saveAllUnsavedDropData();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+        saveAllUnsavedDropData();
     }
 
     private PlayerConfig createPersonalDropConfig(UUID uuid) {

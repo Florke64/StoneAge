@@ -32,7 +32,6 @@ import win.flrque.g2p.stoneage.machine.ApplicableTools;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
 import win.flrque.g2p.stoneage.util.Message;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -227,12 +226,8 @@ public final class StoneAge extends JavaPlugin {
                     final PlayerConfig dropConfig = getPlayerSetup().getPersonalDropConfig(playerUUID);
                     final PlayerStats dropStats = getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
 
-                    try {
-                        getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
-                        getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
+                    getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
+                    getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
 
                     savedCount++;
                 }
