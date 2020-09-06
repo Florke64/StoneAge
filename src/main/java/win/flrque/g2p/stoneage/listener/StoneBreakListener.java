@@ -181,16 +181,18 @@ public class StoneBreakListener implements Listener {
 
     @Nullable
     private ItemStack addItemToInventory(@NotNull ItemStack itemStack, @NotNull Inventory inventory) {
-        //Updating fist free slot index
-        int firstFreeSlot = inventory.firstEmpty();
-        if (firstFreeSlot != -1) {
-            inventory.setItem(firstFreeSlot, itemStack);
-            return null;
-        }
-
         int slot = 0;
         int leftToAdd = itemStack.getAmount();
         for (ItemStack itemInInv : inventory.getContents()) {
+
+            if(itemInInv == null) {
+                //Updating fist free slot index
+                int firstFreeSlot = inventory.firstEmpty();
+                if (firstFreeSlot != -1) {
+                    inventory.setItem(firstFreeSlot, itemStack);
+                    return null;
+                }
+            }
 
             //Adding as much as possible to the Inventory
             final int maxStackSize = itemInInv.getMaxStackSize();
@@ -209,6 +211,14 @@ public class StoneBreakListener implements Listener {
         }
 
         itemStack.setAmount(leftToAdd);
+
+        //Updating fist free slot index
+        int firstFreeSlot = inventory.firstEmpty();
+        if (firstFreeSlot != -1) {
+            inventory.setItem(firstFreeSlot, itemStack);
+            return null;
+        }
+
         return itemStack.getAmount() > 0? itemStack : null;
 
     }
