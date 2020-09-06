@@ -28,7 +28,7 @@ public class PlayersData {
     }
 
     public PlayerStats getPlayerStoneMachineStats(UUID uuid) {
-        if(!stoneMachinePlayerStats.containsKey(uuid)) {
+        if (!stoneMachinePlayerStats.containsKey(uuid)) {
             stoneMachinePlayerStats.put(uuid, createStoneMachinePlayerStats(uuid));
         }
 
@@ -44,7 +44,7 @@ public class PlayersData {
     }
 
     public PlayerConfig getPersonalDropConfig(UUID uuid) {
-        if(!playerPersonalDropConfig.containsKey(uuid)) {
+        if (!playerPersonalDropConfig.containsKey(uuid)) {
             createPersonalDropConfig(uuid);
         }
 
@@ -53,15 +53,15 @@ public class PlayersData {
 
     public int loadPersonalStoneStatsFromDatabase() {
         final String databaseName = plugin.getDatabaseController().getDatabaseName();
-        final String queryStatement = "SELECT * FROM " +databaseName+ ".`" + SQLManager.TABLE_PLAYER_STATS + "`";
+        final String queryStatement = "SELECT * FROM " + databaseName + ".`" + SQLManager.TABLE_PLAYER_STATS + "`";
 
         final PlayersData playerSetup = plugin.getPlayerSetup();
 
         try (final Connection conn = plugin.getDatabaseController().getConnection();
-         final PreparedStatement ps = conn.prepareStatement(queryStatement);
-         final ResultSet result = ps.executeQuery() ) {
+             final PreparedStatement ps = conn.prepareStatement(queryStatement);
+             final ResultSet result = ps.executeQuery()) {
 
-            if(result == null) {
+            if (result == null) {
                 plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
                 return -1;
             }
@@ -69,7 +69,7 @@ public class PlayersData {
             int loadCount = 0;
             while (result.next()) {
                 final ResultSetMetaData metaData = result.getMetaData();
-                final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
+                final UUID uuid = UUID.fromString(result.getString("PlayerUUID"));
                 final long minerExp = result.getLong("MinerExp");
                 final int minerLvl = result.getInt("MinerLvl");
 
@@ -80,11 +80,11 @@ public class PlayersData {
                 //plugin.getLogger().log(Level.INFO, "Loading drop stats for " + result.getString("PlayerUUID"));
 
                 final int columnCount = metaData.getColumnCount();
-                for(int i=1; i<=columnCount; i++) {
+                for (int i = 1; i <= columnCount; i++) {
                     final String columnName = metaData.getColumnName(i);
-                    if(columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
+                    if (columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
                         continue;
-                    else if(columnName.contentEquals("MinerExp") || columnName.contentEquals("MinerLvl"))
+                    else if (columnName.contentEquals("MinerExp") || columnName.contentEquals("MinerLvl"))
                         continue;
 
                     stats.setStatistic(columnName, result.getInt(columnName));
@@ -106,7 +106,7 @@ public class PlayersData {
 
     public int loadPersonalDropConfigFromDatabase() {
         final String databaseName = plugin.getDatabaseController().getDatabaseName();
-        final String queryStatement = "SELECT * FROM " +databaseName+ ".`" + SQLManager.TABLE_PLAYER_DROP_CONFIG + "`";
+        final String queryStatement = "SELECT * FROM " + databaseName + ".`" + SQLManager.TABLE_PLAYER_DROP_CONFIG + "`";
 
         final PlayersData playerSetup = plugin.getPlayerSetup();
 
@@ -114,7 +114,7 @@ public class PlayersData {
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
              final ResultSet result = ps.executeQuery()) {
 
-            if(result == null) {
+            if (result == null) {
                 plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
                 return -1;
             }
@@ -122,15 +122,15 @@ public class PlayersData {
             int loadCount = 0;
             while (result.next()) {
                 final ResultSetMetaData metaData = result.getMetaData();
-                final UUID uuid = UUID.fromString( result.getString("PlayerUUID") );
+                final UUID uuid = UUID.fromString(result.getString("PlayerUUID"));
                 final PlayerConfig config = playerSetup.getPersonalDropConfig(uuid);
 
                 //plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
 
                 final int columnCount = metaData.getColumnCount();
-                for(int i=1; i<=columnCount; i++) {
+                for (int i = 1; i <= columnCount; i++) {
                     final String columnName = metaData.getColumnName(i);
-                    if(columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
+                    if (columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
                         continue;
 
                     config.setDropEntry(columnName, result.getBoolean(columnName));
@@ -154,7 +154,7 @@ public class PlayersData {
     public int savePersonalDropConfigInDatabase(PlayerConfig config) {
         final int response = plugin.getDatabaseController().runUpdateForPersonalDropConfig(config);
 
-        if(response > 0) {
+        if (response > 0) {
             config.onDatabaseSave();
         }
 
@@ -164,7 +164,7 @@ public class PlayersData {
     public int savePersonalStoneStatsInDatabase(PlayerStats stats) {
         final int response = plugin.getDatabaseController().runUpdateForPersonalStoneStats(stats);
 
-        if(response > 0) {
+        if (response > 0) {
             stats.onDatabaseSave();
         }
 
@@ -173,8 +173,8 @@ public class PlayersData {
 
     public void saveAllUnsavedDropData() {
         int saved = 0, skipped = 0;
-        for(PlayerConfig config : playerPersonalDropConfig.values()) {
-            if(config.hasUnsavedEdits()) {
+        for (PlayerConfig config : playerPersonalDropConfig.values()) {
+            if (config.hasUnsavedEdits()) {
                 savePersonalDropConfigInDatabase(config);
                 saved++;
 
@@ -184,11 +184,12 @@ public class PlayersData {
             skipped++;
         }
 
-        plugin.getLogger().log(Level.INFO, "Saved "+saved+" personal configs (skipped: "+skipped+")");
+        plugin.getLogger().log(Level.INFO, "Saved " + saved + " personal configs (skipped: " + skipped + ")");
 
-        saved = 0; skipped = 0;
-        for(PlayerStats playerStats : stoneMachinePlayerStats.values()) {
-            if(playerStats.hasUnsavedEdits()) {
+        saved = 0;
+        skipped = 0;
+        for (PlayerStats playerStats : stoneMachinePlayerStats.values()) {
+            if (playerStats.hasUnsavedEdits()) {
                 savePersonalStoneStatsInDatabase(playerStats);
                 saved++;
 
@@ -198,7 +199,7 @@ public class PlayersData {
             skipped++;
         }
 
-        plugin.getLogger().log(Level.INFO, "Saved "+saved+" player stats (skipped: "+skipped+")");
+        plugin.getLogger().log(Level.INFO, "Saved " + saved + " player stats (skipped: " + skipped + ")");
     }
 
     public void onDisable() {

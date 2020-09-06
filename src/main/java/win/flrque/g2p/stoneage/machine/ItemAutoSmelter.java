@@ -39,9 +39,9 @@ public class ItemAutoSmelter {
         int index = 0;
         final Iterator<Recipe> recipeIterator = plugin.getServer().recipeIterator();
 
-        while(recipeIterator.hasNext()) {
+        while (recipeIterator.hasNext()) {
             final Recipe recipe = recipeIterator.next();
-            if(!(recipe instanceof FurnaceRecipe))
+            if (!(recipe instanceof FurnaceRecipe))
                 continue;
 
             final FurnaceRecipe smeltingRecipe = (FurnaceRecipe) recipe;
@@ -53,13 +53,13 @@ public class ItemAutoSmelter {
     }
 
     public ItemStack getSmelted(@NotNull final Dispenser stoneMachine, @NotNull final ItemStack itemToSmelt) {
-        for(final FurnaceRecipe recipe : this.smeltingRecipeList) {
+        for (final FurnaceRecipe recipe : this.smeltingRecipeList) {
             final ItemStack input = recipe.getInput();
 
             //Checking if input is similar to the item provided as argument
-            if(input.getType() == itemToSmelt.getType()) {
+            if (input.getType() == itemToSmelt.getType()) {
                 final ItemStack smeltedItemStack = recipe.getResult();
-                smeltedItemStack.setAmount( itemToSmelt.getAmount() );
+                smeltedItemStack.setAmount(itemToSmelt.getAmount());
 
                 takeAutoSmeltingUse(stoneMachine, itemToSmelt.getAmount());
 
@@ -74,7 +74,7 @@ public class ItemAutoSmelter {
         final Inventory machineInventory = stoneMachine.getInventory();
         final ItemStack magicCoal = machineInventory.getItem(ItemAutoSmelter.MAGIC_COAL_SLOT);
 
-        if(!hasAutoSmelting(stoneMachine.getInventory())) return 0;
+        if (!hasAutoSmelting(stoneMachine.getInventory())) return 0;
 
         final Integer uses;
         final String coalCustomName = magicCoal.getItemMeta().getDisplayName();
@@ -92,7 +92,7 @@ public class ItemAutoSmelter {
         final Inventory machineInventory = stoneMachine.getInventory();
         final ItemStack magicCoal = machineInventory.getItem(ItemAutoSmelter.MAGIC_COAL_SLOT);
 
-        if(!hasAutoSmelting(stoneMachine.getInventory())) return;
+        if (!hasAutoSmelting(stoneMachine.getInventory())) return;
 
         final Integer availableSmeltingUses;
         final String coalCustomName = magicCoal.getItemMeta().getDisplayName();
@@ -109,7 +109,7 @@ public class ItemAutoSmelter {
     }
 
     public boolean addAutoSmeltingUse(@NotNull final Inventory machineInventory, final int usesToAdd) {
-        if(!hasAutoSmelting(machineInventory)) {
+        if (!hasAutoSmelting(machineInventory)) {
             final ItemStack magicCoal = new ItemStack(Material.COAL, 1);
             final ItemMeta im = magicCoal.getItemMeta();
             im.setDisplayName(Integer.toString(usesToAdd));
@@ -128,7 +128,7 @@ public class ItemAutoSmelter {
                 return false;
             }
 
-            if(availableSmeltingUses >= 16_777_216)
+            if (availableSmeltingUses >= 16_777_216)
                 return false;
 
             final ItemMeta coalIm = magicCoal.getItemMeta();
@@ -143,7 +143,7 @@ public class ItemAutoSmelter {
         final ItemStack magicCoal = machineInventory.getItem(ItemAutoSmelter.MAGIC_COAL_SLOT);
 
         //Auto Smelting was never initialized for this stone machine
-        if(magicCoal == null || magicCoal.getType() != Material.COAL) {
+        if (magicCoal == null || magicCoal.getType() != Material.COAL) {
             return false;
         }
 

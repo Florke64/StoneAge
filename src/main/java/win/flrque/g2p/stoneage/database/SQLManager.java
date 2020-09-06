@@ -52,7 +52,7 @@ public class SQLManager {
 
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();
-        query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_DROP_CONFIG+ "` (");
+        query.append("INSERT INTO ").append(getDatabaseName() + ".`" + SQLManager.TABLE_PLAYER_DROP_CONFIG + "` (");
 
         fields.append("`PlayerUUID`, ");
         fields.append("`PlayerName`, ");
@@ -60,12 +60,12 @@ public class SQLManager {
         final Set<DropEntry> entries = config.getCustomDropEntries();
 
         int i = 0;
-        for(DropEntry entry : entries) {
+        for (DropEntry entry : entries) {
             i++;
-            if(entry == null) continue;
+            if (entry == null) continue;
 
-            fields.append("`" +entry.getEntryName()+ "`");
-            if(i < entries.size()) {
+            fields.append("`" + entry.getEntryName() + "`");
+            if (i < entries.size()) {
                 fields.append(", ");
             }
         }
@@ -74,33 +74,33 @@ public class SQLManager {
 
         i = 0;
         query.append(") VALUES (");
-        query.append("'" +config.getUniqueId()+ "', ");
-        query.append("'" +config.getPlayerName()+ "', ");
-        for(DropEntry entry : entries) {
+        query.append("'" + config.getUniqueId() + "', ");
+        query.append("'" + config.getPlayerName() + "', ");
+        for (DropEntry entry : entries) {
             i++;
-            if(entry == null) continue;
+            if (entry == null) continue;
 
-            int dropSwitchStatus = config.isDropping(entry)? 1 : 0;
-            query.append("'" +dropSwitchStatus+ "'");
-            if(i < entries.size()) {
+            int dropSwitchStatus = config.isDropping(entry) ? 1 : 0;
+            query.append("'" + dropSwitchStatus + "'");
+            if (i < entries.size()) {
                 query.append(", ");
             }
         }
         query.append(") ON DUPLICATE KEY UPDATE ");
 
         i = 0;
-        for(DropEntry entry : entries) {
+        for (DropEntry entry : entries) {
             i++;
-            if(entry == null) continue;
+            if (entry == null) continue;
 
-            query.append("`" +entry.getEntryName()+ "`=VALUES(`" +entry.getEntryName()+ "`)");
-            if(i < entries.size()) {
+            query.append("`" + entry.getEntryName() + "`=VALUES(`" + entry.getEntryName() + "`)");
+            if (i < entries.size()) {
                 query.append(", ");
             }
         }
 
         try (final Connection conn = connectionPool.getConnection();
-         final PreparedStatement ps = conn.prepareStatement(query.toString()) ) {
+             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
 
             if (conn == null || ps == null) return -1;
 
@@ -122,7 +122,7 @@ public class SQLManager {
 
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();
-        query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_PLAYER_STATS+ "` (");
+        query.append("INSERT INTO ").append(getDatabaseName() + ".`" + SQLManager.TABLE_PLAYER_STATS + "` (");
 
         fields.append("`PlayerUUID`, ");
         fields.append("`PlayerName`, ");
@@ -132,12 +132,12 @@ public class SQLManager {
         final Set<String> entries = stats.getStatisticKeys();
 
         int i = 0;
-        for(String key : entries) {
+        for (String key : entries) {
             i++;
-            if(key == null) continue;
+            if (key == null) continue;
 
-            fields.append("`" +key+ "`");
-            if(i < entries.size()) {
+            fields.append("`" + key + "`");
+            if (i < entries.size()) {
                 fields.append(", ");
             }
         }
@@ -146,17 +146,17 @@ public class SQLManager {
 
         i = 0;
         query.append(") VALUES (");
-        query.append("'" +stats.getUniqueId()+ "', ");
-        query.append("'" +stats.getPlayerName()+ "', ");
-        query.append("'" +stats.getMinerExp()+ "', ");
-        query.append("'" +stats.getMinerLvl()+ "', ");
-        for(String key : entries) {
+        query.append("'" + stats.getUniqueId() + "', ");
+        query.append("'" + stats.getPlayerName() + "', ");
+        query.append("'" + stats.getMinerExp() + "', ");
+        query.append("'" + stats.getMinerLvl() + "', ");
+        for (String key : entries) {
             i++;
-            if(key == null) continue;
+            if (key == null) continue;
 
             int dropStatistic = stats.getStatistic(key);
-            query.append("'" +dropStatistic+ "'");
-            if(i < entries.size()) {
+            query.append("'" + dropStatistic + "'");
+            if (i < entries.size()) {
                 query.append(", ");
             }
         }
@@ -166,18 +166,18 @@ public class SQLManager {
         query.append("`MinerLvl`=VALUES(`MinerLvl`), ");
 
         i = 0;
-        for(String key : entries) {
+        for (String key : entries) {
             i++;
-            if(key == null) continue;
+            if (key == null) continue;
 
-            query.append("`" +key+ "`=VALUES(`" +key+ "`)");
-            if(i < entries.size()) {
+            query.append("`" + key + "`=VALUES(`" + key + "`)");
+            if (i < entries.size()) {
                 query.append(", ");
             }
         }
 
         try (final Connection conn = connectionPool.getConnection();
-         final PreparedStatement ps = conn.prepareStatement(query.toString()) ) {
+             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
             if (conn == null || ps == null) return -1;
 
             final int response = ps.executeUpdate();
@@ -203,7 +203,7 @@ public class SQLManager {
         makePlayerDropConfigTable();
         makeDropMultiplierTable();
 
-        for(DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
+        for (DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
             final String dropEntryName = entry.getEntryName();
             addTableColumnIfNotExist(TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnIfNotExist(TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
@@ -218,11 +218,11 @@ public class SQLManager {
     }
 
     private void makeDatabase(final String databaseName) {
-        final String query = "CREATE DATABASE IF NOT EXISTS " +databaseName;
+        final String query = "CREATE DATABASE IF NOT EXISTS " + databaseName;
 
         try (final Connection conn = connectionPool.getConnection();
-         final PreparedStatement ps = conn.prepareStatement(query) ) {
-            if(conn == null) return;
+             final PreparedStatement ps = conn.prepareStatement(query)) {
+            if (conn == null) return;
 
             ps.executeUpdate();
 
@@ -236,18 +236,18 @@ public class SQLManager {
 
         final StringBuilder query = new StringBuilder();
 
-        query.append("ALTER TABLE " +databaseName+ ".`" +tableName+ "` ");
-        query.append("ADD COLUMN `" +columnName+ "` " +columnType+ " NOT NULL default " +defaultValue+ ";");
+        query.append("ALTER TABLE " + databaseName + ".`" + tableName + "` ");
+        query.append("ADD COLUMN `" + columnName + "` " + columnType + " NOT NULL default " + defaultValue + ";");
 
         try (final Connection conn = connectionPool.getConnection();
-         final PreparedStatement ps = conn.prepareStatement(query.toString()) ) {
-            if(conn == null || ps == null) return;
+             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
+            if (conn == null || ps == null) return;
 
             ps.executeUpdate();
 
         } catch (SQLException | NullPointerException ex) {
             //Checks the error code and skipping exception's stack trace printing
-            if(!(ex instanceof SQLException) || ((SQLException)ex).getErrorCode() != 1060) {
+            if (!(ex instanceof SQLException) || ((SQLException) ex).getErrorCode() != 1060) {
                 ex.printStackTrace();
             }
         }
@@ -258,7 +258,7 @@ public class SQLManager {
 
         final StringBuilder query = new StringBuilder();
 
-        query.append("CREATE TABLE IF NOT EXISTS `" +databaseName+ "`.`" + TABLE_DROP_MULTIPLIER + "`");
+        query.append("CREATE TABLE IF NOT EXISTS `" + databaseName + "`.`" + TABLE_DROP_MULTIPLIER + "`");
         query.append(" (");
         query.append(" `MultiplierId` INT NOT NULL AUTO_INCREMENT,");
         query.append(" `SetOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,");
@@ -270,8 +270,8 @@ public class SQLManager {
         query.append(") ");
 
         try (final Connection conn = connectionPool.getConnection();
-         final PreparedStatement ps = conn.prepareStatement(query.toString()) ) {
-            if(conn == null || ps == null) return;
+             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
+            if (conn == null || ps == null) return;
             ps.executeUpdate();
 
         } catch (SQLException | NullPointerException ex) {
@@ -284,18 +284,18 @@ public class SQLManager {
         final Timestamp timeoutTime = new Timestamp(end);
 
         final StringBuilder query = new StringBuilder();
-        query.append("INSERT INTO ").append(getDatabaseName() + ".`" +SQLManager.TABLE_DROP_MULTIPLIER+ "` ");
+        query.append("INSERT INTO ").append(getDatabaseName() + ".`" + SQLManager.TABLE_DROP_MULTIPLIER + "` ");
 
         query.append(" (`MultiplierId`, `SetOn`, `Timeout`, `MultiplierValue`, `CallerName`, `CallerUUID`) VALUES (NULL,");
-        query.append(" '" +startTime+ "',");
-        query.append(" '" +timeoutTime+ "',");
-        query.append(" '" +value+ "', ");
-        query.append(" '" +callerName+ "', ");
-        query.append(" '" +callerUniqueId.toString()+ "');");
+        query.append(" '" + startTime + "',");
+        query.append(" '" + timeoutTime + "',");
+        query.append(" '" + value + "', ");
+        query.append(" '" + callerName + "', ");
+        query.append(" '" + callerUniqueId.toString() + "');");
 
         try (final Connection conn = connectionPool.getConnection();
-         final PreparedStatement ps = conn.prepareStatement(query.toString()) ) {
-            if(conn == null || ps == null) return;
+             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
+            if (conn == null || ps == null) return;
 
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -308,7 +308,7 @@ public class SQLManager {
 
         final StringBuilder query = new StringBuilder();
 
-        query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." +TABLE_PLAYER_DROP_CONFIG);
+        query.append("CREATE TABLE IF NOT EXISTS " + databaseName + "." + TABLE_PLAYER_DROP_CONFIG);
         query.append(" (");
         query.append(" `PlayerUUID` VARCHAR(36),");
         query.append(" `PlayerName` VARCHAR(16),");
@@ -316,8 +316,8 @@ public class SQLManager {
         query.append(") ");
 
         try (final Connection conn = connectionPool.getConnection();
-         final PreparedStatement ps = conn.prepareStatement(query.toString()) ) {
-            if(conn == null || ps == null) return;
+             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
+            if (conn == null || ps == null) return;
 
             ps.executeUpdate();
 
@@ -331,7 +331,7 @@ public class SQLManager {
 
         final StringBuilder query = new StringBuilder();
 
-        query.append("CREATE TABLE IF NOT EXISTS " +databaseName+ "." +TABLE_PLAYER_STATS);
+        query.append("CREATE TABLE IF NOT EXISTS " + databaseName + "." + TABLE_PLAYER_STATS);
         query.append(" (");
         query.append(" `PlayerUUID` VARCHAR(36),");
         query.append(" `PlayerName` VARCHAR(16),");
@@ -341,8 +341,8 @@ public class SQLManager {
         query.append(") ");
 
         try (final Connection conn = connectionPool.getConnection();
-         final PreparedStatement ps = conn.prepareStatement(query.toString()) ) {
-            if(conn == null || ps == null) return;
+             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
+            if (conn == null || ps == null) return;
 
             ps.executeUpdate();
 
@@ -380,7 +380,7 @@ public class SQLManager {
     public int saveAllOnlinePlayersData() {
         int savedCount = 0;
 
-        for(Player player : Bukkit.getServer().getOnlinePlayers()) {
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             final UUID playerUUID = player.getUniqueId();
             final PlayerConfig dropConfig = plugin.getPlayerSetup().getPersonalDropConfig(playerUUID);
             final PlayerStats dropStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
@@ -399,7 +399,7 @@ public class SQLManager {
     }
 
     public void onDisable() {
-        if(connectionPool != null) {
+        if (connectionPool != null) {
             connectionPool.closePool();
         }
     }

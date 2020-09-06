@@ -30,7 +30,7 @@ public class DropEntryConfigReader extends ConfigSectionReader {
 
         //Reading drops for default tool
         final ConfigurationSection defaultToolSection = rootSection.getConfigurationSection("default_tool");
-        if(defaultToolSection != null) {
+        if (defaultToolSection != null) {
             final ItemStackConfigReader defaultToolConfig = new ItemStackConfigReader(defaultToolSection);
 
             defaultToolItem = defaultToolConfig.getItemStack();
@@ -38,23 +38,23 @@ public class DropEntryConfigReader extends ConfigSectionReader {
 
         //Reading drops for tools with Silk Touch enchantment
         final ConfigurationSection silkToolSection = rootSection.getConfigurationSection("silk_touch_tool");
-        if(silkToolSection != null) {
+        if (silkToolSection != null) {
             final ItemStackConfigReader silkToolConfig = new ItemStackConfigReader(silkToolSection);
 
             silkToolItem = silkToolConfig.getItemStack();
         }
 
         //If there was an error while reading those sections
-        if(defaultToolItem == null && silkToolItem == null) {
-            plugin.getLogger().log(Level.SEVERE, "Error while reading DropEntry: \""+ rootSection.getName() +"\".");
+        if (defaultToolItem == null && silkToolItem == null) {
+            plugin.getLogger().log(Level.SEVERE, "Error while reading DropEntry: \"" + rootSection.getName() + "\".");
             return null;
         }
 
-        defaultToolItem = (defaultToolItem != null)? defaultToolItem : silkToolItem;
+        defaultToolItem = (defaultToolItem != null) ? defaultToolItem : silkToolItem;
         final DropEntry dropEntry = new DropEntry(canonicalEntryName, defaultToolItem, weight);
 
         //Setting Silk Touch enchantment drop
-        if(silkToolItem != null)
+        if (silkToolItem != null)
             dropEntry.setSilkTouchItemStack(silkToolItem);
 
         //Fortune Enchant ignoring

@@ -42,7 +42,7 @@ public class StoneMachineWindow extends Window {
 
     @Override
     public boolean open(Player player) {
-        if(!super.open(player)) {
+        if (!super.open(player)) {
             new Message("&cNie udało się otworzyć okna stoniarki!").send(player);
             return false;
         }
@@ -57,17 +57,17 @@ public class StoneMachineWindow extends Window {
     public void updateInventoryContent() {
         final ItemButtonFactory buttonFactory = new ItemButtonFactory(windowOwner);
 
-        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_FILTER));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0, 0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_FILTER));
 //        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0,1).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_INFO));
 
-        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_MULTIPLIER));
-        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.AUTO_SMELTING_STATUS));
-        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4,2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_REPAIR));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4, 0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_MULTIPLIER));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8, 0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.AUTO_SMELTING_STATUS));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4, 2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_REPAIR));
 
 //        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_UPGRADE));
 
-        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 7,2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.STONE_STATISTICS));
-        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_INFO));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 7, 2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.STONE_STATISTICS));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8, 2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_INFO));
     }
 
     @Override
@@ -77,20 +77,20 @@ public class StoneMachineWindow extends Window {
 //        }
 
         //Drop info / selector
-        if(clickedPoint.getSlotNumber() == 0) {
+        if (clickedPoint.getSlotNumber() == 0) {
             player.closeInventory();
             player.performCommand("drop");
         }
 
         //Automatic smelting info
-        if(clickedPoint.getSlotNumber() == 8) {
+        if (clickedPoint.getSlotNumber() == 8) {
             player.closeInventory();
 
             final ItemAutoSmelter autoSmelter = plugin.getStoneMachine().getItemSmelter();
             final int usesLeft = autoSmelter.getAutoSmeltingUsesLeft(stoneMachine);
 
             final Message msg = new Message();
-            if(usesLeft > 0) {
+            if (usesLeft > 0) {
                 msg.addLines("&7Pozostalo &6$_1 &7uzyc automatycznego przepalania.");
                 msg.setVariable(1, Integer.toString(usesLeft));
             } else {
@@ -101,10 +101,10 @@ public class StoneMachineWindow extends Window {
         }
 
         //Repair Stone Machine
-        else if(clickedPoint.getSlotNumber() == 22) {
+        else if (clickedPoint.getSlotNumber() == 22) {
             player.closeInventory();
 
-            if(plugin.getStoneMachine().repairStoneMachine(stoneMachine)) {
+            if (plugin.getStoneMachine().repairStoneMachine(stoneMachine)) {
                 new Message("&7Naprawiono stoniarke!").send(player);
             } else {
                 new Message("&cNie udalo sie naprawic tej stoniarki, sprobuj ponownie pozniej...").send(player);
@@ -112,14 +112,14 @@ public class StoneMachineWindow extends Window {
         }
 
         //Mining statistics
-        else if(clickedPoint.getSlotNumber() == 25) {
+        else if (clickedPoint.getSlotNumber() == 25) {
             player.closeInventory();
 
             player.performCommand("dropstat");
         }
 
         //Stone machine's README / usage instructions
-        else if(clickedPoint.getSlotNumber() == 26) {
+        else if (clickedPoint.getSlotNumber() == 26) {
             player.closeInventory();
 
             player.performCommand("drophelp");

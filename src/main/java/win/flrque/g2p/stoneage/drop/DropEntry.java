@@ -62,7 +62,7 @@ public class DropEntry {
 
     public ItemStack getDrop(boolean silkTouch, int fortuneLevel) {
         final ItemStack itemStack;
-        if(silkTouch) {
+        if (silkTouch) {
             //TODO: Check without cloning
             itemStack = silkTouchItemStack.clone();
             itemStack.setAmount(1);
@@ -101,7 +101,7 @@ public class DropEntry {
     }
 
     public void setMinAmount(int amount) {
-        this.minAmount = (amount < 1)? 1 : amount;
+        this.minAmount = (amount < 1) ? 1 : amount;
     }
 
     public int getMinAmount() {
@@ -109,7 +109,7 @@ public class DropEntry {
     }
 
     public void setMaxAmount(int amount) {
-        this.maxAmount = (amount > this.minAmount)? amount : this.minAmount;
+        this.maxAmount = (amount > this.minAmount) ? amount : this.minAmount;
     }
 
     public int getMaxAmount() {
@@ -126,13 +126,13 @@ public class DropEntry {
 
     public int calculateFinalAmount(int fortuneLevel) {
         final Random random = new Random();
-        int amount = minAmount==maxAmount? minAmount : random.nextInt(maxAmount - minAmount) + minAmount;
+        int amount = minAmount == maxAmount ? minAmount : random.nextInt(maxAmount - minAmount) + minAmount;
 
-        if(isIgnoreFortuneEnchant())
+        if (isIgnoreFortuneEnchant())
             return amount;
 
-        for(int i = 0; i<fortuneLevel; i++) {
-            if(random.nextFloat() <= 0.35f)
+        for (int i = 0; i < fortuneLevel; i++) {
+            if (random.nextFloat() <= 0.35f)
                 amount += 1;
         }
 
@@ -148,11 +148,11 @@ public class DropEntry {
     }
 
     public void setMinimalExp(int exp) {
-        minExp = (exp<0)? 0 : exp;
+        minExp = (exp < 0) ? 0 : exp;
     }
 
     public void setMaximalExp(int exp) {
-        maxExp = (exp<minExp)? minExp : exp;
+        maxExp = (exp < minExp) ? minExp : exp;
     }
 
     public int calculateFinalExpValue() {

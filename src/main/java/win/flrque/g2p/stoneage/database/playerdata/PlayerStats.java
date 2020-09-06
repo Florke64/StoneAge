@@ -39,7 +39,7 @@ public class PlayerStats {
         this.minerLvl = 1;
 
         statistics.put(plugin.getDropCalculator().getPrimitiveDropEntry().getEntryName(), 0);
-        for(DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
+        for (DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
             statistics.put(entry.getEntryName(), 0);
         }
     }
@@ -91,7 +91,7 @@ public class PlayerStats {
     public void setMinerExp(final long minerExp, final boolean updateLevel) {
         final int updatedLevel = plugin.getExpCalculator().expToLevel(minerExp);
 
-        if(updateLevel && updatedLevel > this.minerLvl) {
+        if (updateLevel && updatedLevel > this.minerLvl) {
             setMinerLvl(updatedLevel, true);
         }
 
@@ -105,7 +105,7 @@ public class PlayerStats {
     }
 
     public void setMinerLvl(final int minerLvl, final boolean callEvent) {
-        if(callEvent) {
+        if (callEvent) {
             final MinerLevelUpEvent event = new MinerLevelUpEvent(this, minerLvl);
             this.plugin.getServer().getPluginManager().callEvent(event);
 

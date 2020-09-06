@@ -31,16 +31,16 @@ public class StoneMachineBreakListener implements Listener {
 
     @EventHandler
     public void onStoneMachineBreak(@NotNull BlockBreakEvent event) {
-        if(event.isCancelled())
+        if (event.isCancelled())
             return;
 
-        if(event.getPlayer() == null)
+        if (event.getPlayer() == null)
             return;
 
         final Player destroyer = event.getPlayer();
         final GameMode gameMode = destroyer.getGameMode();
 
-        if(!plugin.getStoneMachine().isStoneMachine(event.getBlock()))
+        if (!plugin.getStoneMachine().isStoneMachine(event.getBlock()))
             return;
 
         final Block brokenBlock = event.getBlock();
@@ -49,7 +49,7 @@ public class StoneMachineBreakListener implements Listener {
         event.setDropItems(false);
 
         final ItemStack tool = destroyer.getInventory().getItemInMainHand();
-        if(plugin.getApplicableTools().isMachineDestroyTool(tool) || gameMode == GameMode.CREATIVE) {
+        if (plugin.getApplicableTools().isMachineDestroyTool(tool) || gameMode == GameMode.CREATIVE) {
             final Location brokenBlockLocation = brokenBlock.getLocation();
 
             stoneMachine.getInventory().clear();
@@ -57,7 +57,7 @@ public class StoneMachineBreakListener implements Listener {
             //Closing all active windows
             final WindowManager windowManager = plugin.getWindowManager();
             final Window brokenMachinesWindow = windowManager.getWindow(stoneMachine);
-            if(brokenMachinesWindow != null) {
+            if (brokenMachinesWindow != null) {
 
                 final Message machineDestroyedMsg = new Message("&cTa stoniarka zostala zniszczona.");
                 for (Player user : brokenMachinesWindow.getUsers()) {
@@ -75,7 +75,7 @@ public class StoneMachineBreakListener implements Listener {
                 }
             }
 
-            if(gameMode != GameMode.CREATIVE) {
+            if (gameMode != GameMode.CREATIVE) {
                 brokenBlockLocation.getWorld().dropItemNaturally(brokenBlockLocation, plugin.getStoneMachine().createStoneMachineItem());
             }
 

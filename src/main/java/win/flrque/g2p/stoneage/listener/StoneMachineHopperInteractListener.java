@@ -32,27 +32,27 @@ public class StoneMachineHopperInteractListener implements Listener {
 
     @EventHandler
     public void onHopperInteraction(@NotNull InventoryMoveItemEvent event) {
-        if(event.isCancelled())
+        if (event.isCancelled())
             return;
 
         final Inventory sourceInventory = event.getSource();
         final Inventory destinationInventory = event.getDestination();
 
         //Blocking hopper output
-        if(plugin.getStoneMachine().isStoneMachine(sourceInventory)) {
+        if (plugin.getStoneMachine().isStoneMachine(sourceInventory)) {
 //            plugin.getLogger().log(Level.INFO, "InventoryMoveItemEvent: source inventory is a stone machine!");
             event.setCancelled(true);
         }
 
-        if(plugin.getStoneMachine().isStoneMachine(destinationInventory)) {
+        if (plugin.getStoneMachine().isStoneMachine(destinationInventory)) {
 //            plugin.getLogger().log(Level.INFO, "InventoryMoveItemEvent: destination inventory is a stone machine!");
             final ItemStack fuelItem = event.getItem();
-            if(stoneMachine.isHopperInputAllowed() && fuelItem.getType() == Material.COAL) {
+            if (stoneMachine.isHopperInputAllowed() && fuelItem.getType() == Material.COAL) {
                 final int fuelAmount = fuelItem.getAmount() * 8;
 
                 final boolean success = autoSmelter.addAutoSmeltingUse(destinationInventory, fuelAmount);
 
-                if(success) event.setItem(new ItemStack(Material.AIR, 1));
+                if (success) event.setItem(new ItemStack(Material.AIR, 1));
 
                 return;
             }

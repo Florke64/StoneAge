@@ -47,25 +47,25 @@ public class StoneBreakListener implements Listener {
 
     @EventHandler
     public void onStoneBreak(@NotNull BlockBreakEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
 //        long start = System.currentTimeMillis();
 
         final Player player = event.getPlayer();
-        if(player == null) return;
+        if (player == null) return;
 
         final Block brokenBlock = event.getBlock();
-        if(!brokenBlock.getType().equals(Material.STONE)) return;
+        if (!brokenBlock.getType().equals(Material.STONE)) return;
 
         final DropMultiplier dropMultiplier = plugin.getDropCalculator().getDropMultiplier();
-        if(dropMultiplier.isActive() && !dropMultiplier.getMultiplierBossBar().getPlayers().contains(player)) {
+        if (dropMultiplier.isActive() && !dropMultiplier.getMultiplierBossBar().getPlayers().contains(player)) {
             dropMultiplier.getMultiplierBossBar().addPlayer(player);
             dropMultiplier.getMultiplierBossBar().setVisible(true);
         }
 
         @SuppressWarnings("deprecation")
         byte stoneType = brokenBlock.getState().getData().getData();
-        if(stoneType != ((byte) 0)) return;
+        if (stoneType != ((byte) 0)) return;
 
         final Block machineBlock = plugin.getStoneMachine().getConnectedStoneMachine(brokenBlock);
         final Dispenser stoneMachine = machineBlock != null ? (Dispenser) machineBlock.getState() : null;
@@ -83,13 +83,13 @@ public class StoneBreakListener implements Listener {
     private void customizeStoneDrop(@NotNull Player player, Dispenser stoneMachine, Block brokenBlock) {
         final GameMode playerGameMode = player.getGameMode();
         final DropLoot finalDrop;
-        if(playerGameMode != GameMode.CREATIVE && playerGameMode != GameMode.SPECTATOR) {
+        if (playerGameMode != GameMode.CREATIVE && playerGameMode != GameMode.SPECTATOR) {
             final ItemStack usedTool = player.getInventory().getItemInMainHand();
             //TODO: Async calculation
             finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
 
-            if(finalDrop == null) {
-                plugin.getLogger().log(Level.INFO, "DropLoot calculated is null (Player: "+ player.getName() +", Location: "+ player.getLocation().toString() +")");
+            if (finalDrop == null) {
+                plugin.getLogger().log(Level.INFO, "DropLoot calculated is null (Player: " + player.getName() + ", Location: " + player.getLocation().toString() + ")");
             }
 
             dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
@@ -97,7 +97,7 @@ public class StoneBreakListener implements Listener {
             finalDrop = null;
         }
 
-        if(stoneMachine != null && stoneMachine.getBlock() != null){
+        if (stoneMachine != null && stoneMachine.getBlock() != null) {
             final StoneMachineStoneBreakEvent stoneBreakEvent = new StoneMachineStoneBreakEvent(player, stoneMachine, finalDrop);
             Bukkit.getServer().getPluginManager().callEvent(stoneBreakEvent);
 
@@ -112,7 +112,7 @@ public class StoneBreakListener implements Listener {
     }
 
     private void dropLoot(Player player, Location stoneLoc, @Nullable Dispenser stoneMachine, DropLoot dropLoot) {
-        if(dropLoot == null) {
+        if (dropLoot == null) {
             return;
         }
 
@@ -138,7 +138,7 @@ public class StoneBreakListener implements Listener {
         //Looping through all loots and dropping them for the player to pickup.
         for (DropEntry drop : dropLoot.getActiveDropEntries()) {
             final ItemStack itemLoot = dropLoot.getItemLoot(drop);
-            if(itemLoot == null)
+            if (itemLoot == null)
                 continue;
 
             final int totalAmount = itemLoot.getAmount();
@@ -147,7 +147,7 @@ public class StoneBreakListener implements Listener {
             final StoneDropLootEvent lootEvent = new StoneDropLootEvent(player, itemLoot);
             Bukkit.getServer().getPluginManager().callEvent(lootEvent);
 
-            if(lootEvent.isCancelled()) {
+            if (lootEvent.isCancelled()) {
                 continue;
             }
 
@@ -170,7 +170,7 @@ public class StoneBreakListener implements Listener {
                 itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, hopperLeftItem);
             }
 
-            if(drop != plugin.getDropCalculator().getPrimitiveDropEntry()) {
+            if (drop != plugin.getDropCalculator().getPrimitiveDropEntry()) {
                 final Message dropMessage = new Message("&7Udalo ci sie wykopac &c$_1 &7x&6$_2");
                 dropMessage.setVariable(1, drop.getCustomName());
                 dropMessage.setVariable(2, Integer.toString(totalAmount));
@@ -185,7 +185,7 @@ public class StoneBreakListener implements Listener {
         int leftToAdd = itemStack.getAmount();
         for (ItemStack itemInInv : inventory.getContents()) {
 
-            if(itemInInv == null) {
+            if (itemInInv == null) {
                 //Updating fist free slot index
                 int firstFreeSlot = inventory.firstEmpty();
                 if (firstFreeSlot != -1) {
@@ -199,11 +199,11 @@ public class StoneBreakListener implements Listener {
             if (itemInInv.isSimilar(itemStack) && itemInInv.getAmount() < maxStackSize) {
                 final int handleSize = maxStackSize - itemInInv.getAmount();
                 final int adding = itemStack.getAmount() < handleSize ? itemStack.getAmount() : handleSize;
-                itemInInv.setAmount(itemInInv.getAmount() + ((adding > 0)? adding : 0));
+                itemInInv.setAmount(itemInInv.getAmount() + ((adding > 0) ? adding : 0));
 
-                leftToAdd -= adding > 0? adding : 0;
+                leftToAdd -= adding > 0 ? adding : 0;
 
-                if(leftToAdd < 1) break;
+                if (leftToAdd < 1) break;
 
             }
 
@@ -219,7 +219,7 @@ public class StoneBreakListener implements Listener {
             return null;
         }
 
-        return itemStack.getAmount() > 0? itemStack : null;
+        return itemStack.getAmount() > 0 ? itemStack : null;
 
     }
 

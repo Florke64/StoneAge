@@ -25,7 +25,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DropInfoWindow extends Window  {
+public class DropInfoWindow extends Window {
 
     private final Player windowContentOwner;
     private final PlayerConfig personalDropConfig;
@@ -46,14 +46,14 @@ public class DropInfoWindow extends Window  {
         final DropCalculator calculator = plugin.getDropCalculator();
         final PlayerStats stats = plugin.getPlayerSetup().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
 
-        for(int i=0; i<=calculator.getDropEntries().size(); i++) {
-            if(i >= inventory.getSize()) {
+        for (int i = 0; i <= calculator.getDropEntries().size(); i++) {
+            if (i >= inventory.getSize()) {
                 break;
             }
 
             final DropEntry drop;
 
-            if(i == calculator.getDropEntries().size()) drop = calculator.getPrimitiveDropEntry();
+            if (i == calculator.getDropEntries().size()) drop = calculator.getPrimitiveDropEntry();
             else drop = calculator.getDropEntries().get(i);
 
             final ItemStack icon = createIconItem(drop, stats);
@@ -73,17 +73,17 @@ public class DropInfoWindow extends Window  {
         icon.setAmount(1);
 
         final ItemMeta meta = icon.getItemMeta();
-        meta.setDisplayName(ChatColor.GREEN + Message.simplePrepare(drop.getCustomName()) + ChatColor.GOLD +" ("+ df.format(dropChance) +"%)");
+        meta.setDisplayName(ChatColor.GREEN + Message.simplePrepare(drop.getCustomName()) + ChatColor.GOLD + " (" + df.format(dropChance) + "%)");
 
         final List<String> lore = new ArrayList<>();
         lore.add(Message.color("  &8+" + drop.getMinerExp() + "xp"));
-        final String dropEntryStatus = personalDropConfig.isDropping(drop)? "&2Wlaczony" : "&cWylaczony";
+        final String dropEntryStatus = personalDropConfig.isDropping(drop) ? "&2Wlaczony" : "&cWylaczony";
         lore.add(Message.color("&7Status: " + dropEntryStatus));
         lore.add(Message.color("&7(Kliknij aby zmienic)"));
         lore.add(Message.EMPTY);
         lore.add(Message.color("&cWykopano juz: " + stats.getStatistic(drop.getEntryName())));
 
-        if(currentDropMultiplier != calculator.getDropMultiplier().getDefaultDropMultiplier()) {
+        if (currentDropMultiplier != calculator.getDropMultiplier().getDefaultDropMultiplier()) {
             lore.add(" "); // spacer
 
             final float realDropChance = getRealChancePercentage(drop);
@@ -105,14 +105,14 @@ public class DropInfoWindow extends Window  {
         final DropCalculator calculator = plugin.getDropCalculator();
         final DropMultiplier dropMultiplier = calculator.getDropMultiplier();
 
-        final float multiplier = (drop.isMultipliable()? dropMultiplier.getCurrentDropMultiplier() : 1.0f);
+        final float multiplier = (drop.isMultipliable() ? dropMultiplier.getCurrentDropMultiplier() : 1.0f);
 
         return (((drop.getChanceWeight() * multiplier) / plugin.getDropCalculator().getTotalWeight()) * 100);
     }
 
     @Override
     public boolean open(Player player) {
-        if(!super.open(player)) {
+        if (!super.open(player)) {
             new Message("&cNie udało się otworzyć okna dropu!").send(player);
             return false;
         }
@@ -129,9 +129,9 @@ public class DropInfoWindow extends Window  {
         final DropCalculator calculator = plugin.getDropCalculator();
         final DropEntry dropEntry;
 
-        if(clickedSlot < calculator.getDropEntries().size())
+        if (clickedSlot < calculator.getDropEntries().size())
             dropEntry = calculator.getDropEntries().get(clickedSlot);
-        else if(clickedSlot == calculator.getDropEntries().size())
+        else if (clickedSlot == calculator.getDropEntries().size())
             dropEntry = calculator.getPrimitiveDropEntry();
         else {
             // Clicked on empty slot perhaps
@@ -145,7 +145,7 @@ public class DropInfoWindow extends Window  {
 
         final Message infoMessage = new Message("&7Ustawiono drop &c$_1 &7na $_2&7.");
         infoMessage.setVariable(1, dropEntry.getCustomName());
-        infoMessage.setVariable(2, (isDropping? "&2wlaczony" : "&cwylaczony"));
+        infoMessage.setVariable(2, (isDropping ? "&2wlaczony" : "&cwylaczony"));
         infoMessage.send(player);
     }
 

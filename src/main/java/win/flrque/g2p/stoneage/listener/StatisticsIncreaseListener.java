@@ -32,7 +32,7 @@ public class StatisticsIncreaseListener implements Listener {
     public void onStoneMachineUse(@NotNull StoneMachineStoneBreakEvent event) {
         final Player player = event.getPlayer();
 
-        if(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+        if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
             return;
         }
 
@@ -40,13 +40,13 @@ public class StatisticsIncreaseListener implements Listener {
         final PlayerStats playerStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
 
         final DropLoot dropLoot = event.getLoot();
-        if(dropLoot == null) {
+        if (dropLoot == null) {
             return;
         }
 
         final Collection<DropEntry> dropEntries = dropLoot.getActiveDropEntries();
 
-        for(DropEntry entry : dropEntries) {
+        for (DropEntry entry : dropEntries) {
             final int amount = event.getLoot().getAmountLooted(entry);
             playerStats.increaseStatistic(entry.getEntryName(), amount);
         }

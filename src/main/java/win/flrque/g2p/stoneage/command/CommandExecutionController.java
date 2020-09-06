@@ -47,7 +47,7 @@ public class CommandExecutionController {
     }
 
     public boolean onCommandExecute(@NotNull final CommandSender sender) {
-        if(!(sender instanceof Player)) return true;
+        if (!(sender instanceof Player)) return true;
         final UUID playerUniqueId = ((Player) sender).getUniqueId();
 
         //Check if cooldown passed
@@ -55,7 +55,7 @@ public class CommandExecutionController {
     }
 
     public void recordCommandExecution(@NotNull final CommandSender sender) {
-        if(!(sender instanceof Player)) return;
+        if (!(sender instanceof Player)) return;
         final UUID playerUniqueId = ((Player) sender).getUniqueId();
 
         final long currentTime = System.currentTimeMillis();

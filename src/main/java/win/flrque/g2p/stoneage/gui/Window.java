@@ -38,7 +38,7 @@ public abstract class Window {
     public boolean open(@NotNull Player player) {
         player.closeInventory();
 
-        if(player.isSleeping()) {
+        if (player.isSleeping()) {
             return false;
         }
 

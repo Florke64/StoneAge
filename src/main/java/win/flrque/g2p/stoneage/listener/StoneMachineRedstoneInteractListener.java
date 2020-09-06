@@ -23,19 +23,19 @@ public class StoneMachineRedstoneInteractListener implements Listener {
 
     @EventHandler
     public void onRedstoneInteract(@NotNull BlockDispenseEvent event) {
-        if(event.isCancelled())
+        if (event.isCancelled())
             return;
 
         final Block interactedBlock = event.getBlock();
-        if(!plugin.getStoneMachine().isStoneMachine(interactedBlock))
+        if (!plugin.getStoneMachine().isStoneMachine(interactedBlock))
             return;
 
         event.setCancelled(true);
 
         /*This code is ready and provides stone generation on Redstone input
-        *   but this can be easily abused and lag a server!
-        * TODO: add possibility to disable this functionality with config.yml
-        */
+         *   but this can be easily abused and lag a server!
+         * TODO: add possibility to disable this functionality with config.yml
+         */
 //        final Dispenser stoneMachine = (Dispenser) interactedBlock.getState();
 //        final Location stoneLocation = plugin.getStoneMachine().getGeneratedStoneLocation(stoneMachine);
 //

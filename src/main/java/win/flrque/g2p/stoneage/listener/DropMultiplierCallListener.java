@@ -29,7 +29,7 @@ public class DropMultiplierCallListener implements Listener {
 
     @EventHandler
     public void onDropMultiplierCall(@NotNull final DropMultiplierStartEvent event) {
-        if(event.isCancelled()) {
+        if (event.isCancelled()) {
             return;
         }
 
@@ -51,7 +51,7 @@ public class DropMultiplierCallListener implements Listener {
             }
         }.runTaskAsynchronously(plugin);
 
-        for(final Player player : Bukkit.getOnlinePlayers()) {
+        for (final Player player : Bukkit.getOnlinePlayers()) {
             plugin.getDropCalculator().getDropMultiplier().getMultiplierBossBar().addPlayer(player);
         }
 

@@ -26,12 +26,12 @@ public class StoneMachinePlaceListener implements Listener {
 
     @EventHandler
     public void onStoneMachinePlace(@NotNull BlockPlaceEvent event) {
-        if(event.isCancelled())
+        if (event.isCancelled())
             return;
 
         final Block placedBlock = event.getBlockPlaced();
 
-        if(!plugin.getStoneMachine().isStoneMachine(event.getBlock()))
+        if (!plugin.getStoneMachine().isStoneMachine(event.getBlock()))
             return;
 
         final Directional machine = (Directional) placedBlock.getState().getData();

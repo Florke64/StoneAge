@@ -10,6 +10,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 import win.flrque.g2p.stoneage.event.MinerLevelUpEvent;
@@ -26,21 +27,21 @@ public class MinerLevelUpListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerLevelUp(MinerLevelUpEvent event) {
-        if(event.isCancelled())
+    public void onPlayerLevelUp(@NotNull MinerLevelUpEvent event) {
+        if (event.isCancelled())
             return;
 
         final PlayerStats stats = event.getPlayerStats();
         final UUID playerUniqueId = stats.getUniqueId();
         final Player player = this.plugin.getServer().getPlayer(playerUniqueId);
-        if(player == null || !player.isOnline()) {
+        if (player == null || !player.isOnline()) {
             return;
         }
 
         player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f);
 
         final int lvl = event.getUpToLevel();
-        if(lvl > 40 || lvl % 5 == 0 || lvl == 2) {
+        if (lvl > 40 || lvl % 5 == 0 || lvl == 2) {
             final Message congratulations = new Message("&dGratulacje! &c$_1 &dosiaga &6$_2 &dpoziom gornictwa!");
             congratulations.setVariable(1, player.getName());
             congratulations.setVariable(2, Integer.toString(lvl));

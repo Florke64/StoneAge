@@ -52,12 +52,12 @@ public class DropStatCommand implements CommandExecutor {
      */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             new Message("&cTa komende moze wykonac tylko gracz.").send(sender);
             return false;
         }
 
-        if(!executionController.onCommandExecute(sender)) {
+        if (!executionController.onCommandExecute(sender)) {
             new Message("&cOdczekaj chwile przed wykonaniem kolejnej komendy.").send(sender);
             return true;
         }
@@ -96,8 +96,8 @@ public class DropStatCommand implements CommandExecutor {
         message.addLines(Message.EMPTY);
 
         int summary = 0;
-        for(DropEntry dropEntry : dropCalculator.getDropEntries()) {
-            if(dropEntry == dropCalculator.getPrimitiveDropEntry())
+        for (DropEntry dropEntry : dropCalculator.getDropEntries()) {
+            if (dropEntry == dropCalculator.getPrimitiveDropEntry())
                 continue;
 
             summary += playerStats.getStatistic(dropEntry.getEntryName());

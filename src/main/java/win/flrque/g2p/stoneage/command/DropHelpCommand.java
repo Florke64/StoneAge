@@ -51,7 +51,7 @@ public class DropHelpCommand implements CommandExecutor {
      */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(!executionController.onCommandExecute(sender)) {
+        if (!executionController.onCommandExecute(sender)) {
             new Message("&cOdczekaj chwile przed wykonaniem kolejnej komendy.").send(sender);
             return true;
         }

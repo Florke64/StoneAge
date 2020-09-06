@@ -62,7 +62,7 @@ public class DropCalculator {
 
     private float calculateTotalWeight() {
         float weight = 0.0f;
-        for(DropEntry drop : dropEntries.values())
+        for (DropEntry drop : dropEntries.values())
             weight += drop.getChanceWeight();
 
         totalWeight = weight + primitiveDrop.getChanceWeight();
@@ -78,10 +78,10 @@ public class DropCalculator {
         //TODO: Check StoneMachine's configuration book inside its Inventory
 
         //No tool was used to break a block
-        if(tool == null) return null;
+        if (tool == null) return null;
 
         //Not applicable tool was used, means no drops
-        if(!plugin.getApplicableTools().isApplicableTool(tool.getType())) {
+        if (!plugin.getApplicableTools().isApplicableTool(tool.getType())) {
             return null;
         }
 
@@ -91,12 +91,12 @@ public class DropCalculator {
         boolean hasSilkTouch = false;
         int fortuneLevel = 0;
 
-        if(tool.hasItemMeta()) {
-            for(Enchantment enchant : tool.getEnchantments().keySet()) {
-                if(enchant.equals(Enchantment.SILK_TOUCH))
+        if (tool.hasItemMeta()) {
+            for (Enchantment enchant : tool.getEnchantments().keySet()) {
+                if (enchant.equals(Enchantment.SILK_TOUCH))
                     hasSilkTouch = true;
 
-                else if(enchant.equals(Enchantment.LOOT_BONUS_BLOCKS))
+                else if (enchant.equals(Enchantment.LOOT_BONUS_BLOCKS))
                     fortuneLevel = tool.getEnchantments().get(enchant);
             }
         }
@@ -113,7 +113,7 @@ public class DropCalculator {
         final ItemAutoSmelter autoSmelter = plugin.getStoneMachine().getItemSmelter();
 
         //Checks if cobble wasn't disabled by the player
-        if(dropConfig.isDropping(primitiveDrop)) {
+        if (dropConfig.isDropping(primitiveDrop)) {
             ItemStack primitiveItemStack = primitiveDrop.getDrop(hasSilkTouch, fortuneLevel);
 
             //TODO: Autosmelting primitive drop
@@ -130,16 +130,16 @@ public class DropCalculator {
         for (DropEntry dropEntry : dropEntries.values()) {
 
             //Check for requirements for this drop
-            if(playerStats.getMinerLvl() < dropEntry.getNeededMinerLevel()) {
+            if (playerStats.getMinerLvl() < dropEntry.getNeededMinerLevel()) {
                 continue;
             }
 
-            if(usedToolLevel < dropEntry.getNeededToolLevel()) {
+            if (usedToolLevel < dropEntry.getNeededToolLevel()) {
                 continue;
             }
 
             //Checks for player's personalised drop entry settings
-            if(!dropConfig.isDropping(dropEntry)) {
+            if (!dropConfig.isDropping(dropEntry)) {
                 continue;
             }
 
@@ -147,19 +147,19 @@ public class DropCalculator {
 
             final float itemChanceWeight = dropEntry.getChanceWeight();
             final float currentDropMultiplier;
-            if(dropMultiplier.isActive()) {
+            if (dropMultiplier.isActive()) {
                 currentDropMultiplier = this.getDropMultiplier().getCurrentDropMultiplier();
             } else {
                 currentDropMultiplier = getDropMultiplier().getDefaultDropMultiplier();
             }
 
-            if (luck <  itemChanceWeight * currentDropMultiplier) {
+            if (luck < itemChanceWeight * currentDropMultiplier) {
                 ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
 
                 //Auto smelting feature
-                if(stoneMachine != null && autoSmelter.getAutoSmeltingUsesLeft(stoneMachine) >= itemDrop.getAmount()) {
+                if (stoneMachine != null && autoSmelter.getAutoSmeltingUsesLeft(stoneMachine) >= itemDrop.getAmount()) {
                     final ItemStack smelted = autoSmelter.getSmelted(stoneMachine, itemDrop);
-                    if(smelted != null) {
+                    if (smelted != null) {
                         itemDrop = smelted;
                     }
                 }
@@ -176,7 +176,7 @@ public class DropCalculator {
     }
 
     public DropEntry getDropEntry(@NotNull String key) {
-        if(key.contentEquals(primitiveDrop.getEntryName()))
+        if (key.contentEquals(primitiveDrop.getEntryName()))
             return getPrimitiveDropEntry();
         return dropEntries.get(key);
     }

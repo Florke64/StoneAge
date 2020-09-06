@@ -20,7 +20,7 @@ public class DropLoot {
     private int totalExp = 0;
 
     public void addLoot(@NotNull DropEntry dropEntry, ItemStack itemStack) {
-        if(dropEntry.getMaximalExp() > 0)
+        if (dropEntry.getMaximalExp() > 0)
             totalExp += dropEntry.calculateFinalExpValue();
 
         loots.put(dropEntry, itemStack);

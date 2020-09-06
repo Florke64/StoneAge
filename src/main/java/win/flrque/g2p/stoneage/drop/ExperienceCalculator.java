@@ -31,18 +31,18 @@ public class ExperienceCalculator {
 
     public int expToLevel(final long experience) {
         int lvl = 1;
-        for(final Long requiredExp : this.experienceTable) {
-            if(requiredExp > experience)
+        for (final Long requiredExp : this.experienceTable) {
+            if (requiredExp > experience)
                 break;
-            else lvl ++;
+            else lvl++;
         }
 
         return lvl;
     }
 
     public long getExpNeededToLevel(final int level) {
-        if(level < 2) return 0;
-        else if(level > getMaximumMinerLevel())
+        if (level < 2) return 0;
+        else if (level > getMaximumMinerLevel())
             return experienceTable.get(experienceTable.size());
 
         return experienceTable.get(level - 2);
@@ -54,12 +54,12 @@ public class ExperienceCalculator {
 
         experienceTable.clear();
 
-        for(int x = start_x; x <= (maxLevel); x++) {
+        for (int x = start_x; x <= (maxLevel); x++) {
             double nextLevelFormula = (double) INITIAL_XP;
-            if(x == start_x) {
+            if (x == start_x) {
                 nextLevelFormula += (double) INITIAL_XP;
             } else {
-                nextLevelFormula +=(double) experienceTable.get(experienceTable.size()-1);
+                nextLevelFormula += (double) experienceTable.get(experienceTable.size() - 1);
             }
             nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) x / 10d) * Math.pow(2, 0));
             nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) x / 50d) * Math.pow(2, 16));
@@ -80,7 +80,7 @@ public class ExperienceCalculator {
     }
 
     public void setMaximumMinerLevel(int maximumMinerLevel) {
-        if(maximumMinerLevel != this.maximumMinerLevel) {
+        if (maximumMinerLevel != this.maximumMinerLevel) {
             this.maximumMinerLevel = maximumMinerLevel;
             initExperienceTableValues();
         }

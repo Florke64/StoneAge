@@ -24,14 +24,14 @@ public class DropMultiplierCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, String label, String[] args) {
-        if(args.length == 0) {
+        if (args.length == 0) {
             DropMultiplier multiplier = plugin.getDropCalculator().getDropMultiplier();
             printMultiplierInfo(sender, multiplier, false);
 
             return true;
         }
 
-        if(!sender.hasPermission("g2p.stone.admin")) {
+        if (!sender.hasPermission("g2p.stone.admin")) {
             new Message("&cNie posiadasz wystarczajacych uprawnien do wykonania tej komendy.").send(sender);
             return false;
         }
@@ -45,7 +45,7 @@ public class DropMultiplierCommand implements CommandExecutor {
         }
 
         long time = 100000;
-        if(args.length == 2) {
+        if (args.length == 2) {
             try {
                 time = Long.parseLong(args[1]) * 60 * 1000;
             } catch (NumberFormatException ex) {
@@ -58,8 +58,10 @@ public class DropMultiplierCommand implements CommandExecutor {
         DropMultiplier multiplier = plugin.getDropCalculator().getDropMultiplier();
         boolean success = multiplier.setDropMultiplier(sender, multiplierValue, time);
 
-        if(success) printMultiplierInfo(sender, multiplier, true);
-        else { new Message("&4Serwer odmowil ustawienia takiego mnoznika! &c(Event was cancelled?)").send(sender); }
+        if (success) printMultiplierInfo(sender, multiplier, true);
+        else {
+            new Message("&4Serwer odmowil ustawienia takiego mnoznika! &c(Event was cancelled?)").send(sender);
+        }
 
         return true;
     }
@@ -67,10 +69,10 @@ public class DropMultiplierCommand implements CommandExecutor {
     private void printMultiplierInfo(@NotNull final CommandSender commandSender, @NotNull final DropMultiplier multiplier, boolean broadcast) {
         final Message multiplierMessage = new Message();
 
-        if(broadcast) multiplierMessage.addLines("&6* * * * * &7UWAGA! &6* * * * *");
+        if (broadcast) multiplierMessage.addLines("&6* * * * * &7UWAGA! &6* * * * *");
         else multiplierMessage.addLines("&6* * * * * &7Informacje o mnozniku kamienia &6* * * * *");
 
-        if(!multiplier.isActive()) {
+        if (!multiplier.isActive()) {
             multiplierMessage.addLines("  &cMnoznik dropu nie jest aktywowany.");
         } else {
             multiplierMessage.addLines("  &2Mnoznik dropu z kamienia aktywowany przez: &8$_1&2.");
@@ -83,7 +85,7 @@ public class DropMultiplierCommand implements CommandExecutor {
             multiplierMessage.setVariable(3, Integer.toString(multiplier.getMinutesLeft()));
         }
 
-        if(broadcast) multiplierMessage.broadcastToTheServer();
+        if (broadcast) multiplierMessage.broadcastToTheServer();
         else multiplierMessage.send(commandSender);
 
     }

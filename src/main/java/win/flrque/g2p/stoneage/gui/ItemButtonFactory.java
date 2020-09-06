@@ -53,11 +53,11 @@ public class ItemButtonFactory {
         final DropMultiplier multiplier = plugin.getDropCalculator().getDropMultiplier();
         final List<String> lore = new ArrayList<>();
 
-        if(multiplier.isActive()) {
-            lore.add(ChatColor.translateAlternateColorCodes('&', "&7Aktywny mnoznik &3x"+ multiplier.getCurrentDropMultiplier() + "."));
+        if (multiplier.isActive()) {
+            lore.add(ChatColor.translateAlternateColorCodes('&', "&7Aktywny mnoznik &3x" + multiplier.getCurrentDropMultiplier() + "."));
 
             final long timeoutInMinutes = ((multiplier.getMultiplierTimeout() - System.currentTimeMillis()) / 1000) / 60;
-            lore.add(ChatColor.translateAlternateColorCodes('&', "&7Wygasnie za &4"+ timeoutInMinutes + " &7minut."));
+            lore.add(ChatColor.translateAlternateColorCodes('&', "&7Wygasnie za &4" + timeoutInMinutes + " &7minut."));
         } else {
             lore.add(ChatColor.translateAlternateColorCodes('&', "&7Mnoznik dropu nie jest aktywny..."));
         }
@@ -80,16 +80,16 @@ public class ItemButtonFactory {
 
         final ItemStack itemIcon;
 
-        ItemButtonType(@NotNull final ItemStack icon, final String label, @NotNull final String ...rawLore) {
+        ItemButtonType(@NotNull final ItemStack icon, final String label, @NotNull final String... rawLore) {
             final ItemMeta meta = icon.getItemMeta();
             meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', label));
 
             final List<String> lore = new ArrayList<>();
-            for(String line : rawLore) {
+            for (String line : rawLore) {
                 lore.add(ChatColor.translateAlternateColorCodes('&', line));
             }
 
-            if(!lore.isEmpty()) {
+            if (!lore.isEmpty()) {
                 meta.setLore(lore);
             }
 

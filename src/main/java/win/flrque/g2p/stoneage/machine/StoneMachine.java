@@ -58,7 +58,7 @@ public class StoneMachine {
 
         final Message lore = new Message(machineLore);
         this.machineLore = lore.getPreparedMessage();
-        
+
         this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
 
         this.machineLabel = new ItemStack(Material.PAPER, 1);
@@ -71,7 +71,7 @@ public class StoneMachine {
 
     public boolean repairStoneMachine(Dispenser machine) {
         final long repairCooldownLimit = (System.currentTimeMillis() - (1000 * getRepairCooldown()));
-        if(lastStoneMachineRepair.containsKey(machine) && lastStoneMachineRepair.get(machine) >= repairCooldownLimit) {
+        if (lastStoneMachineRepair.containsKey(machine) && lastStoneMachineRepair.get(machine) >= repairCooldownLimit) {
             //Player is trying to repair stone machine too frequently
             return false;
         }
@@ -85,22 +85,22 @@ public class StoneMachine {
     }
 
     public boolean isStoneMachine(@NotNull final Block block) {
-        if(block.getState() instanceof Dispenser) {
+        if (block.getState() instanceof Dispenser) {
             return isStoneMachine((Dispenser) block.getState());
         }
-        
+
         return false;
     }
 
     public boolean isStoneMachine(@NotNull final Dispenser dispenserBlock) {
-        if(dispenserBlock.getCustomName() == null)
+        if (dispenserBlock.getCustomName() == null)
             return false;
 
         return dispenserBlock.getCustomName().equals(this.machineName);
     }
 
     public boolean isStoneMachine(Inventory inventory) {
-        if(inventory == null) {
+        if (inventory == null) {
             return false;
         }
 
@@ -108,7 +108,7 @@ public class StoneMachine {
     }
 
     public Location getGeneratedStoneLocation(Dispenser stoneMachine) {
-        if(!isStoneMachine(stoneMachine))
+        if (!isStoneMachine(stoneMachine))
             return null;
 
         final Directional machine = (Directional) stoneMachine.getData();
@@ -117,14 +117,14 @@ public class StoneMachine {
     }
 
     public Block getConnectedStoneMachine(Block block) {
-        for(int i=0; i<6; i++) {
+        for (int i = 0; i < 6; i++) {
             final Block relativeBlock = block.getRelative(BlockFace.values()[i], 1);
 
-            if(isStoneMachine(relativeBlock)) {
+            if (isStoneMachine(relativeBlock)) {
                 final Dispenser stoneMachine = (Dispenser) relativeBlock.getState();
                 final Directional direction = (Directional) stoneMachine.getData();
 
-                if(direction.getFacing().getOppositeFace().equals(BlockFace.values()[i])) {
+                if (direction.getFacing().getOppositeFace().equals(BlockFace.values()[i])) {
                     return relativeBlock;
                 }
             }
@@ -152,10 +152,10 @@ public class StoneMachine {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if(!isConnectedToStoneMachine(block))
+                        if (!isConnectedToStoneMachine(block))
                             return;
 
-                        if(!block.getType().equals(Material.AIR))
+                        if (!block.getType().equals(Material.AIR))
                             return;
 
                         block.setType(Material.STONE);
@@ -192,7 +192,7 @@ public class StoneMachine {
     }
 
     public List<String> getMachineLore() {
-        if(machineLore == null || machineLore.isEmpty()) {
+        if (machineLore == null || machineLore.isEmpty()) {
             createDefaultMachineLore();
         }
 
@@ -216,11 +216,11 @@ public class StoneMachine {
         final NamespacedKey namespacedKey = new NamespacedKey(this.plugin, "stone_machine");
 
         final Iterator<Recipe> registeredRecipes = Bukkit.recipeIterator();
-        while(registeredRecipes.hasNext()) {
+        while (registeredRecipes.hasNext()) {
             final Recipe recipe = registeredRecipes.next();
-            if(!(recipe instanceof ShapedRecipe)) continue;
+            if (!(recipe instanceof ShapedRecipe)) continue;
 
-            if(((ShapedRecipe) recipe).getKey().getKey().contentEquals(namespacedKey.getKey())) {
+            if (((ShapedRecipe) recipe).getKey().getKey().contentEquals(namespacedKey.getKey())) {
                 plugin.getLogger().log(Level.WARNING, "Skipping crafting recipe registration, as the same NamespaceKey was already reserved.");
                 return;
             }

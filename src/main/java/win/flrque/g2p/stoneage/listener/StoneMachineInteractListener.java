@@ -29,19 +29,19 @@ public class StoneMachineInteractListener implements Listener {
 
     @EventHandler
     public void onStoneMachineClick(@NotNull PlayerInteractEvent event) {
-        if(event.getPlayer() == null || event.isCancelled())
+        if (event.getPlayer() == null || event.isCancelled())
             return;
 
         final Player player = event.getPlayer();
 
-        if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || player.isSneaking())
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || player.isSneaking())
             return;
 
-        if(!plugin.getStoneMachine().isStoneMachine(event.getClickedBlock()))
+        if (!plugin.getStoneMachine().isStoneMachine(event.getClickedBlock()))
             return;
 
         final ItemStack tool = player.getInventory().getItemInMainHand();
-        if(plugin.getApplicableTools().isMachineDestroyTool(tool) && player.isOp()) {
+        if (plugin.getApplicableTools().isMachineDestroyTool(tool) && player.isOp()) {
             return;
         }
 

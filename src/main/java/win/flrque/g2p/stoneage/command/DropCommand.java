@@ -36,23 +36,23 @@ public class DropCommand implements CommandExecutor {
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             new Message("&cTylko Gracz moze wykonac te komende!").send(sender);
             return true;
         }
 
-        if(!executionController.onCommandExecute(sender)) {
+        if (!executionController.onCommandExecute(sender)) {
             new Message("&cOdczekaj chwile przed wykonaniem kolejnej komendy.").send(sender);
             return true;
         }
 
-        if(args.length == 1 && (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("pomoc"))) {
+        if (args.length == 1 && (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("pomoc"))) {
             ((Player) sender).performCommand("drophelp");
             return true;
         }
 
-        if(args.length > 0 && (args[0].equalsIgnoreCase("stat") || args[0].equalsIgnoreCase("stats"))) {
-            if(args.length > 1) {
+        if (args.length > 0 && (args[0].equalsIgnoreCase("stat") || args[0].equalsIgnoreCase("stats"))) {
+            if (args.length > 1) {
                 ((Player) sender).performCommand("dropstat " + args[1]);
                 return true;
             }

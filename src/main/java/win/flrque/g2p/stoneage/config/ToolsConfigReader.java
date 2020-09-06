@@ -34,19 +34,19 @@ public class ToolsConfigReader extends ConfigSectionReader {
     public void compile() {
         final String machineDestroyToolName = rootSection.getString("machine_destroy");
         final Material machineDestroyToolMaterial = Material.getMaterial(machineDestroyToolName);
-        if(machineDestroyToolMaterial != null) {
+        if (machineDestroyToolMaterial != null) {
             this.machineDestroyTool = machineDestroyToolMaterial;
         }
 
         final ConfigurationSection applicableToolsSection = rootSection.getConfigurationSection("levels");
-        if(applicableToolsSection == null) {
+        if (applicableToolsSection == null) {
             this.plugin.getLogger().log(Level.WARNING, "No applicable tools found. Please, check config file!");
             return;
         }
 
-        for(final String key : applicableToolsSection.getKeys(false)) {
+        for (final String key : applicableToolsSection.getKeys(false)) {
             final Material toolMaterial = Material.getMaterial(key);
-            if(toolMaterial == null) {
+            if (toolMaterial == null) {
                 this.plugin.getLogger().log(Level.WARNING, "Invalid \"" + key + "\" in tool levels configuration! Skipping...");
                 continue;
             }

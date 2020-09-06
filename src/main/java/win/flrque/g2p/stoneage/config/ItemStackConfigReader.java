@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class ItemStackConfigReader extends ConfigSectionReader{
+public class ItemStackConfigReader extends ConfigSectionReader {
 
     private ItemStack cachedItemStack;
 
@@ -29,7 +29,7 @@ public class ItemStackConfigReader extends ConfigSectionReader{
     }
 
     public ItemStack getItemStack() {
-        if(cachedItemStack == null) {
+        if (cachedItemStack == null) {
             try {
                 cachedItemStack = compileItemStack();
             } catch (InvalidConfigurationException ex) {
@@ -44,7 +44,7 @@ public class ItemStackConfigReader extends ConfigSectionReader{
     public ItemStack compileItemStack() throws InvalidConfigurationException {
         //Getting material type from config section
         final Material itemMaterial = readMaterial();
-        if(itemMaterial == null)
+        if (itemMaterial == null)
             throw new InvalidConfigurationException("Invalid Material name. Please refer to Bukkit's Material enum class.");
 
         final ItemStack itemStack = new ItemStack(itemMaterial);
@@ -52,26 +52,26 @@ public class ItemStackConfigReader extends ConfigSectionReader{
         //TODO: Fix magic value
         //Getting data magic value
         final byte magicValue = (byte) readMagicValue();
-        if(magicValue < 0)
+        if (magicValue < 0)
             plugin.getLogger().log(Level.WARNING, "Magic value for " + itemMaterial + " wasn't specified correctly. Using default value...");
 
-        itemStack.getData().setData(magicValue < 0? 0 : magicValue);
+        itemStack.getData().setData(magicValue < 0 ? 0 : magicValue);
 
         final ItemMeta itemMeta = itemStack.getItemMeta();
 
         //Getting item's custom name
         final String customName = readCustomName();
-        if(!customName.equals(""))
+        if (!customName.equals(""))
             itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', customName));
 
         //Reading item's lore
         final List<String> lore = readLore();
-        if(lore != null && !lore.isEmpty())
+        if (lore != null && !lore.isEmpty())
             itemMeta.setLore(lore);
 
         //Reading enchantments
         final Map<Enchantment, Integer> enchants = readEnchantments();
-        for(Enchantment enchantment : enchants.keySet()) {
+        for (Enchantment enchantment : enchants.keySet()) {
             itemMeta.addEnchant(enchantment, enchants.get(enchantment), true);
         }
 
@@ -96,7 +96,7 @@ public class ItemStackConfigReader extends ConfigSectionReader{
 
     private List<String> readLore() {
         final List<String> lore = new ArrayList<>();
-        for(String line : rootSection.getStringList("lore")) {
+        for (String line : rootSection.getStringList("lore")) {
             lore.add(ChatColor.translateAlternateColorCodes('&', line));
         }
 
@@ -107,16 +107,16 @@ public class ItemStackConfigReader extends ConfigSectionReader{
         final List<String> enchantmentList = rootSection.getStringList("enchantments");
         final Map<Enchantment, Integer> enchantments = new HashMap<>();
 
-        for(String enchant : enchantmentList) {
+        for (String enchant : enchantmentList) {
             final String[] enchantmentData = enchant.split(" ", 2);
 
             final Enchantment enchantment;
             final int enchantmentLevel;
 
             enchantment = Enchantment.getByName(enchantmentData[0].toUpperCase());
-            enchantmentLevel = (enchantmentData.length<2)? 1 : Integer.parseInt(enchantmentData[1]);
+            enchantmentLevel = (enchantmentData.length < 2) ? 1 : Integer.parseInt(enchantmentData[1]);
 
-            if(enchantment != null) {
+            if (enchantment != null) {
                 enchantments.put(enchantment, enchantmentLevel);
             } else {
                 plugin.getLogger().log(Level.WARNING, "Invalid Enchantment for the item found - please double check the config.yml file!");

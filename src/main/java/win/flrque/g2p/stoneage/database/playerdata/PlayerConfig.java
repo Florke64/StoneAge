@@ -32,7 +32,7 @@ public class PlayerConfig {
         this.playerName = playerName;
 
         customDropEntries.put(plugin.getDropCalculator().getPrimitiveDropEntry(), true);
-        for(DropEntry drop : plugin.getDropCalculator().getDropEntries()) {
+        for (DropEntry drop : plugin.getDropCalculator().getDropEntries()) {
             customDropEntries.put(drop, true);
         }
 

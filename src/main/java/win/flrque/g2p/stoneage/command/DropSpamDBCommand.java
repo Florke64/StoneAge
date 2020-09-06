@@ -40,12 +40,12 @@ public class DropSpamDBCommand implements CommandExecutor {
      */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(!sender.hasPermission("g2p.stone.admin")) {
+        if (!sender.hasPermission("g2p.stone.admin")) {
             new Message("&cNie posiadasz wystarczajacych uprawnien do wykonania tej komendy.").send(sender);
             return false;
         }
 
-        if(args.length < 1) {
+        if (args.length < 1) {
             new Message("&cNie wystarczajaca ilosc argumentow do wykonania komendy.").send(sender);
             return false;
         }
@@ -65,7 +65,7 @@ public class DropSpamDBCommand implements CommandExecutor {
     }
 
     private final void createRandomPlayerStats(final int n) {
-        for(int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             final UUID uuid = UUID.randomUUID();
 
             playerSetup.getPlayerStoneMachineStats(uuid).markUnsaved(true);

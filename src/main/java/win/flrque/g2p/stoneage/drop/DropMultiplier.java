@@ -102,7 +102,7 @@ public class DropMultiplier {
         final String callerName = caller.getName();
         final UUID callerUniqueId;
 
-        if(caller instanceof Player) {
+        if (caller instanceof Player) {
             callerUniqueId = ((Player) caller).getUniqueId();
         } else {
             callerUniqueId = UUID.randomUUID();
@@ -112,10 +112,10 @@ public class DropMultiplier {
     }
 
     public boolean setDropMultiplier(String callerName, UUID callerUniqueId, float value, long time) {
-        if(value <= defaultDropMultiplier || value > maxDropMultiplier)
+        if (value <= defaultDropMultiplier || value > maxDropMultiplier)
             return false;
 
-        if(time < (1 * 60 * 1000) || time > (24 * 60 * 60 * 1000))
+        if (time < (1 * 60 * 1000) || time > (24 * 60 * 60 * 1000))
             return false;
 
         final long startTime = System.currentTimeMillis();
@@ -124,7 +124,7 @@ public class DropMultiplier {
         DropMultiplierStartEvent event = new DropMultiplierStartEvent(callerName, callerUniqueId, value, startTime, timeout);
         plugin.getServer().getPluginManager().callEvent(event);
 
-        if(event.isCancelled()) {
+        if (event.isCancelled()) {
             return false;
         }
 
@@ -139,11 +139,11 @@ public class DropMultiplier {
     }
 
     public int getMinutesLeft() {
-        return (int)((getMultiplierTimeout()/1000 - System.currentTimeMillis()/1000)/60);
+        return (int) ((getMultiplierTimeout() / 1000 - System.currentTimeMillis() / 1000) / 60);
     }
 
     public boolean isActive() {
-        if(getMultiplierTimeout() < System.currentTimeMillis())
+        if (getMultiplierTimeout() < System.currentTimeMillis())
             return false;
 
         return defaultDropMultiplier != currentDropMultiplier;
@@ -152,15 +152,15 @@ public class DropMultiplier {
     public void readPreviousMultiplierFromDatabase() {
         final StringBuilder query = new StringBuilder();
 
-        query.append("SELECT * FROM `"+ SQLManager.TABLE_DROP_MULTIPLIER +"` ");
-        query.append("ORDER BY `"+ SQLManager.TABLE_DROP_MULTIPLIER +"`.`Timeout` DESC ");
+        query.append("SELECT * FROM `" + SQLManager.TABLE_DROP_MULTIPLIER + "` ");
+        query.append("ORDER BY `" + SQLManager.TABLE_DROP_MULTIPLIER + "`.`Timeout` DESC ");
         query.append("LIMIT 1;");
 
         try (final Connection conn = plugin.getDatabaseController().getConnection();
-         final PreparedStatement ps = conn.prepareStatement(query.toString());
-         final ResultSet response = ps.executeQuery()) {
+             final PreparedStatement ps = conn.prepareStatement(query.toString());
+             final ResultSet response = ps.executeQuery()) {
 
-            if(response == null) {
+            if (response == null) {
                 plugin.getLogger().log(Level.WARNING, "Couldn't recover drop multiplier from database!");
                 return;
             }
@@ -202,8 +202,8 @@ public class DropMultiplier {
             @Override
             public void run() {
                 multiplierBossBar.removeAll();
-                if(!multiplier.isActive()) {
-                    if(activeCheck == true) {
+                if (!multiplier.isActive()) {
+                    if (activeCheck == true) {
                         activeCheck = false;
                         new Message("&cMnoznik dropu zakonczyl sie...").broadcastToTheServer();
                     }
@@ -233,19 +233,19 @@ public class DropMultiplier {
                 bossBarTitle.addLines("&cMnoznik dropu za chwile sie skonczy!");
                 bossBarTitle.setVariable(1, Float.toString(value));
                 bossBarTitle.setVariable(2, Integer.toString(leftTime));
-                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(leftTime==0? 2 : textSwitch? 0 : 1));
+                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(leftTime == 0 ? 2 : textSwitch ? 0 : 1));
 
                 multiplierBossBar.setProgress(percentage);
-                multiplierBossBar.setColor(percentage < 0.2d? BarColor.RED : BarColor.BLUE);
+                multiplierBossBar.setColor(percentage < 0.2d ? BarColor.RED : BarColor.BLUE);
 
-                for(final Player player : Bukkit.getOnlinePlayers()) {
+                for (final Player player : Bukkit.getOnlinePlayers()) {
                     multiplierBossBar.addPlayer(player);
                 }
             }
         };
 
-        if(multiplierBossBarRunnable != null)
-            multiplierBossBarRunnable.runTaskTimerAsynchronously(plugin, 10*20, 15*20);
+        if (multiplierBossBarRunnable != null)
+            multiplierBossBarRunnable.runTaskTimerAsynchronously(plugin, 10 * 20, 15 * 20);
     }
 
     public BossBar getMultiplierBossBar() {

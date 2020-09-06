@@ -48,8 +48,8 @@ public class Message {
         this.rawMessage.clear();
     }
 
-    public Message(@NotNull String ...message) {
-        for(final String line : message) {
+    public Message(@NotNull String... message) {
+        for (final String line : message) {
             this.rawMessage.add(line);
         }
 
@@ -57,7 +57,7 @@ public class Message {
     }
 
     public Message(@NotNull List<String> message) {
-        for(final String line : message) {
+        for (final String line : message) {
             this.rawMessage.add(line);
         }
 
@@ -65,20 +65,20 @@ public class Message {
     }
 
     public void broadcastToTheServer() {
-        for(final String line : this.message) {
-            Bukkit.getServer().broadcastMessage((usePrefixOnSend? linePrefix : "") + line);
+        for (final String line : this.message) {
+            Bukkit.getServer().broadcastMessage((usePrefixOnSend ? linePrefix : "") + line);
         }
     }
 
     public void send(@NotNull CommandSender target) {
-        for(final String line : this.message) {
-            target.sendMessage((usePrefixOnSend? linePrefix : "") + line);
+        for (final String line : this.message) {
+            target.sendMessage((usePrefixOnSend ? linePrefix : "") + line);
         }
     }
 
     public void sendActionMessage(@NotNull Player target) {
-        for(final String line : this.message) {
-            final BaseComponent chatComponent = new TextComponent((usePrefixOnSend? linePrefix : "") + line);
+        for (final String line : this.message) {
+            final BaseComponent chatComponent = new TextComponent((usePrefixOnSend ? linePrefix : "") + line);
             target.spigot().sendMessage(ChatMessageType.ACTION_BAR, chatComponent);
         }
     }
@@ -88,15 +88,15 @@ public class Message {
     }
 
     public void logToConsole(@NotNull final Level level, @Nullable final String signature) {
-        final String logPrefixSignature = signature == null? "" : signature + ": ";
+        final String logPrefixSignature = signature == null ? "" : signature + ": ";
 
-        for(final String line : this.message) {
+        for (final String line : this.message) {
             logger.log(level, logPrefixSignature + line);
         }
     }
 
-    public void addLines(@NotNull final String ...lines) {
-        for(final String line : lines) {
+    public void addLines(@NotNull final String... lines) {
+        for (final String line : lines) {
             this.rawMessage.add(line);
         }
 
@@ -104,7 +104,7 @@ public class Message {
     }
 
     public void addLines(@NotNull final List<String> lines) {
-        for(final String line : lines) {
+        for (final String line : lines) {
             this.rawMessage.add(line);
         }
 
@@ -131,7 +131,7 @@ public class Message {
     }
 
     private void insertVariableValues() {
-        for(int i=0; i<this.rawMessage.size(); i++) {
+        for (int i = 0; i < this.rawMessage.size(); i++) {
             final String currentLine = this.rawMessage.get(i);
             final String updatedLine = insertVariableValues(currentLine);
 
@@ -140,16 +140,16 @@ public class Message {
     }
 
     private String insertVariableValues(String line) {
-        for(int v : this.variables.keySet()) {
+        for (int v : this.variables.keySet()) {
             final String variable = capitalize(this.variables.get(v));
-            line = line.replace(("$_"+v), variable);
+            line = line.replace(("$_" + v), variable);
         }
 
         return line;
     }
 
     private void color() {
-        for(int i=0; i<this.rawMessage.size(); i++) {
+        for (int i = 0; i < this.rawMessage.size(); i++) {
             final String coloredLine = color(this.rawMessage.get(i));
             this.message.add(coloredLine);
         }
@@ -164,7 +164,7 @@ public class Message {
     }
 
     public static String color(String text) {
-        if(text == null || text.isEmpty()) {
+        if (text == null || text.isEmpty()) {
             return text;
         }
 
@@ -172,7 +172,7 @@ public class Message {
     }
 
     public static String simplePrepare(String textLine) {
-        if(textLine == null || textLine.isEmpty()) {
+        if (textLine == null || textLine.isEmpty()) {
             return textLine;
         }
 
@@ -184,7 +184,7 @@ public class Message {
     }
 
     public static String capitalize(String text) {
-        if(text == null || text.isEmpty()) {
+        if (text == null || text.isEmpty()) {
             return text;
         }
 
@@ -192,7 +192,7 @@ public class Message {
     }
 
     public static String replaceUnderlines(String text) {
-        if(text == null || text.isEmpty()) {
+        if (text == null || text.isEmpty()) {
             return text;
         }
 
