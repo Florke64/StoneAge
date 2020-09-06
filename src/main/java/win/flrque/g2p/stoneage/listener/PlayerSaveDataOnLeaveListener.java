@@ -38,7 +38,7 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
     }
 
     private void saveDropConfig(@NotNull PlayerConfig dropConfig) {
-        if(!dropConfig.hasUnsavedEdits()) {
+        if (!dropConfig.hasUnsavedEdits()) {
             return;
         }
 
@@ -46,16 +46,10 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
 
             @Override
             public void run() {
-                try {
-                    final int response = plugin.getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
+                final int response = plugin.getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
 
-                    if(response == 0) {
-                        plugin.getLogger().log(Level.WARNING, "Database executeUpdate() successful but responded with 0.");
-                    }
-                } catch (SQLException ex) {
-                    plugin.getLogger().log(Level.SEVERE, "Unable to save Personal Configuration for " + dropConfig.getUniqueId() + ".");
-                    ex.printStackTrace();
-                    return;
+                if (response == 0) {
+                    plugin.getLogger().log(Level.WARNING, "Database executeUpdate() successful but responded with 0.");
                 }
 
                 plugin.getLogger().log(Level.INFO, "Saved Personal Configuration for " + dropConfig.getUniqueId() + ".");
@@ -64,7 +58,7 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
     }
 
     private void saveDropStatistics(@NotNull PlayerStats dropStats) {
-        if(!dropStats.hasUnsavedEdits()) {
+        if (!dropStats.hasUnsavedEdits()) {
             return;
         }
 
@@ -72,16 +66,10 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
 
             @Override
             public void run() {
-                try {
-                    final int response = plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+                final int response = plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
 
-                    if(response == 0) {
-                        plugin.getLogger().log(Level.WARNING, "Database executeUpdate() successful but responded with 0.");
-                    }
-                } catch (SQLException ex) {
-                    plugin.getLogger().log(Level.SEVERE, "Unable to update PersonalStoneStats in database!");
-                    ex.printStackTrace();
-                    return;
+                if (response == 0) {
+                    plugin.getLogger().log(Level.WARNING, "Database executeUpdate() successful but responded with 0.");
                 }
 
                 plugin.getLogger().log(Level.INFO, "Saved Personal Drop Stats for " + dropStats.getUniqueId() + ".");
