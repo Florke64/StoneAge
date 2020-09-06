@@ -188,8 +188,6 @@ public class DropMultiplier {
 
         plugin.getLogger().log(Level.INFO, "Initialized Multiplier visualization via Boss Bar.");
 
-        final DropMultiplier multiplier = plugin.getDropCalculator().getDropMultiplier();
-
         final NamespacedKey bossBarKey = new NamespacedKey(plugin, "multiplier_bossbar");
         multiplierBossBar = Bukkit.createBossBar(bossBarKey, ChatColor.RED + "Go2Play", BarColor.BLUE, BarStyle.SEGMENTED_10);
         multiplierBossBar.setVisible(false);
@@ -202,7 +200,7 @@ public class DropMultiplier {
             @Override
             public void run() {
                 multiplierBossBar.removeAll();
-                if (!multiplier.isActive()) {
+                if (!DropMultiplier.this.isActive()) {
                     if (activeCheck == true) {
                         activeCheck = false;
                         new Message("&cMnoznik dropu zakonczyl sie...").broadcastToTheServer();
@@ -214,38 +212,43 @@ public class DropMultiplier {
 
                 activeCheck = true;
 
-                updateBossBar();
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        updateBossBar(textSwitch);
+                        multiplierBossBar.setVisible(true);
 
-                multiplierBossBar.setVisible(true);
+                    }
+                }.runTaskAsynchronously(plugin);
+
                 this.textSwitch = !this.textSwitch;
-            }
-
-            private void updateBossBar() {
-                final long fullTime = ((multiplier.getMultiplierTimeout() - multiplier.getMultiplierStartTime()) / 1000) / 60;
-                final int leftTime = multiplier.getMinutesLeft();
-                final float value = multiplier.getCurrentDropMultiplier();
-
-                final double percentage = ((double) leftTime / (double) fullTime);
-
-                final Message bossBarTitle = new Message();
-                bossBarTitle.addLines("&6Mnoznik dropu: &7x&c$_1 &6(aktywny przez &c$_2&7min&6)");
-                bossBarTitle.addLines("&eMnoznik dropu z kamienia aktywny, nie przegap okazji!");
-                bossBarTitle.addLines("&cMnoznik dropu za chwile sie skonczy!");
-                bossBarTitle.setVariable(1, Float.toString(value));
-                bossBarTitle.setVariable(2, Integer.toString(leftTime));
-                multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(leftTime == 0 ? 2 : textSwitch ? 0 : 1));
-
-                multiplierBossBar.setProgress(percentage);
-                multiplierBossBar.setColor(percentage < 0.2d ? BarColor.RED : BarColor.BLUE);
-
-                for (final Player player : Bukkit.getOnlinePlayers()) {
-                    multiplierBossBar.addPlayer(player);
-                }
             }
         };
 
-        if (multiplierBossBarRunnable != null)
-            multiplierBossBarRunnable.runTaskTimerAsynchronously(plugin, 10 * 20, 15 * 20);
+        multiplierBossBarRunnable.runTaskTimerAsynchronously(plugin, 10 * 20, 15 * 20);
+    }
+
+    private void updateBossBar(final boolean textSwitch) {
+        final long fullTime = ((getMultiplierTimeout() - getMultiplierStartTime()) / 1000) / 60;
+        final int leftTime = getMinutesLeft();
+        final float value = getCurrentDropMultiplier();
+
+        final double percentage = ((double) leftTime / (double) fullTime);
+
+        final Message bossBarTitle = new Message();
+        bossBarTitle.addLines("&6Mnoznik dropu: &7x&c$_1 &6(aktywny przez &c$_2&7min&6)");
+        bossBarTitle.addLines("&eMnoznik dropu z kamienia aktywny, nie przegap okazji!");
+        bossBarTitle.addLines("&cMnoznik dropu za chwile sie skonczy!");
+        bossBarTitle.setVariable(1, Float.toString(value));
+        bossBarTitle.setVariable(2, Integer.toString(leftTime));
+        multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(leftTime == 0 ? 2 : textSwitch ? 0 : 1));
+
+        multiplierBossBar.setProgress(percentage);
+        multiplierBossBar.setColor(percentage < 0.2d ? BarColor.RED : BarColor.BLUE);
+
+        for (final Player player : Bukkit.getOnlinePlayers()) {
+            multiplierBossBar.addPlayer(player);
+        }
     }
 
     public BossBar getMultiplierBossBar() {
