@@ -35,7 +35,7 @@ public class PlayerStats {
         this.uuid = uuid;
         this.playerName = playerName;
 
-        this.minerExp = 0;
+        this.minerExp = plugin.getExpCalculator().INITIAL_XP;
         this.minerLvl = 1;
 
         statistics.put(plugin.getDropCalculator().getPrimitiveDropEntry().getEntryName(), 0);

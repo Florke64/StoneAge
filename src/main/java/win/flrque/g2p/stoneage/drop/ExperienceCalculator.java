@@ -17,7 +17,7 @@ public class ExperienceCalculator {
 
     private final StoneAge plugin;
 
-    public final long INITIAL_EXP_NEEDED = 300;
+    public final long INITIAL_XP = 500;
 
     private int maximumMinerLevel = 99;
 
@@ -40,20 +40,24 @@ public class ExperienceCalculator {
         return lvl;
     }
 
-    //TODO: Make config file ?
     private void initExperienceTableValues() {
-        final int start_i = 2;
+        final int start_x = 1;
         final int maxLevel = getMaximumMinerLevel();
 
         experienceTable.clear();
 
-        for(int i = start_i; i <= (maxLevel); i++) {
-            if(i == start_i) {
-                experienceTable.add(INITIAL_EXP_NEEDED);
+        for(int x = start_x; x <= (maxLevel); x++) {
+            double nextLevelFormula = (double) INITIAL_XP;
+            if(x == start_x) {
+                nextLevelFormula += (double) INITIAL_XP;
             } else {
-                final double nextLevelFormula = (i-1) * Math.ceil((double) i/ 3.0d) * (300d * Math.ceil((double) i/150.0d));
-                experienceTable.add((long) nextLevelFormula);
+                nextLevelFormula +=(double) experienceTable.get(experienceTable.size()-1);
             }
+            nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) x / 10d) * Math.pow(2, 0));
+            nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) x / 50d) * Math.pow(2, 16));
+            nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) x / 100d) * Math.pow(2, 16)) * 2;
+
+            experienceTable.add((long) nextLevelFormula);
         }
 
         final Message success = new Message("ExperienceTable: Generated new Experience Table ($_1 level(s)) from the math formula.");

@@ -288,7 +288,8 @@ public final class StoneAge extends JavaPlugin {
         // Plugin shutdown logic
         this.getLogger().log(Level.INFO, "Called plugin's onDisable() method. Bye cruel world!");
 
-        getDropCalculator().getDropMultiplier().getMultiplierBossBar().removeAll();
+        if(getDropCalculator() != null && getDropCalculator().getDropMultiplier() != null && getDropCalculator().getDropMultiplier().getMultiplierBossBar() != null)
+            getDropCalculator().getDropMultiplier().getMultiplierBossBar().removeAll();
 
         this.getLogger().log(Level.INFO, "Closing all Window Manager's GUIs... ");
         getWindowManager().closeAllWindows();
