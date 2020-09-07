@@ -35,11 +35,8 @@ public class WindowClickListener implements Listener {
             return;
 
         final Player player = (Player) event.getWhoClicked();
-        if (player == null) return;
 
-        // Null-checking.
         final Inventory clickedInventory = event.getWhoClicked().getOpenInventory().getTopInventory();
-        if (clickedInventory == null) return;
 
         // Checking if clicked Inventory matches one of the supported Windows.
         final WindowManager manager = plugin.getWindowManager();
