@@ -13,6 +13,7 @@ public enum LogTag {
     START_UP("start-up"),
     CONFIG("config"),
     AUTO_SAVE("auto-save"),
+    DATABASE("database"),
     DEBUG("debug"),;
 
     private final String logSignature;
