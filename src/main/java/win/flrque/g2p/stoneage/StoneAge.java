@@ -238,6 +238,9 @@ public final class StoneAge extends JavaPlugin {
         return playersData;
     }
 
+    /**
+     * @see StoneMachine
+     */
     public StoneMachine getStoneMachine() {
         return this.stoneMachine;
     }
