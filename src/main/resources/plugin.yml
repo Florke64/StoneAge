@@ -1,11 +1,11 @@
-name: StoneAge
+name: ${project.artifactId}
 version: ${project.version}
-main: win.flrque.g2p.stoneage.StoneAge
+main: ${project.groupId}.StoneAge
 api-version: 1.15
-prefix: StoneMachines
+prefix: ${project.name}
 authors: [FlrQue]
-description: Spigot Plugin adding stone generator machines.
-website: https://www.flrque.win/
+description: ${project.description}
+website: ${project.url}
 
 commands:
   drop:
