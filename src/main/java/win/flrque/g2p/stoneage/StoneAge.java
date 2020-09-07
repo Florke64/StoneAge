@@ -7,6 +7,8 @@
 package win.flrque.g2p.stoneage;
 
 import org.bukkit.Material;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -77,17 +79,30 @@ public final class StoneAge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DropMultiplierCallListener(), this);
 
         //Registering Plugin Commands
-        getCommand("drop").setExecutor(new DropCommand());
-        getCommand("drophelp").setExecutor(new DropHelpCommand());
-        getCommand("dropstat").setExecutor(new DropStatCommand());
-        getCommand("multiplier").setExecutor(new DropMultiplierCommand());
-        getCommand("dropspamdb").setExecutor(new DropSpamDBCommand());
+        registerPluginCommandExecutor("drop", new DropCommand());
+        registerPluginCommandExecutor("drophelp", new DropHelpCommand());
+        registerPluginCommandExecutor("dropstat", new DropStatCommand());
+        registerPluginCommandExecutor("multiplier", new DropMultiplierCommand());
+        registerPluginCommandExecutor("dropspamdb", new DropSpamDBCommand());
 
         //TODO: Add this setting to the config.yml (open issue #17)
         final long period = 15; // autosave period in minutes
 
         getDatabaseController().initAsyncAutosave(period);
         getDropCalculator().getDropMultiplier().initMultiplierBossBar();
+    }
+
+    private void registerPluginCommandExecutor(@NotNull final String commandLabel, @NotNull final CommandExecutor commandExecutor) {
+        final PluginCommand command = getCommand(commandLabel);
+        if (command == null) {
+            final Message error = new Message("&4Couldn't set CommandExecutor for /$_1: Command is null!");
+            error.setVariable(1, commandLabel);
+            error.logToConsole(Level.SEVERE, LogTag.START_UP);
+
+            return;
+        }
+
+        command.setExecutor(commandExecutor);
     }
 
     private void initStoneMachines() {
@@ -172,14 +187,6 @@ public final class StoneAge extends JavaPlugin {
             loadingMessage.logToConsole(Level.INFO, LogTag.DEBUG);
 
             final DropEntryConfigReader customDropEntry = new DropEntryConfigReader(customDropsSection.getConfigurationSection(entryName));
-
-            if (customDropEntry == null) {
-                final Message success = new Message("\"Custom Drop Entry equals null value! Skipping the \"$_1\"...");
-                success.setVariable(1, entryName);
-                success.logToConsole(Level.SEVERE, LogTag.CONFIG);
-
-                continue;
-            }
 
             dropCalculator.addDrop(customDropEntry.compileDropEntry());
 
