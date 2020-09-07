@@ -26,6 +26,8 @@ import win.flrque.g2p.stoneage.gui.WindowManager;
 import win.flrque.g2p.stoneage.listener.*;
 import win.flrque.g2p.stoneage.machine.ApplicableTools;
 import win.flrque.g2p.stoneage.machine.StoneMachine;
+import win.flrque.g2p.stoneage.util.LogTag;
+import win.flrque.g2p.stoneage.util.Message;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -97,13 +99,17 @@ public final class StoneAge extends JavaPlugin {
 
     @Override
     public void reloadConfig() {
-        getLogger().log(Level.INFO, "Reloading configuration file...");
+        new Message("Reloading the configuration file...").logToConsole(Level.INFO, LogTag.CONFIG);
         super.reloadConfig();
 
         //Reading 'General' configuration for Stone Machines
         if (!getConfig().isConfigurationSection("machines")) {
-            getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"machines\" section)!");
-            getLogger().log(Level.SEVERE, this.getName() + " plugin will now be disabled.");
+            final Message error = new Message();
+            error.addLines("Invalid Configuration file (missing the \"machines\" section)!");
+            error.addLines("$_1 plugin will now be disabled.");
+            error.setVariable(1, this.getName());
+            error.logToConsole(Level.SEVERE, LogTag.CONFIG);
+
             getPluginLoader().disablePlugin(this);
             return;
         }
@@ -133,8 +139,12 @@ public final class StoneAge extends JavaPlugin {
 
         //Reading Primitive Stone drop
         if (!getConfig().isConfigurationSection("primitive_drop")) {
-            getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"primitive_drop\" section)!");
-            getLogger().log(Level.SEVERE, this.getName() + " plugin will now be disabled.");
+            final Message error = new Message();
+            error.addLines("Invalid Configuration file (missing the \"primitive_drop\" section)!");
+            error.addLines("$_1 plugin will now be disabled.");
+            error.setVariable(1, this.getName());
+            error.logToConsole(Level.SEVERE, LogTag.CONFIG);
+
             getPluginLoader().disablePlugin(this);
             return;
         }
@@ -144,35 +154,53 @@ public final class StoneAge extends JavaPlugin {
 
         //Reading Custom Stone drop
         if (!getConfig().isConfigurationSection("custom_drops")) {
-            getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"custom_drops\" section)!");
-            getLogger().log(Level.SEVERE, "Skipping, stone will drop server-default items.");
+            final Message error = new Message();
+            error.addLines("Invalid Configuration file (missing the \"custom_drops\" section)!");
+            error.addLines("Skipping, stone will drop server-default items.");
+            error.logToConsole(Level.SEVERE, LogTag.CONFIG);
+
             return;
         }
 
-        int customDropsCount = 0;
+        int customDropsLoaded = 0, customDropsFound = 0;
         final ConfigurationSection customDropsSection = getConfig().getConfigurationSection("custom_drops");
         for (String entryName : customDropsSection.getKeys(false)) {
+            customDropsFound++;
 
-            getLogger().log(Level.INFO, "Attempting to load drop entry: " + entryName);
+            final Message loadingMessage = new Message("Attempting to load drop entry: $_1");
+            loadingMessage.setVariable(1, entryName);
+            loadingMessage.logToConsole(Level.INFO, LogTag.DEBUG);
 
             final DropEntryConfigReader customDropEntry = new DropEntryConfigReader(customDropsSection.getConfigurationSection(entryName));
 
             if (customDropEntry == null) {
-                getLogger().log(Level.SEVERE, "Custom Drop Entry equals null value! Skipping...");
+                final Message success = new Message("\"Custom Drop Entry equals null value! Skipping the \"$_1\"...");
+                success.setVariable(1, entryName);
+                success.logToConsole(Level.SEVERE, LogTag.CONFIG);
+
                 continue;
             }
 
             dropCalculator.addDrop(customDropEntry.compileDropEntry());
 
-            getLogger().log(Level.INFO, "Loaded custom drop: " + entryName);
+            final Message success = new Message("Loaded a custom drop: $_1");
+            success.setVariable(1, entryName);
+            success.logToConsole(Level.INFO, LogTag.CONFIG);
 
-            customDropsCount++;
+            customDropsLoaded++;
         }
+
+        final Message customDropsInfo = new Message("Loaded $_1 of $_2 custom drop entries.");
+        customDropsInfo.setVariable(1, Integer.toString(customDropsLoaded));
+        customDropsInfo.setVariable(2, Integer.toString(customDropsFound));
+        customDropsInfo.logToConsole(LogTag.CONFIG);
 
         //Reading 'database' configuration
         if (!getConfig().isConfigurationSection("database")) {
-            getLogger().log(Level.SEVERE, "Invalid Configuration file (missing \"database\" section)!");
-            getLogger().log(Level.SEVERE, "Skipping, database won't work.");
+            final Message error = new Message();
+            error.addLines("Invalid Configuration file (missing the \"database\" section)!");
+            error.addLines("Skipping, database won't work.");
+            error.logToConsole(Level.SEVERE, LogTag.CONFIG);
         } else {
             final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(getConfig().getConfigurationSection("database"));
             databaseConfig.readDatabaseConnectionDetails();
@@ -189,16 +217,21 @@ public final class StoneAge extends JavaPlugin {
 
                     final long dbLoadFinishTime = System.currentTimeMillis();
 
-                    getLogger().log(Level.INFO, "Loaded drop stats and config from database (in number of " + statsCount + " and " + configsCount + ")");
-                    getLogger().log(Level.INFO, "Loading from database took " + (dbLoadFinishTime - dbLoadStartTime) + "ms");
+                    final Message success = new Message();
+                    success.addLines("Loaded PlayerStats ($_1) and PlayerConfigs ($_2) from the database");
+                    success.addLines("Loading took $_3ms");
+                    success.setVariable(1, Integer.toString(statsCount));
+                    success.setVariable(2, Integer.toString(configsCount));
+                    success.setVariable(3, Long.toString(dbLoadFinishTime - dbLoadStartTime));
+                    success.logToConsole(Level.INFO, LogTag.DATABASE);
+
                 }
             }.runTaskAsynchronously(this);
 
             getDropCalculator().getDropMultiplier().readPreviousMultiplierFromDatabase();
         }
 
-        getLogger().log(Level.FINE, "Config reloaded!");
-        getLogger().log(Level.INFO, "Loaded " + customDropsCount + " custom drop entries.");
+        new Message("Config reloaded!").logToConsole(Level.INFO, LogTag.CONFIG);
     }
 
     public PlayersData getPlayerSetup() {
