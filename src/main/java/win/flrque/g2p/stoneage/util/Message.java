@@ -17,10 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import win.flrque.g2p.stoneage.StoneAge;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,9 +30,9 @@ public class Message {
     private String linePrefix = "&l&8> ";
 
     //TODO: Automatically color different data types
-    private ChatColor genericTextColor = ChatColor.GRAY;
-    private ChatColor variableValueColor = ChatColor.RED;
-    private ChatColor numberValueColor = ChatColor.GOLD;
+//    private ChatColor genericTextColor = ChatColor.GRAY;
+//    private ChatColor variableValueColor = ChatColor.RED;
+//    private ChatColor numberValueColor = ChatColor.GOLD;
 
     private final Map<Integer, String> variables = new HashMap<>();
 
@@ -46,22 +43,14 @@ public class Message {
 
     private boolean usePrefixOnSend = false;
 
-    public Message() {
-        this.rawMessage.clear();
-    }
-
     public Message(@NotNull String... message) {
-        for (final String line : message) {
-            this.rawMessage.add(line);
-        }
+        this.rawMessage.addAll(Arrays.asList(message));
 
         prepare();
     }
 
     public Message(@NotNull List<String> message) {
-        for (final String line : message) {
-            this.rawMessage.add(line);
-        }
+        this.rawMessage.addAll(message);
 
         prepare();
     }
@@ -85,22 +74,27 @@ public class Message {
         }
     }
 
+    @SuppressWarnings("unused")
     public void logToConsole() {
         logToConsole(Level.INFO, (String) null);
     }
 
+    @SuppressWarnings("unused")
     public void logToConsole(@Nullable final String signature) {
         logToConsole(Level.INFO, signature);
     }
 
+    @SuppressWarnings("unused")
     public void logToConsole(@NotNull final LogTag logTag) {
         logToConsole(Level.INFO, logTag.toString());
     }
 
+    @SuppressWarnings("unused")
     public void logToConsole(@NotNull final Level level) {
         logToConsole(level, (String) null);
     }
 
+    @SuppressWarnings("unused")
     public void logToConsole(@NotNull final Level level, @NotNull final LogTag logTag) {
         logToConsole(level, logTag.toString());
     }
@@ -116,27 +110,27 @@ public class Message {
         }
     }
 
+    @SuppressWarnings("unused")
     public void addLines(@NotNull final String... lines) {
-        for (final String line : lines) {
-            this.rawMessage.add(line);
-        }
+        this.rawMessage.addAll(Arrays.asList(lines));
 
         prepare();
     }
 
+    @SuppressWarnings("unused")
     public void addLines(@NotNull final List<String> lines) {
-        for (final String line : lines) {
-            this.rawMessage.add(line);
-        }
+        this.rawMessage.addAll(lines);
 
         prepare();
     }
 
+    @SuppressWarnings("unused")
     public void clear() {
         this.rawMessage.clear();
         this.message.clear();
     }
 
+    @SuppressWarnings("unused")
     public void setVariable(int n, String value) {
         this.variables.put(n, value);
 
@@ -170,16 +164,18 @@ public class Message {
     }
 
     private void color() {
-        for (int i = 0; i < this.rawMessage.size(); i++) {
-            final String coloredLine = color(this.rawMessage.get(i));
+        for (String s : this.rawMessage) {
+            final String coloredLine = color(s);
             this.message.add(coloredLine);
         }
     }
 
+    @SuppressWarnings("unused")
     public void setUsePrefixOnSend(boolean usePrefix) {
         this.usePrefixOnSend = usePrefix;
     }
 
+    @SuppressWarnings("unused")
     public boolean isUsingPrefixOnSend() {
         return usePrefixOnSend;
     }
@@ -226,6 +222,11 @@ public class Message {
 
     public List<String> getPreparedMessage() {
         return this.message;
+    }
+
+    @Nullable
+    public String getPreparedLine(final int n) {
+        return this.message.get(n);
     }
 
     @SuppressWarnings("unused")
