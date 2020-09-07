@@ -49,7 +49,7 @@ public class ApplicableTools {
     }
 
     public boolean isMachineDestroyTool(@NotNull final ItemStack tool) {
-        return tool != null && isMachineDestroyTool(tool.getType());
+        return isMachineDestroyTool(tool.getType());
     }
 
     public boolean isMachineDestroyTool(@NotNull final Material tool) {
