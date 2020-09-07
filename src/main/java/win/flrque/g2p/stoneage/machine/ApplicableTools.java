@@ -28,6 +28,7 @@ public class ApplicableTools {
         return machineDestroyTool;
     }
 
+    @SuppressWarnings("unused")
     public Set<Material> getApplicableToolsSet() {
         return toolLevelMap.keySet();
     }
@@ -53,7 +54,7 @@ public class ApplicableTools {
     }
 
     public boolean isMachineDestroyTool(@NotNull final Material tool) {
-        return machineDestroyTool == tool;
+        return tool == getMachineDestroyTool();
     }
 
 }
