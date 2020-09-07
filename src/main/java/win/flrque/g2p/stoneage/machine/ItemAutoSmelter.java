@@ -25,6 +25,9 @@ public class ItemAutoSmelter {
 
     public static final int MAGIC_COAL_SLOT = 1;
 
+    // Equivalent of Math.pow(2, 24) = 2^24
+    public static final int MAX_FUEL_CAPACITY = 1 << 24;
+
     private final StoneAge plugin;
 
     private final List<FurnaceRecipe> smeltingRecipeList = new ArrayList<>();
@@ -128,7 +131,7 @@ public class ItemAutoSmelter {
                 return false;
             }
 
-            if (availableSmeltingUses >= 16_777_216)
+            if (availableSmeltingUses >= MAX_FUEL_CAPACITY)
                 return false;
 
             final ItemMeta coalIm = magicCoal.getItemMeta();
