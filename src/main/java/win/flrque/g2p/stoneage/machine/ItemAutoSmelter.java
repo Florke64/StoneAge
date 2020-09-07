@@ -139,6 +139,7 @@ public class ItemAutoSmelter {
         return true;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean hasAutoSmelting(@NotNull final Inventory machineInventory) {
         final ItemStack magicCoal = machineInventory.getItem(ItemAutoSmelter.MAGIC_COAL_SLOT);
 
@@ -148,7 +149,8 @@ public class ItemAutoSmelter {
         }
 
         //Some weird bug, this is not a real "magic coal"
-        return magicCoal.getItemMeta().hasDisplayName();
+        final ItemMeta coalMeta = magicCoal.getItemMeta();
+        return coalMeta != null && magicCoal.getItemMeta().hasDisplayName();
     }
 
 }
