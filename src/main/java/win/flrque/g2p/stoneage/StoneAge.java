@@ -113,7 +113,7 @@ public final class StoneAge extends JavaPlugin {
     }
 
     @Override
-    public void reloadConfig() {
+    public void reloadConfig() throws AssertionError {
         new Message("Reloading the configuration file...").logToConsole(Level.INFO, LogTag.CONFIG);
         super.reloadConfig();
 
@@ -179,22 +179,30 @@ public final class StoneAge extends JavaPlugin {
 
         int customDropsLoaded = 0, customDropsFound = 0;
         final ConfigurationSection customDropsSection = getConfig().getConfigurationSection("custom_drops");
-        for (String entryName : customDropsSection.getKeys(false)) {
-            customDropsFound++;
 
-            final Message loadingMessage = new Message("Attempting to load drop entry: $_1");
-            loadingMessage.setVariable(1, entryName);
-            loadingMessage.logToConsole(Level.INFO, LogTag.DEBUG);
+        if (customDropsSection == null) {
+            final Message error = new Message();
+            error.addLines("Invalid Configuration file (missing the \"custom_drops\" section)!");
+            error.addLines("Skipping, Stone will drop server-default values.");
+            error.logToConsole(Level.SEVERE, LogTag.CONFIG);
+        } else {
+            for (String entryName : customDropsSection.getKeys(false)) {
+                customDropsFound++;
 
-            final DropEntryConfigReader customDropEntry = new DropEntryConfigReader(customDropsSection.getConfigurationSection(entryName));
+                final Message loadingMessage = new Message("Attempting to load drop entry: $_1");
+                loadingMessage.setVariable(1, entryName);
+                loadingMessage.logToConsole(Level.INFO, LogTag.DEBUG);
 
-            dropCalculator.addDrop(customDropEntry.compileDropEntry());
+                final DropEntryConfigReader customDropEntry = new DropEntryConfigReader(customDropsSection.getConfigurationSection(entryName));
 
-            final Message success = new Message("Loaded a custom drop: $_1");
-            success.setVariable(1, entryName);
-            success.logToConsole(Level.INFO, LogTag.CONFIG);
+                dropCalculator.addDrop(customDropEntry.compileDropEntry());
 
-            customDropsLoaded++;
+                final Message success = new Message("Loaded a custom drop: $_1");
+                success.setVariable(1, entryName);
+                success.logToConsole(Level.INFO, LogTag.CONFIG);
+
+                customDropsLoaded++;
+            }
         }
 
         final Message customDropsInfo = new Message("Loaded $_1 of $_2 custom drop entries.");
