@@ -46,7 +46,7 @@ public class StoneMachine {
 
     private final Map<Dispenser, Long> lastStoneMachineRepair = new HashMap<>();
 
-    private long stoneRespawnFrequency = 40l;
+    private long stoneRespawnFrequency = 40L;
     private int repairCooldown = 5;
 
     private boolean allowHopperOutput = false;
@@ -75,6 +75,8 @@ public class StoneMachine {
 
         this.machineLabel = new ItemStack(Material.PAPER, 1);
         final ItemMeta im = this.machineLabel.getItemMeta();
+
+        assert im != null;
         im.setLore(this.machineLore);
         im.setDisplayName(this.machineName);
 
@@ -219,7 +221,7 @@ public class StoneMachine {
      * @param delay    value in server ticks to wait and place block.
      */
     public void generateStone(@NotNull final Location location, final long delay) {
-        final Block block = location.getWorld().getBlockAt(location);
+        final Block block = Objects.requireNonNull(location.getWorld()).getBlockAt(location);
 
         new BukkitRunnable() {
             @Override
@@ -264,6 +266,7 @@ public class StoneMachine {
         final ItemMeta meta = item.getItemMeta();
 
         //TODO: Add appropriate configuration sections (issue #18)
+        assert meta != null;
         meta.setDisplayName(machineName);
         meta.setLore(machineLore);
 
