@@ -3,6 +3,11 @@
 
 Spigot Plugin adding stone generator machines.
 
+### Latest Release
+
+The latest release details can be seen [here](https://github.com/FlrQue/StoneAge/releases/latest)
+(what's new and *.jar downloads).
+
 ### API
 An API usage will be explained later (issue #20).
 
