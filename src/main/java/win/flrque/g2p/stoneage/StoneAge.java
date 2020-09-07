@@ -37,7 +37,7 @@ public final class StoneAge extends JavaPlugin {
     private StoneMachine stoneMachine;
     private ApplicableTools applicableTools;
     private CommandExecutionController commandExecutionController;
-    private PlayersData playerSetup;
+    private PlayersData playersData;
 
     private WindowManager windowManager;
     private DropCalculator dropCalculator;
@@ -51,7 +51,7 @@ public final class StoneAge extends JavaPlugin {
         windowManager = new WindowManager();
         dropCalculator = new DropCalculator();
         expCalculator = new ExperienceCalculator();
-        playerSetup = new PlayersData();
+        playersData = new PlayersData();
 
         initStoneMachines();
         stoneMachine.registerCraftingRecipe();
@@ -212,8 +212,8 @@ public final class StoneAge extends JavaPlugin {
                     final long dbLoadStartTime = System.currentTimeMillis();
 
                     //Loading data of all players from database
-                    final int statsCount = playerSetup.loadPersonalStoneStatsFromDatabase();
-                    final int configsCount = playerSetup.loadPersonalDropConfigFromDatabase();
+                    final int statsCount = playersData.loadPersonalStoneStatsFromDatabase();
+                    final int configsCount = playersData.loadPersonalDropConfigFromDatabase();
 
                     final long dbLoadFinishTime = System.currentTimeMillis();
 
@@ -234,8 +234,8 @@ public final class StoneAge extends JavaPlugin {
         new Message("Config reloaded!").logToConsole(Level.INFO, LogTag.CONFIG);
     }
 
-    public PlayersData getPlayerSetup() {
-        return playerSetup;
+    public PlayersData getPlayersData() {
+        return playersData;
     }
 
     public StoneMachine getStoneMachine() {
@@ -284,7 +284,7 @@ public final class StoneAge extends JavaPlugin {
         getWindowManager().closeAllWindows();
 
         this.getLogger().log(Level.INFO, "Syncing all unsaved data with the databasse...");
-        playerSetup.onDisable();
+        playersData.onDisable();
 
         this.getLogger().log(Level.INFO, "Disconnecting database, closing connection pool...");
         sqlManager.onDisable();

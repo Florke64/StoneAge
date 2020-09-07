@@ -37,7 +37,7 @@ public class StatisticsIncreaseListener implements Listener {
         }
 
         final UUID playerUUID = player.getUniqueId();
-        final PlayerStats playerStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
+        final PlayerStats playerStats = plugin.getPlayersData().getPlayerStoneMachineStats(playerUUID);
 
         final DropLoot dropLoot = event.getLoot();
         if (dropLoot == null) {

@@ -106,7 +106,7 @@ public class DropCalculator {
 
         final DropLoot dropLoot = new DropLoot();
 
-        final PlayersData playerSetup = plugin.getPlayerSetup();
+        final PlayersData playerSetup = plugin.getPlayersData();
         final PlayerConfig dropConfig = playerSetup.getPersonalDropConfig(player.getUniqueId());
         final PlayerStats playerStats = playerSetup.getPlayerStoneMachineStats(player.getUniqueId());
 

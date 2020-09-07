@@ -151,7 +151,7 @@ public class StoneBreakListener implements Listener {
                 continue;
             }
 
-            final PlayerStats stats = this.plugin.getPlayerSetup().getPlayerStoneMachineStats(player.getUniqueId());
+            final PlayerStats stats = this.plugin.getPlayersData().getPlayerStoneMachineStats(player.getUniqueId());
             stats.addMinerExp(drop.getMinerExp());
 
             //Drop to hopper under the Stone Machine

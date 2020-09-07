@@ -382,11 +382,11 @@ public class SQLManager {
 
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             final UUID playerUUID = player.getUniqueId();
-            final PlayerConfig dropConfig = plugin.getPlayerSetup().getPersonalDropConfig(playerUUID);
-            final PlayerStats dropStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
+            final PlayerConfig dropConfig = plugin.getPlayersData().getPersonalDropConfig(playerUUID);
+            final PlayerStats dropStats = plugin.getPlayersData().getPlayerStoneMachineStats(playerUUID);
 
-            plugin.getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
-            plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+            plugin.getPlayersData().savePersonalDropConfigInDatabase(dropConfig);
+            plugin.getPlayersData().savePersonalStoneStatsInDatabase(dropStats);
 
             savedCount++;
         }

@@ -33,7 +33,7 @@ public class DropStatCommand implements CommandExecutor {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
         this.executionController = plugin.getCommandExecutionController();
 
-        this.playerSetupManager = plugin.getPlayerSetup();
+        this.playerSetupManager = plugin.getPlayersData();
         this.dropCalculator = plugin.getDropCalculator();
         this.experienceCalculator = plugin.getExpCalculator();
     }

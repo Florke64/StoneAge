@@ -55,7 +55,7 @@ public class PlayersData {
         final String databaseName = plugin.getDatabaseController().getDatabaseName();
         final String queryStatement = "SELECT * FROM " + databaseName + ".`" + SQLManager.TABLE_PLAYER_STATS + "`";
 
-        final PlayersData playerSetup = plugin.getPlayerSetup();
+        final PlayersData playerSetup = plugin.getPlayersData();
 
         try (final Connection conn = plugin.getDatabaseController().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
@@ -108,7 +108,7 @@ public class PlayersData {
         final String databaseName = plugin.getDatabaseController().getDatabaseName();
         final String queryStatement = "SELECT * FROM " + databaseName + ".`" + SQLManager.TABLE_PLAYER_DROP_CONFIG + "`";
 
-        final PlayersData playerSetup = plugin.getPlayerSetup();
+        final PlayersData playerSetup = plugin.getPlayersData();
 
         try (final Connection conn = plugin.getDatabaseController().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);

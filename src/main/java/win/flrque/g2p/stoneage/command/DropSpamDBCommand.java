@@ -23,7 +23,7 @@ public class DropSpamDBCommand implements CommandExecutor {
 
     public DropSpamDBCommand() {
         plugin = StoneAge.getPlugin(StoneAge.class);
-        playerSetup = plugin.getPlayerSetup();
+        playerSetup = plugin.getPlayersData();
     }
 
     /**

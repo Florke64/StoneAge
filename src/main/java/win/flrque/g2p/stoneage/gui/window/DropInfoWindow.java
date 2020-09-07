@@ -37,14 +37,14 @@ public class DropInfoWindow extends Window {
         super(ChatColor.translateAlternateColorCodes('&', "&7&lSTONIARKA &8&l> &5&lDROP INFO"));
 
         windowContentOwner = owner;
-        personalDropConfig = plugin.getPlayerSetup().getPersonalDropConfig(windowContentOwner.getUniqueId());
+        personalDropConfig = plugin.getPlayersData().getPersonalDropConfig(windowContentOwner.getUniqueId());
     }
 
     @Override
     public void updateInventoryContent() {
 
         final DropCalculator calculator = plugin.getDropCalculator();
-        final PlayerStats stats = plugin.getPlayerSetup().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
+        final PlayerStats stats = plugin.getPlayersData().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
 
         for (int i = 0; i <= calculator.getDropEntries().size(); i++) {
             if (i >= inventory.getSize()) {
@@ -141,7 +141,7 @@ public class DropInfoWindow extends Window {
         //Closing to reduce inventory update lag
         player.closeInventory();
 
-        boolean isDropping = plugin.getPlayerSetup().getPersonalDropConfig(player.getUniqueId()).switchDropEntry(dropEntry);
+        boolean isDropping = plugin.getPlayersData().getPersonalDropConfig(player.getUniqueId()).switchDropEntry(dropEntry);
 
         final Message infoMessage = new Message("&7Ustawiono drop &c$_1 &7na $_2&7.");
         infoMessage.setVariable(1, dropEntry.getCustomName());

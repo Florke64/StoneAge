@@ -15,7 +15,6 @@ import win.flrque.g2p.stoneage.StoneAge;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerConfig;
 import win.flrque.g2p.stoneage.database.playerdata.PlayerStats;
 
-import java.sql.SQLException;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -30,8 +29,8 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
     @EventHandler
     public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
         final UUID playerUUID = event.getPlayer().getUniqueId();
-        final PlayerConfig dropConfig = plugin.getPlayerSetup().getPersonalDropConfig(playerUUID);
-        final PlayerStats dropStats = plugin.getPlayerSetup().getPlayerStoneMachineStats(playerUUID);
+        final PlayerConfig dropConfig = plugin.getPlayersData().getPersonalDropConfig(playerUUID);
+        final PlayerStats dropStats = plugin.getPlayersData().getPlayerStoneMachineStats(playerUUID);
 
         saveDropConfig(dropConfig);
         saveDropStatistics(dropStats);
@@ -46,7 +45,7 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
 
             @Override
             public void run() {
-                final int response = plugin.getPlayerSetup().savePersonalDropConfigInDatabase(dropConfig);
+                final int response = plugin.getPlayersData().savePersonalDropConfigInDatabase(dropConfig);
 
                 if (response == 0) {
                     plugin.getLogger().log(Level.WARNING, "Database executeUpdate() successful but responded with 0.");
@@ -66,7 +65,7 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
 
             @Override
             public void run() {
-                final int response = plugin.getPlayerSetup().savePersonalStoneStatsInDatabase(dropStats);
+                final int response = plugin.getPlayersData().savePersonalStoneStatsInDatabase(dropStats);
 
                 if (response == 0) {
                     plugin.getLogger().log(Level.WARNING, "Database executeUpdate() successful but responded with 0.");
