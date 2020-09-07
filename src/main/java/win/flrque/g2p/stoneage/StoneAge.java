@@ -83,8 +83,8 @@ public final class StoneAge extends JavaPlugin {
         getCommand("multiplier").setExecutor(new DropMultiplierCommand());
         getCommand("dropspamdb").setExecutor(new DropSpamDBCommand());
 
-        //TODO: Add this setting to the config.yml
-        final long period = 15; // autosave peroid in minutes
+        //TODO: Add this setting to the config.yml (open issue #17)
+        final long period = 15; // autosave period in minutes
 
         getDatabaseController().initAsyncAutosave(period);
         getDropCalculator().getDropMultiplier().initMultiplierBossBar();
@@ -93,7 +93,7 @@ public final class StoneAge extends JavaPlugin {
     private void initStoneMachines() {
         final List<String> machineLore = StoneMachine.createDefaultMachineLore();
 
-        //TODO: replace with config values
+        //TODO: replace with the config (lang.yml) values (open issue #18)
         stoneMachine = new StoneMachine("&6&lStoniarka", machineLore);
     }
 
