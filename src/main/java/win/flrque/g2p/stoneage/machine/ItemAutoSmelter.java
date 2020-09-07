@@ -77,27 +77,27 @@ public class ItemAutoSmelter {
         final Inventory machineInventory = stoneMachine.getInventory();
         final ItemStack magicCoal = machineInventory.getItem(ItemAutoSmelter.MAGIC_COAL_SLOT);
 
-        if (!hasAutoSmelting(stoneMachine.getInventory())) return 0;
+        if (!hasAutoSmelting(stoneMachine.getInventory()))
+            return 0;
 
-        final Integer uses;
         final String coalCustomName = magicCoal.getItemMeta().getDisplayName();
+
         try {
-            uses = Integer.parseInt(coalCustomName);
+            return Integer.parseInt(coalCustomName);
         } catch (final NumberFormatException ex) {
             ex.printStackTrace();
             return 0;
         }
-
-        return uses;
     }
 
     public void takeAutoSmeltingUse(@NotNull final Dispenser stoneMachine, final int usesToTake) {
         final Inventory machineInventory = stoneMachine.getInventory();
         final ItemStack magicCoal = machineInventory.getItem(ItemAutoSmelter.MAGIC_COAL_SLOT);
 
-        if (!hasAutoSmelting(stoneMachine.getInventory())) return;
+        if (!hasAutoSmelting(stoneMachine.getInventory()))
+            return;
 
-        final Integer availableSmeltingUses;
+        final int availableSmeltingUses;
         final String coalCustomName = magicCoal.getItemMeta().getDisplayName();
         try {
             availableSmeltingUses = Integer.parseInt(coalCustomName);
