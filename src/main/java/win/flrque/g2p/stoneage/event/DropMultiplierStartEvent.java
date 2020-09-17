@@ -9,6 +9,7 @@ package win.flrque.g2p.stoneage.event;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -55,12 +56,12 @@ public class DropMultiplierStartEvent extends Event implements Cancellable {
     }
 
     @Override
-    public String getEventName() {
+    public @NotNull String getEventName() {
         return super.getEventName();
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 
