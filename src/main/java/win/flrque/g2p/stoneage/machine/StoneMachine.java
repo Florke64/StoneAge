@@ -36,6 +36,9 @@ import java.util.logging.Level;
 public class StoneMachine {
 
     public static final Material STONE_MACHINE_MATERIAL = Material.DISPENSER;
+    public static final Material MACHINE_LABEL_MATERIAL = Material.PAPER;
+
+    public static final int MACHINE_LABEL_SLOT = 0;
 
     private final StoneAge plugin;
 
@@ -73,7 +76,7 @@ public class StoneMachine {
 
         this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
 
-        this.machineLabel = new ItemStack(Material.PAPER, 1);
+        this.machineLabel = new ItemStack(MACHINE_LABEL_MATERIAL, 1);
         final ItemMeta im = this.machineLabel.getItemMeta();
 
         assert im != null;
@@ -114,7 +117,7 @@ public class StoneMachine {
      */
     public Location getGeneratedStoneLocation(@NotNull final Dispenser stoneMachine) {
         Location result = null;
-        if (isStoneMachine(stoneMachine)) {
+        if (isStoneMachine(stoneMachine.getInventory())) {
             final Directional machine = (Directional) stoneMachine.getData();
             result = stoneMachine.getBlock().getRelative(machine.getFacing()).getLocation();
         }
@@ -122,54 +125,38 @@ public class StoneMachine {
         return result;
     }
 
-
-    /**
-     * Verifies if given block's inventory contains machine label.
-     *
-     * @param block {@link Block} to be checked.
-     * @return {@code true} if given inventory contains machine label {@link ItemStack} which means that it is a proper stone machine block.
-     * @see StoneMachine#isStoneMachine(Inventory)
-     */
-    public boolean isStoneMachine(@NotNull final Block block) {
-        if (block.getState() instanceof Dispenser) {
-            return isStoneMachine((Dispenser) block.getState());
+    public boolean isStoneMachine(@Nullable final Block block) {
+        if (block == null || !(block.getState() instanceof Dispenser)) {
+            return false;
         }
 
-        return false;
-    }
+        final Dispenser machine = (Dispenser) block.getState();
 
-    /**
-     * Verifies if given dispenser's inventory contains machine label and custom name.
-     *
-     * @param dispenserBlock {@link Dispenser} to be checked.
-     * @return {@code true} if given dispenser's inventory contains machine label {@link ItemStack} which means that it is a proper stone machine block.
-     * @see StoneMachine#isStoneMachine(Inventory)
-     */
-    public boolean isStoneMachine(@NotNull final Dispenser dispenserBlock) {
-        if (dispenserBlock.getCustomName() == null)
+        if (machine.getCustomName() == null) {
             return false;
+        }
 
-        return dispenserBlock.getCustomName().equals(this.machineName);
+        return machine.getCustomName().equalsIgnoreCase(this.machineName);
     }
 
-    /**
-     * Verifies if given inventory contains machine label.
-     *
-     * @param inventory block's {@link Inventory} to be checked.
-     * @return {@code true} if given inventory contains machine label {@link ItemStack} which means that it is a proper stone machine block.
-     * @see StoneMachine#getMachineLabel()
-     */
-    public boolean isStoneMachine(@NotNull final Inventory inventory) {
-        return inventory.contains(this.machineLabel);
+    public boolean isStoneMachine(@Nullable final Inventory inventory) {
+        if (inventory == null || inventory.getLocation() == null) {
+            return false;
+        }
+
+        final Block block = inventory.getLocation().getBlock();
+
+        return isStoneMachine(block);
     }
 
-    /**
-     * Gets first available, connected stone machine.<br />
-     * It basically loops trough six different {@link BlockFace}s of given parameter and calls {@link StoneMachine#isStoneMachine(Block)}.
-     *
-     * @param block to be tested for connections with stone machines around.
-     * @return stone machine's {@link Block} instance or {@code null} if there is no stone machine connected with given block parameter.
-     */
+    public boolean isStoneMachine(@NotNull final Dispenser machine) {
+        if (machine.getCustomName() == null) {
+            return false;
+        }
+
+        return machine.getCustomName().equalsIgnoreCase(this.machineName);
+    }
+
     @Nullable
     public Block getConnectedStoneMachine(@NotNull final Block block) {
         for (int i = 0; i < 6; i++) {
