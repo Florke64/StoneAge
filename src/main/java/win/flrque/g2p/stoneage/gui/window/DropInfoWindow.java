@@ -83,7 +83,7 @@ public class DropInfoWindow extends Window {
         lore.add(Message.EMPTY);
         lore.add(Message.color("&cWykopano juz: " + stats.getStatistic(drop.getEntryName())));
 
-        if (currentDropMultiplier != calculator.getDropMultiplier().getDefaultDropMultiplier()) {
+        if (calculator.getDropMultiplier().isActive()) {
             lore.add(" "); // spacer
 
             final float realDropChance = getRealChancePercentage(drop);
