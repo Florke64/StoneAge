@@ -73,15 +73,31 @@ public class DropInfoWindow extends Window {
         icon.setAmount(1);
 
         final ItemMeta meta = icon.getItemMeta();
-        meta.setDisplayName(ChatColor.GREEN + Message.simplePrepare(drop.getCustomName()) + ChatColor.GOLD + " (" + df.format(dropChance) + "%)");
+
+        final boolean playerHasNeededLevelForDrop = stats.getMinerLvl() >= drop.getNeededMinerLevel();
+
+        final String dropEntryNameDetails;
+        if (playerHasNeededLevelForDrop) {
+            dropEntryNameDetails = ChatColor.GOLD + " (" + df.format(dropChance) + "%)";
+        } else {
+            dropEntryNameDetails = "";
+        }
+
+        meta.setDisplayName(ChatColor.GREEN + Message.simplePrepare(drop.getCustomName()) + dropEntryNameDetails);
 
         final List<String> lore = new ArrayList<>();
-        lore.add(Message.color("  &8+" + drop.getMinerExp() + "xp"));
-        final String dropEntryStatus = personalDropConfig.isDropping(drop) ? "&2Wlaczony" : "&cWylaczony";
-        lore.add(Message.color("&7Status: " + dropEntryStatus));
-        lore.add(Message.color("&7(Kliknij aby zmienic)"));
-        lore.add(Message.EMPTY);
-        lore.add(Message.color("&cWykopano juz: " + stats.getStatistic(drop.getEntryName())));
+        if (!playerHasNeededLevelForDrop) {
+            lore.add(ChatColor.RED + "Wymagany lvl: " + drop.getNeededMinerLevel());
+        }
+        else {
+            lore.add(Message.color("  &8+" + drop.getMinerExp() + "xp"));
+
+            final String dropEntryStatus = personalDropConfig.isDropping(drop) ? "&2Wlaczony" : "&cWylaczony";
+            lore.add(Message.color("&7Status: " + dropEntryStatus));
+            lore.add(Message.color("&7(Kliknij aby zmienic)"));
+            lore.add(Message.EMPTY);
+            lore.add(Message.color("&cWykopano juz: " + stats.getStatistic(drop.getEntryName())));
+        }
 
         if (calculator.getDropMultiplier().isActive()) {
             lore.add(" "); // spacer
