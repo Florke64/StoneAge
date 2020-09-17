@@ -122,7 +122,7 @@ public class ItemAutoSmelter {
         } else {
             final ItemStack magicCoal = machineInventory.getItem(ItemAutoSmelter.MAGIC_COAL_SLOT);
 
-            final Integer availableSmeltingUses;
+            final int availableSmeltingUses;
             final String coalCustomName = magicCoal.getItemMeta().getDisplayName();
             try {
                 availableSmeltingUses = Integer.parseInt(coalCustomName);
