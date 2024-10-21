@@ -1,9 +1,9 @@
 config_version: 1
 
 database:
-  server_address: '127.0.0.1'
+  server_address: 'localhost'
   server_port: '3306'
-  db_name: 'g2plocaltest'
+  db_name: 'stoneage'
   db_user: 'root'
   db_password: ''
 
