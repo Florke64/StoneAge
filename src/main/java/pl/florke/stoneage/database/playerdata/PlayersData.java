@@ -20,6 +20,7 @@ package pl.florke.stoneage.database.playerdata;
 import org.bukkit.Bukkit;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.database.SQLManager;
+import pl.florke.stoneage.util.Message;
 
 import java.sql.*;
 import java.util.HashMap;
@@ -56,7 +57,7 @@ public class PlayersData {
 
     public PlayerConfig getPersonalDropConfig(UUID uuid) {
         if (!playerPersonalDropConfig.containsKey(uuid)) {
-            createPersonalDropConfig(uuid);
+            return createPersonalDropConfig(uuid);
         }
 
         return playerPersonalDropConfig.get(uuid);
@@ -73,7 +74,7 @@ public class PlayersData {
              final ResultSet result = ps.executeQuery()) {
 
             if (result == null) {
-                plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
+                new Message("Couldn't load Personal Stone Stats on start!").log(Level.SEVERE);
                 return -1;
             }
 
@@ -88,7 +89,7 @@ public class PlayersData {
                 stats.setMinerExp(minerExp, false);
                 stats.setMinerLvl(minerLvl, false);
 
-                //plugin.getLogger().log(Level.INFO, "Loading drop stats for " + result.getString("PlayerUUID"));
+                //new Message()"Loading drop stats for " + result.getString("PlayerUUID"));
 
                 final int columnCount = metaData.getColumnCount();
                 for (int i = 1; i <= columnCount; i++) {
@@ -108,7 +109,7 @@ public class PlayersData {
 
             return loadCount;
         } catch (SQLException ex) {
-            plugin.getLogger().log(Level.SEVERE, "Couldn't query results!");
+            new Message("Couldn't query results!").log(Level.SEVERE);
             ex.printStackTrace();
         }
 
@@ -126,7 +127,7 @@ public class PlayersData {
              final ResultSet result = ps.executeQuery()) {
 
             if (result == null) {
-                plugin.getLogger().log(Level.SEVERE, "Couldn't load Personal Stone Stats on start!");
+                new Message("Couldn't load Personal Stone Stats on start!").log(Level.SEVERE);
                 return -1;
             }
 
@@ -136,7 +137,7 @@ public class PlayersData {
                 final UUID uuid = UUID.fromString(result.getString("PlayerUUID"));
                 final PlayerConfig config = playerSetup.getPersonalDropConfig(uuid);
 
-                //plugin.getLogger().log(Level.INFO, "Loading drop configuration for " + result.getString("PlayerUUID"));
+                //new Message()"Loading drop configuration for " + result.getString("PlayerUUID"));
 
                 final int columnCount = metaData.getColumnCount();
                 for (int i = 1; i <= columnCount; i++) {
@@ -155,7 +156,7 @@ public class PlayersData {
 
             return loadCount;
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Couldn't query results!");
+            new Message("Couldn't query results!").log(Level.SEVERE);
             e.printStackTrace();
         }
 
@@ -195,7 +196,10 @@ public class PlayersData {
             skipped++;
         }
 
-        plugin.getLogger().log(Level.INFO, "Saved " + saved + " personal configs (skipped: " + skipped + ")");
+        new Message("Saved $_1 personal configs (skipped: $_2)")
+                .replacePlaceholder(1, String.valueOf(saved))
+                .replacePlaceholder(2, String.valueOf(skipped))
+                .log(Level.INFO);
 
         saved = 0;
         skipped = 0;
@@ -210,7 +214,10 @@ public class PlayersData {
             skipped++;
         }
 
-        plugin.getLogger().log(Level.INFO, "Saved " + saved + " player stats (skipped: " + skipped + ")");
+        new Message("Saved " + saved + " player stats (skipped: " + skipped + ")")
+                .replacePlaceholder(1, String.valueOf(saved))
+                .replacePlaceholder(2, String.valueOf(skipped))
+                .log(Level.INFO);
     }
 
     public void onDisable() {

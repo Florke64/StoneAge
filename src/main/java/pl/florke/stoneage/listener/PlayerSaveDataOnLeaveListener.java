@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
+import pl.florke.stoneage.util.Message;
 
 import java.util.UUID;
 import java.util.logging.Level;
@@ -59,10 +60,10 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
                 final int response = plugin.getPlayersData().savePersonalDropConfigInDatabase(dropConfig);
 
                 if (response == 0) {
-                    plugin.getLogger().log(Level.WARNING, "Database executeUpdate() successful but responded with 0.");
+                    new Message("Database executeUpdate() successful but responded with 0.").log(Level.WARNING);
                 }
 
-                plugin.getLogger().log(Level.INFO, "Saved Personal Configuration for " + dropConfig.getUniqueId() + ".");
+                new Message("Saved Personal Configuration for " + dropConfig.getUniqueId() + ".").log(Level.INFO);
             }
         }.runTaskAsynchronously(plugin);
     }
@@ -79,10 +80,10 @@ public class PlayerSaveDataOnLeaveListener implements Listener {
                 final int response = plugin.getPlayersData().savePersonalStoneStatsInDatabase(dropStats);
 
                 if (response == 0) {
-                    plugin.getLogger().log(Level.WARNING, "Database executeUpdate() successful but responded with 0.");
+                    new Message("Database executeUpdate() successful but responded with 0.").log(Level.WARNING);
                 }
 
-                plugin.getLogger().log(Level.INFO, "Saved Personal Drop Stats for " + dropStats.getUniqueId() + ".");
+                new Message("Saved Personal Drop Stats for " + dropStats.getUniqueId() + ".").log(Level.INFO);
             }
         }.runTaskAsynchronously(plugin);
     }

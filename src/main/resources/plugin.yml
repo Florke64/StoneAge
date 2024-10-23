@@ -1,28 +1,28 @@
 name: ${project.artifactId}
 version: ${project.version}
 main: ${project.groupId}.StoneAge
-api-version: 1.15
+api-version: 1.21
 prefix: ${project.name}
-authors: [ FlrQue ]
+authors: [ Florke64 ]
 description: ${project.description}
 website: ${project.url}
 
 commands:
   drop:
-    description: Sprawdzanie i ustawianie preferencji dropu ze stoniarek
-    aliases: [ dropinfo, dropy, drops, stone, dropstat ]
-    permission: g2p.stone.drop
+    description: Check and configure Stone Machine's drop
+    aliases: [ dropinfo, stone, dropstat ]
+    permission: stoneage.drop
   dropstat:
-    description: Statystyki gornictwa / stone
-    aliases: [ dropstatystyki, gornictwo ]
-    permission: g2p.stone.drop
+    description: Miner's drop and grind statistics
+    aliases: [ mining, minerstat ]
+    permission: stoneage.drop
   drophelp:
-    description: Wyswietla instrukcje obslugi stoniarek.
-    permission: g2p.stone.drop
+    description: Help for Stone Machine's drop
+    permission: stoneage.drop
   dropmultiplier:
-    description: Komenda dla administratorow. Mnozy przelicznik dropu z kamienia.
+    description: Set drop multiplier, admin only
     aliases: [ multiplier, mnoznik ]
-    permission: g2p.stone.admin
+    permission: stoneage.admin
   dropspamdb:
-    description: Debug command to create random Player Data entries
-    permission: g2p.stone.admin
+    description: Debug command to create random Player Data entries.
+    permission: stoneage.admin

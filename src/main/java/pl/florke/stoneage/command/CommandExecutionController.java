@@ -28,18 +28,14 @@ import java.util.UUID;
 
 public class CommandExecutionController {
 
-    private final StoneAge plugin;
-
     private final int commandCooldownSeconds;
     private final long commandCooldownMillis;
 
     private final Map<UUID, Long> commandExecutionHistory = new HashMap<>();
 
     public CommandExecutionController(final int commandCooldownSeconds) {
-        this.plugin = StoneAge.getPlugin(StoneAge.class);
-
         this.commandCooldownSeconds = commandCooldownSeconds;
-        this.commandCooldownMillis = commandCooldownSeconds * 1000;
+        this.commandCooldownMillis = commandCooldownSeconds * 1000L;
     }
 
     public int getCommandCooldownSeconds() {
@@ -50,19 +46,19 @@ public class CommandExecutionController {
         return commandCooldownMillis;
     }
 
-    private boolean isAllowedToExecuteYet(@NotNull final UUID playerUniqueId) {
+    private boolean isCooldown(@NotNull final UUID playerUniqueId) {
         final long currentTime = System.currentTimeMillis();
         final long lastExecution = this.commandExecutionHistory.getOrDefault(playerUniqueId, 0l);
 
-        return (lastExecution + commandCooldownMillis) <= currentTime;
+        return (lastExecution + commandCooldownMillis) > currentTime;
     }
 
-    public boolean onCommandExecute(@NotNull final CommandSender sender) {
+    public boolean isCooldown(@NotNull final CommandSender sender) {
         if (!(sender instanceof Player)) return true;
         final UUID playerUniqueId = ((Player) sender).getUniqueId();
 
         //Check if cooldown passed
-        return isAllowedToExecuteYet(playerUniqueId);
+        return isCooldown(playerUniqueId);
     }
 
     public void recordCommandExecution(@NotNull final CommandSender sender) {

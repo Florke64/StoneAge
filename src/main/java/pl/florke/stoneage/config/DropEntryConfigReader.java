@@ -20,6 +20,7 @@ package pl.florke.stoneage.config;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import pl.florke.stoneage.drop.DropEntry;
+import pl.florke.stoneage.util.Message;
 
 import java.util.logging.Level;
 
@@ -57,7 +58,10 @@ public class DropEntryConfigReader extends ConfigSectionReader {
 
         //If there was an error while reading those sections
         if (defaultToolItem == null && silkToolItem == null) {
-            plugin.getLogger().log(Level.SEVERE, "Error while reading DropEntry: \"" + rootSection.getName() + "\".");
+            new Message("Error while reading DropEntry: $_1.")
+                    .replacePlaceholder(1, rootSection.getName())
+                    .log(Level.SEVERE);
+
             return null;
         }
 

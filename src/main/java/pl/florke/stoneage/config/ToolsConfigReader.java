@@ -21,6 +21,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
+import pl.florke.stoneage.util.Message;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,16 +30,11 @@ import java.util.logging.Level;
 
 public class ToolsConfigReader extends ConfigSectionReader {
 
-    private final StoneAge plugin;
-
     private Map<Material, Integer> miningTools = new HashMap<>();
     private Material machineDestroyTool;
 
     public ToolsConfigReader(ConfigurationSection configurationSection) {
         super(configurationSection);
-
-        this.plugin = StoneAge.getPlugin(StoneAge.class);
-
         this.machineDestroyTool = Material.GOLDEN_PICKAXE;
     }
 
@@ -51,20 +47,25 @@ public class ToolsConfigReader extends ConfigSectionReader {
 
         final ConfigurationSection applicableToolsSection = rootSection.getConfigurationSection("levels");
         if (applicableToolsSection == null) {
-            this.plugin.getLogger().log(Level.WARNING, "No applicable tools found. Please, check config file!");
+            new Message("No applicable tools found. Please, check config file!").log(Level.WARNING);
             return;
         }
 
         for (final String key : applicableToolsSection.getKeys(false)) {
             final Material toolMaterial = Material.getMaterial(key);
             if (toolMaterial == null) {
-                this.plugin.getLogger().log(Level.WARNING, "Invalid \"" + key + "\" in tool levels configuration! Skipping...");
+                new Message("Invalid $_1 in tool levels configuration! Skipping...")
+                        .replacePlaceholder(1, key).log(Level.WARNING);
                 continue;
             }
 
             final int level = applicableToolsSection.getInt(key, 1);
-            plugin.getLogger().log(Level.INFO, "Added applicable tool " + toolMaterial.toString() + " (" + level + ")");
             miningTools.put(toolMaterial, level);
+
+            new Message("Added applicable tool $_1 ($_2)")
+                    .replacePlaceholder(1, toolMaterial.toString())
+                    .replacePlaceholder(2, String.valueOf(level))
+                    .log(Level.INFO);
         }
     }
 

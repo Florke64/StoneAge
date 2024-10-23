@@ -70,7 +70,7 @@ public class StoneMachineBreakListener implements Listener {
             final Window brokenMachinesWindow = windowManager.getWindow(stoneMachine);
             if (brokenMachinesWindow != null) {
 
-                final Message machineDestroyedMsg = new Message("&cTa stoniarka zostala zniszczona.");
+                final Message machineDestroyedMsg = new Message(plugin.getLanguage("stone-machine-destroyed"));
                 for (Player user : brokenMachinesWindow.getUsers()) {
                     if (user != null && user.isOnline()) {
 
@@ -93,7 +93,7 @@ public class StoneMachineBreakListener implements Listener {
         } else {
             event.setCancelled(true);
 
-            final Message wrongToolMsg = new Message("&7Stoniarka moze byc usunieta tylko przy pomocy &czlotego kilofa&7!");
+            final Message wrongToolMsg = new Message(plugin.getLanguage("stone-machine-destroyed-deny"));
             wrongToolMsg.send(destroyer);
         }
     }

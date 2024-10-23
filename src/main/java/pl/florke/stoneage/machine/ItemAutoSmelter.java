@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pl.florke.stoneage.StoneAge;
+import pl.florke.stoneage.util.Message;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -62,7 +63,7 @@ public class ItemAutoSmelter {
             index++;
         }
 
-        plugin.getLogger().log(Level.INFO, "Cached " + index + " smelting recipes.");
+        new Message("Cached " + index + " smelting recipes for auto smelting feature.").log(Level.INFO);
     }
 
     public ItemStack getSmelted(@NotNull final Dispenser stoneMachine, @NotNull final ItemStack itemToSmelt) {

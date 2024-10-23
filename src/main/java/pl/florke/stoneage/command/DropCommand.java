@@ -60,7 +60,7 @@ public class DropCommand implements CommandExecutor {
             return true;
         }
 
-        if (!executionController.onCommandExecute(sender)) {
+        if (executionController.isCooldown(sender)) {
             new Message("&cOdczekaj chwile przed wykonaniem kolejnej komendy.").send(sender);
             return true;
         }

@@ -44,7 +44,7 @@ public class DropInfoWindow extends Window {
 
     //TODO: Support for pagination
     public DropInfoWindow(Player owner) {
-        super(ChatColor.translateAlternateColorCodes('&', "&7&lSTONIARKA &8&l> &5&lDROP INFO"));
+        super(Message.color("stone-drop-info-title"));
 
         windowContentOwner = owner;
         personalDropConfig = plugin.getPlayersData().getPersonalDropConfig(windowContentOwner.getUniqueId());
@@ -93,26 +93,36 @@ public class DropInfoWindow extends Window {
             dropEntryNameDetails = "";
         }
 
-        meta.setDisplayName(ChatColor.GREEN + Message.simplePrepare(drop.getCustomName()) + dropEntryNameDetails);
+        meta.setDisplayName(ChatColor.GREEN + Message.constNamePrettify(drop.getCustomName()) + dropEntryNameDetails);
 
         final List<String> lore = new ArrayList<>();
         if (!playerHasNeededLevelForDrop) {
-            lore.add(ChatColor.RED + "Wymagany lvl: " + drop.getNeededMinerLevel());
+            lore.add(new Message(plugin.getLanguage("stone-drop-info-lvl-required"))
+                    .replacePlaceholder(1, String.valueOf(drop.getNeededMinerLevel()))
+                    .getCachedCompiledMessage().getFirst());
         } else {
             lore.add(Message.color("  &8+" + drop.getMinerExp() + "xp"));
 
-            final String dropEntryStatus = personalDropConfig.isDropping(drop) ? "&2Wlaczony" : "&cWylaczony";
-            lore.add(Message.color("&7Status: " + dropEntryStatus));
-            lore.add(Message.color("&7(Kliknij aby zmienic)"));
-            lore.add(Message.EMPTY);
-            lore.add(Message.color("&cWykopano juz: " + stats.getStatistic(drop.getEntryName())));
+            final String dropEntryStatus = new Message(personalDropConfig.isDropping(drop) ?
+                    plugin.getLanguage("system-enabled") : plugin.getLanguage("system-disabled"))
+                    .getCachedCompiledMessage().getFirst();
+            lore.add(new Message(plugin.getLanguage("stone-drop-info-entry-status"))
+                    .replacePlaceholder(1, dropEntryStatus).getCachedCompiledMessage().getFirst());
+            lore.add(new Message(plugin.getLanguage("stone-drop-info-click-to-switch"))
+                    .getCachedCompiledMessage().getFirst());
+            lore.add(" ");
+            lore.add(new Message(plugin.getLanguage("command-feedback-drop-print-summary"))
+                    .replacePlaceholder(1, String.valueOf(stats.getStatistic(drop.getEntryName())))
+                    .getCachedCompiledMessage().getFirst());
         }
 
         if (calculator.getDropMultiplier().isActive()) {
             lore.add(" "); // spacer
 
             final float realDropChance = getRealChancePercentage(drop);
-            lore.add(Message.color("&7Rzeczywisty drop: " + df.format(realDropChance) + "%"));
+            lore.add(new Message(plugin.getLanguage("stone-machine-drop-chance"))
+                    .replacePlaceholder(1, String.valueOf(realDropChance))
+                    .getCachedCompiledMessage().getFirst());
         }
 
         meta.setLore(lore);
@@ -138,7 +148,7 @@ public class DropInfoWindow extends Window {
     @Override
     public boolean open(Player player) {
         if (!super.open(player)) {
-            new Message("&cNie udało się otworzyć okna dropu!").send(player);
+            new Message(plugin.getLanguage("stone-drop-gui-error")).send(player);
             return false;
         }
 
@@ -168,9 +178,11 @@ public class DropInfoWindow extends Window {
 
         boolean isDropping = plugin.getPlayersData().getPersonalDropConfig(player.getUniqueId()).switchDropEntry(dropEntry);
 
-        final Message infoMessage = new Message("&7Ustawiono drop &c$_1 &7na $_2&7.");
-        infoMessage.setVariable(1, dropEntry.getCustomName());
-        infoMessage.setVariable(2, (isDropping ? "&2wlaczony" : "&cwylaczony"));
+        final Message infoMessage = new Message(plugin.getLanguage("stone-drop-info"));
+        infoMessage.replacePlaceholder(1, dropEntry.getCustomName());
+        infoMessage.replacePlaceholder(2, (isDropping ?
+                plugin.getLanguage("system-enabled") :
+                plugin.getLanguage("system-disabled")));
         infoMessage.send(player);
     }
 

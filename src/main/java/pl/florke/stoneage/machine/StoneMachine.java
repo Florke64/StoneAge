@@ -96,7 +96,7 @@ public class StoneMachine {
         this.machineName = Message.color(machineName);
 
         final Message lore = new Message(machineLore);
-        this.machineLore = lore.getPreparedMessage();
+        this.machineLore = lore.getCachedCompiledMessage();
 
         this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
 
@@ -117,14 +117,7 @@ public class StoneMachine {
     public static List<String> createDefaultMachineLore() {
         final Message defaultMachineLore = new Message();
 
-        // TODO: Read those values from lang.yml (issue #18)
-        defaultMachineLore.addLines("&7Postaw stoniarke w kierunku,");
-        defaultMachineLore.addLines("&7gdzie ma generowac stone!");
-        defaultMachineLore.addLines(Message.EMPTY);
-        defaultMachineLore.addLines("&4Uwaga! &eStoniarki mozna niszczyc");
-        defaultMachineLore.addLines("&etylko zlotym kilofem.");
-
-        return defaultMachineLore.getPreparedMessage();
+        return defaultMachineLore.getCachedCompiledMessage();
     }
 
     /**
@@ -337,7 +330,8 @@ public class StoneMachine {
             if (!(recipe instanceof ShapedRecipe)) continue;
 
             if (((ShapedRecipe) recipe).getKey().getKey().contentEquals(namespacedKey.getKey())) {
-                plugin.getLogger().log(Level.WARNING, "Skipping crafting recipe registration, as the same NamespaceKey was already reserved.");
+                new Message("Skipping crafting recipe registration, as the same NamespaceKey was already reserved.")
+                        .log(Level.WARNING);
                 return;
             }
         }

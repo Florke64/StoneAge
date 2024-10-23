@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.jetbrains.annotations.NotNull;
+import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.gui.InventoryPoint;
 import pl.florke.stoneage.gui.ItemButtonFactory;
 import pl.florke.stoneage.gui.ItemButtonFactory.ItemButtonType;
@@ -37,7 +38,8 @@ public class StoneMachineWindow extends Window {
     private final Dispenser stoneMachine;
 
     public StoneMachineWindow(Player owner, Dispenser stoneMachine) {
-        super(ChatColor.translateAlternateColorCodes('&', "&7&lSTONIARKA &8&l> &5&lOPCJE"));
+        super(StoneAge.getPlugin(StoneAge.class)
+                .getLanguage("stone-drop-actions-title"));
 
         windowOwner = owner;
         this.stoneMachine = stoneMachine;
@@ -54,7 +56,7 @@ public class StoneMachineWindow extends Window {
     @Override
     public boolean open(Player player) {
         if (!super.open(player)) {
-            new Message("&cNie udało się otworzyć okna stoniarki!").send(player);
+            new Message(plugin.getLanguage("stone-machine-gui-error")).send(player);
             return false;
         }
 
@@ -102,10 +104,10 @@ public class StoneMachineWindow extends Window {
 
             final Message msg = new Message();
             if (usesLeft > 0) {
-                msg.addLines("&7Pozostalo &6$_1 &7uzyc automatycznego przepalania.");
-                msg.setVariable(1, Integer.toString(usesLeft));
+                msg.addLines(plugin.getLanguage("stone-smelting-use"));
+                msg.replacePlaceholder(1, Integer.toString(usesLeft));
             } else {
-                msg.addLines("&6Wprowadz wegiel hopperem, a stoniarka bedzie przepalac automatycznie!");
+                msg.addLines(plugin.getLanguage("stone-smelting-hopper"));
             }
 
             msg.send(player);
@@ -116,9 +118,9 @@ public class StoneMachineWindow extends Window {
             player.closeInventory();
 
             if (plugin.getStoneMachine().repairStoneMachine(stoneMachine)) {
-                new Message("&7Naprawiono stoniarke!").send(player);
+                new Message(plugin.getLanguage("stone-machine-repaired")).send(player);
             } else {
-                new Message("&cNie udalo sie naprawic tej stoniarki, sprobuj ponownie pozniej...").send(player);
+                new Message(plugin.getLanguage("stone-machine-repaired-deny")).send(player);
             }
         }
 

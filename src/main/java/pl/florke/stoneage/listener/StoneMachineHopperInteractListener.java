@@ -58,12 +58,12 @@ public class StoneMachineHopperInteractListener implements Listener {
 
         //Blocking hopper output
         if (stoneMachine.isStoneMachine(sourceInventory)) {
-//            plugin.getLogger().log(Level.INFO, "InventoryMoveItemEvent: source inventory is a stone machine!");
+//            new Message()"InventoryMoveItemEvent: source inventory is a stone machine!");
             event.setCancelled(true);
         }
 
         if (stoneMachine.isStoneMachine(destinationInventory)) {
-//            plugin.getLogger().log(Level.INFO, "InventoryMoveItemEvent: destination inventory is a stone machine!");
+//            new Message()"InventoryMoveItemEvent: destination inventory is a stone machine!");
             final ItemStack fuelItem = event.getItem();
             if (stoneMachine.isHopperInputAllowed() && fuelItem.getType() == Material.COAL) {
                 final int fuelAmount = fuelItem.getAmount() * 8;

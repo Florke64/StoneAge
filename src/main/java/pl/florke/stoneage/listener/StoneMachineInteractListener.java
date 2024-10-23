@@ -40,7 +40,12 @@ public class StoneMachineInteractListener implements Listener {
 
     @EventHandler
     public void onStoneMachineClick(@NotNull PlayerInteractEvent event) {
-        if (event.getPlayer() == null || event.isCancelled())
+        if (event.isCancelled())
+            /* PlayerInteractEvent#isCancelled is deprecated.
+             * This event has two possible cancellation states,
+             * one for useInteractedBlock() and one for useItemInHand().
+             * https://jd.papermc.io/paper/1.21.1/org/bukkit/event/player/PlayerInteractEvent.html
+             */
             return;
 
         final Player player = event.getPlayer();

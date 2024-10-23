@@ -87,7 +87,7 @@ public class StoneBreakListener implements Listener {
         customizeStoneDrop(player, stoneMachine, brokenBlock);
 
 //        long stop = System.currentTimeMillis();
-//        plugin.getLogger().log(Level.INFO, "StoneBreakListener took " + (stop-start) + "ms of main thread time.");
+//        new Message()"StoneBreakListener took " + (stop-start) + "ms of main thread time.");
 
     }
 
@@ -100,7 +100,10 @@ public class StoneBreakListener implements Listener {
             finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
 
             if (finalDrop == null) {
-                plugin.getLogger().log(Level.INFO, "DropLoot calculated is null (Player: " + player.getName() + ", Location: " + player.getLocation().toString() + ")");
+                new Message("DropLoot calculated is null (Player: $_1, Location: $_2)")
+                        .replacePlaceholder(1, player.getName())
+                        .replacePlaceholder(2, brokenBlock.getLocation().toString())
+                        .log(Level.WARNING);
             }
 
             dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
@@ -182,9 +185,9 @@ public class StoneBreakListener implements Listener {
             }
 
             if (drop != plugin.getDropCalculator().getPrimitiveDropEntry()) {
-                final Message dropMessage = new Message("&7Udalo ci sie wykopac &c$_1 &7x&6$_2");
-                dropMessage.setVariable(1, drop.getCustomName());
-                dropMessage.setVariable(2, Integer.toString(totalAmount));
+                final Message dropMessage = new Message(plugin.getLanguage("stone-machine-drop-alert"));
+                dropMessage.replacePlaceholder(1, drop.getCustomName());
+                dropMessage.replacePlaceholder(2, Integer.toString(totalAmount));
                 dropMessage.sendActionMessage(player);
             }
         }

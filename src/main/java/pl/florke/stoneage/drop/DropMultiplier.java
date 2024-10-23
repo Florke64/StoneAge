@@ -126,7 +126,7 @@ public class DropMultiplier {
         if (value <= defaultDropMultiplier || value > maxDropMultiplier)
             return false;
 
-        if (time < (1 * 60 * 1000) || time > (24 * 60 * 60 * 1000))
+        if (time < (60 * 1000) || time > (24 * 60 * 60 * 1000))
             return false;
 
         final long startTime = System.currentTimeMillis();
@@ -172,7 +172,7 @@ public class DropMultiplier {
              final ResultSet response = ps.executeQuery()) {
 
             if (response == null) {
-                plugin.getLogger().log(Level.WARNING, "Couldn't recover drop multiplier from database!");
+                new Message("Couldn't recover drop multiplier from database!").log(Level.WARNING);
                 return;
             }
 
@@ -197,10 +197,11 @@ public class DropMultiplier {
 
     public void initMultiplierBossBar() {
 
-        plugin.getLogger().log(Level.INFO, "Initialized Multiplier visualization via Boss Bar.");
+        new Message("Initialized Multiplier visualization via Boss Bar.").log(Level.INFO);
 
         final NamespacedKey bossBarKey = new NamespacedKey(plugin, "multiplier_bossbar");
-        multiplierBossBar = Bukkit.createBossBar(bossBarKey, ChatColor.RED + "Go2Play", BarColor.BLUE, BarStyle.SEGMENTED_10);
+        final String bossBarTitle = plugin.getLanguage("stone-multiplier-title-ticker");
+        multiplierBossBar = Bukkit.createBossBar(bossBarKey, Message.color(bossBarTitle), BarColor.BLUE, BarStyle.SEGMENTED_10);
         multiplierBossBar.setVisible(false);
 
         multiplierBossBarRunnable = new BukkitRunnable() {
@@ -214,7 +215,7 @@ public class DropMultiplier {
                 if (!DropMultiplier.this.isActive()) {
                     if (activeCheck == true) {
                         activeCheck = false;
-                        new Message("&cMnoznik dropu zakonczyl sie...").broadcastToTheServer();
+                        new Message(plugin.getLanguage("stone-multiplier-end")).broadcast();
                     }
 
                     multiplierBossBar.setVisible(false);
@@ -246,13 +247,14 @@ public class DropMultiplier {
 
         final double percentage = ((double) leftTime / (double) fullTime);
 
-        final Message bossBarTitle = new Message();
-        bossBarTitle.addLines("&6Mnoznik dropu: &7x&c$_1 &6(aktywny przez &c$_2&7min&6)");
-        bossBarTitle.addLines("&eMnoznik dropu z kamienia aktywny, nie przegap okazji!");
-        bossBarTitle.addLines("&cMnoznik dropu za chwile sie skonczy!");
-        bossBarTitle.setVariable(1, Float.toString(value));
-        bossBarTitle.setVariable(2, Integer.toString(leftTime));
-        multiplierBossBar.setTitle(bossBarTitle.getPreparedMessage().get(leftTime == 0 ? 2 : textSwitch ? 0 : 1));
+        int bossBarTitleId = leftTime == 0 ? 2 : textSwitch ? 0 : 1;
+
+        multiplierBossBar.setTitle(
+            new Message(plugin.getLanguage("stone-multiplier-title", bossBarTitleId))
+                    .replacePlaceholder(1, Float.toString(value))
+                    .replacePlaceholder(2, Integer.toString(leftTime))
+                    .getCachedCompiledMessage().getFirst()
+        );
 
         multiplierBossBar.setProgress(percentage);
         multiplierBossBar.setColor(percentage < 0.2d ? BarColor.RED : BarColor.BLUE);

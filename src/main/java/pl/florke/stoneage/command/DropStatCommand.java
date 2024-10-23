@@ -46,11 +46,12 @@ import pl.florke.stoneage.database.playerdata.PlayersData;
 import pl.florke.stoneage.drop.DropCalculator;
 import pl.florke.stoneage.drop.DropEntry;
 import pl.florke.stoneage.drop.ExperienceCalculator;
+import pl.florke.stoneage.util.Language;
 import pl.florke.stoneage.util.Message;
 
 public class DropStatCommand implements CommandExecutor {
 
-    private final StoneAge plugin;
+    private final Language lang;
     private final CommandExecutionController executionController;
 
     private final PlayersData playerSetupManager;
@@ -58,7 +59,9 @@ public class DropStatCommand implements CommandExecutor {
     private final ExperienceCalculator experienceCalculator;
 
     public DropStatCommand() {
-        this.plugin = StoneAge.getPlugin(StoneAge.class);
+        final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
+
+        this.lang = plugin.getLanguage();
         this.executionController = plugin.getCommandExecutionController();
 
         this.playerSetupManager = plugin.getPlayersData();
@@ -69,27 +72,22 @@ public class DropStatCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player)) {
-            new Message("&cTa komende moze wykonac tylko gracz.").send(sender);
+            new Message(lang.getText("command-error-cmd-executor")).send(sender);
             return false;
         }
 
-        if (!executionController.onCommandExecute(sender)) {
-            new Message("&cOdczekaj chwile przed wykonaniem kolejnej komendy.").send(sender);
+        if (executionController.isCooldown(sender)) {
+            new Message(lang.getText("command-error-cooldown")).send(sender);
             return true;
         }
 
         executionController.recordCommandExecution(sender);
 
-        Player targetPlayer = null;
-        if (args.length == 1) {
-            targetPlayer = Bukkit.getServer().getPlayerExact(args[0]);
-        } else {
-            targetPlayer = ((Player) sender);
-        }
+        Player targetPlayer = args.length == 1? Bukkit.getServer().getPlayerExact(args[0]) : ((Player) sender);
+
 
         if (targetPlayer == null) {
-            new Message("&cBlad! Nie znaleziono podanego gracza (Online).").send(sender);
-
+            new Message(lang.getText("command-error-player-offline")).send(sender);
             return false;
         }
 
@@ -100,16 +98,10 @@ public class DropStatCommand implements CommandExecutor {
     }
 
     private void printPlayerStatistics(@NotNull final CommandSender sender, @NotNull final PlayerStats playerStats) {
-
         final long miningExp = playerStats.getMinerExp();
         final int miningLevel = playerStats.getMinerLvl();
 
-        final Message message = new Message();
-        message.addLines(Message.EMPTY);
-        message.addLines("&6== &7Statystyki (&c$_5&7) &6==");
-        message.addLines("&7Poziom gornictwa: &6$_1");
-        message.addLines("&7Poziom doswiadczenie: &6$_2 &7/ &6$_3");
-        message.addLines(Message.EMPTY);
+        final Message message = new Message(lang.getText("command-feedback-drop-print-stats"));
 
         int summary = 0;
         for (DropEntry dropEntry : dropCalculator.getDropEntries()) {
@@ -119,14 +111,14 @@ public class DropStatCommand implements CommandExecutor {
             summary += playerStats.getStatistic(dropEntry.getEntryName());
         }
 
-        message.addLines("&7W sumie wykopanych &6$_4&7 roznych przedmiotow.");
+        message.addLines(lang.getText("command-feedback-drop-print-summary"));
 
         final long nextLevelExperience = experienceCalculator.getExpNeededToLevel(miningLevel + 1);
-        message.setVariable(1, Integer.toString(miningLevel));
-        message.setVariable(2, Long.toString(miningExp));
-        message.setVariable(3, Long.toString(nextLevelExperience));
-        message.setVariable(4, Integer.toString(summary));
-        message.setVariable(5, playerStats.getPlayerName());
+        message.replacePlaceholder(1, Integer.toString(miningLevel));
+        message.replacePlaceholder(2, Long.toString(miningExp));
+        message.replacePlaceholder(3, Long.toString(nextLevelExperience));
+        message.replacePlaceholder(4, Integer.toString(summary));
+        message.replacePlaceholder(5, playerStats.getPlayerName());
 
         message.send(sender);
     }

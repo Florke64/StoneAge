@@ -40,29 +40,30 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.database.playerdata.PlayersData;
+import pl.florke.stoneage.util.Language;
 import pl.florke.stoneage.util.Message;
 
 import java.util.UUID;
 
 public class DropSpamDBCommand implements CommandExecutor {
 
-    private final StoneAge plugin;
+    private final Language lang;
     private final PlayersData playerSetup;
 
     public DropSpamDBCommand() {
-        plugin = StoneAge.getPlugin(StoneAge.class);
-        playerSetup = plugin.getPlayersData();
+        lang = StoneAge.getPlugin(StoneAge.class).getLanguage();
+        playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!sender.hasPermission("g2p.stone.admin")) {
-            new Message("&cNie posiadasz wystarczajacych uprawnien do wykonania tej komendy.").send(sender);
+        if (!sender.hasPermission("stoneage.admin")) {
+            new Message(lang.getText("command-error-cmd-permission-deny")).send(sender);
             return false;
         }
 
         if (args.length < 1) {
-            new Message("&cNie wystarczajaca ilosc argumentow do wykonania komendy.").send(sender);
+            new Message(lang.getText("command-error-cmd-usage")).send(sender);
             return false;
         }
 
@@ -70,17 +71,17 @@ public class DropSpamDBCommand implements CommandExecutor {
             final int entries = Integer.parseInt(args[0]);
             createRandomPlayerStats(entries);
 
-            new Message("&2Wykonano!").send(sender);
+            new Message(lang.getText("command-feedback-dropspamdb")).send(sender);
             return true;
 
         } catch (NumberFormatException ex) {
-            new Message("&cPodano nie wlasciwy argument.").send(sender);
+            new Message(lang.getText("command-error-cmd-usage")).send(sender);
         }
 
         return true;
     }
 
-    private final void createRandomPlayerStats(final int n) {
+    private void createRandomPlayerStats(final int n) {
         for (int i = 0; i < n; i++) {
             final UUID uuid = UUID.randomUUID();
 

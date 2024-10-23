@@ -52,7 +52,7 @@ public class SQLManager {
         try {
             init();
         } catch (Exception e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to initialize db! Running without DB!");
+            new Message("Failed to initialize db! Running without DB!").log(Level.SEVERE);
             e.printStackTrace();
         }
     }
@@ -362,7 +362,7 @@ public class SQLManager {
 
     public void initAsyncAutosave(final long period) {
 
-        plugin.getLogger().log(Level.INFO, "Initialized Async Autosave.");
+        new Message("Initialized Async Autosave.").log(Level.INFO);
 
         autosaveRunnable = new BukkitRunnable() {
 
@@ -373,11 +373,11 @@ public class SQLManager {
                     public void run() {
                         final int savedCount = saveAllOnlinePlayersData();
 
-                        final Message success = new Message("Auto-save: Saved $_1 players data into the database | Next Auto-Save in $_2 minutes");
-                        success.setVariable(1, Integer.toString(savedCount));
-                        success.setVariable(2, Long.toString(period));
+                        new Message("Saved $_1 players in database. Next Auto-Save: $_2m")
+                            .replacePlaceholder(1, Integer.toString(savedCount))
+                            .replacePlaceholder(2, Long.toString(period))
+                                .log(Level.INFO);
 
-                        plugin.getLogger().log(Level.INFO, success.getPreparedMessage().get(0));
                     }
                 }.runTaskAsynchronously(plugin);
             }

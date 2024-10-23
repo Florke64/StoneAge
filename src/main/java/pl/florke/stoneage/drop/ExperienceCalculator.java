@@ -76,13 +76,13 @@ public class ExperienceCalculator {
             experienceTable.add((long) nextLevelFormula);
         }
 
-        final Message success = new Message("ExperienceTable: Generated new Experience Table ($_1 level(s)) from the math formula.");
-        success.setVariable(1, Integer.toString(experienceTable.size()));
-        plugin.getLogger().log(Level.INFO, success.getPreparedMessage().get(0));
+        new Message("ExperienceTable: Generated new Experience Table ($_1 level(s)) from the math formula.")
+            .replacePlaceholder(1, Integer.toString(experienceTable.size()))
+            .log(Level.INFO);
 
 //        int level = 2;
 //        for(final long exp : experienceTable) {
-//            plugin.getLogger().log(Level.INFO, "Level " + level + " - Exp needed: " + exp);
+//            new Message()"Level " + level + " - Exp needed: " + exp);
 //            level++;
 //        }
     }

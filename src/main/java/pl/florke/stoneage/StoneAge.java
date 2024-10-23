@@ -17,6 +17,7 @@
 
 package pl.florke.stoneage;
 
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
@@ -40,7 +41,7 @@ import pl.florke.stoneage.gui.WindowManager;
 import pl.florke.stoneage.listener.*;
 import pl.florke.stoneage.machine.ApplicableTools;
 import pl.florke.stoneage.machine.StoneMachine;
-import pl.florke.stoneage.util.LogTag;
+import pl.florke.stoneage.util.Language;
 import pl.florke.stoneage.util.Message;
 
 import java.util.List;
@@ -57,10 +58,16 @@ public final class StoneAge extends JavaPlugin {
     private DropCalculator dropCalculator;
     private ExperienceCalculator expCalculator;
 
+    private Language language;
+    private BukkitAudiences adventure;
     private SQLManager sqlManager;
 
     @Override
     public void onEnable() {
+        // Dependency check
+        adventure = BukkitAudiences.create(this);
+        language = new Language("lang");
+
         // Plugin startup logic
         windowManager = new WindowManager();
         dropCalculator = new DropCalculator();
@@ -108,8 +115,8 @@ public final class StoneAge extends JavaPlugin {
         final PluginCommand command = getCommand(commandLabel);
         if (command == null) {
             final Message error = new Message("&4Couldn't set CommandExecutor for /$_1: Command is null!");
-            error.setVariable(1, commandLabel);
-            error.logToConsole(Level.SEVERE, LogTag.START_UP);
+            error.replacePlaceholder(1, commandLabel);
+            error.log(Level.SEVERE);
 
             return;
         }
@@ -120,22 +127,23 @@ public final class StoneAge extends JavaPlugin {
     private void initStoneMachines() {
         final List<String> machineLore = StoneMachine.createDefaultMachineLore();
 
-        //TODO: replace with the config (lang.yml) values (open issue #18)
-        stoneMachine = new StoneMachine("&6&lStoniarka", machineLore);
+        // TODO: Move to config.yml
+        final String machineName = new Message(getLanguage("stone-machine-item-name")).getCachedCompiledMessage().getFirst();
+
+        stoneMachine = new StoneMachine(machineName, machineLore);
     }
 
     @Override
     public void reloadConfig() throws AssertionError {
-        new Message("Reloading the configuration file...").logToConsole(Level.INFO, LogTag.CONFIG);
+        new Message("Reloading the configuration file...").log(Level.INFO);
         super.reloadConfig();
 
         //Reading 'General' configuration for Stone Machines
         if (!getConfig().isConfigurationSection("machines")) {
-            final Message error = new Message();
-            error.addLines("Invalid Configuration file (missing the \"machines\" section)!");
-            error.addLines("$_1 plugin will now be disabled.");
-            error.setVariable(1, this.getName());
-            error.logToConsole(Level.SEVERE, LogTag.CONFIG);
+            new Message("Invalid Configuration file (missing the \"machines\" section)!")
+                .addLines("$_1 plugin will now be disabled.")
+                .replacePlaceholder(1, this.getName())
+                    .log(Level.SEVERE);
 
             Bukkit.getServer().getPluginManager().disablePlugin(this);
             return;
@@ -169,8 +177,8 @@ public final class StoneAge extends JavaPlugin {
             final Message error = new Message();
             error.addLines("Invalid Configuration file (missing the \"primitive_drop\" section)!");
             error.addLines("$_1 plugin will now be disabled.");
-            error.setVariable(1, this.getName());
-            error.logToConsole(Level.SEVERE, LogTag.CONFIG);
+            error.replacePlaceholder(1, this.getName());
+            error.log(Level.SEVERE);
 
             Bukkit.getServer().getPluginManager().disablePlugin(this);
 
@@ -185,7 +193,7 @@ public final class StoneAge extends JavaPlugin {
             final Message error = new Message();
             error.addLines("Invalid Configuration file (missing the \"custom_drops\" section)!");
             error.addLines("Skipping, stone will drop server-default items.");
-            error.logToConsole(Level.SEVERE, LogTag.CONFIG);
+            error.log(Level.SEVERE);
 
             return;
         }
@@ -197,38 +205,38 @@ public final class StoneAge extends JavaPlugin {
             final Message error = new Message();
             error.addLines("Invalid Configuration file (missing the \"custom_drops\" section)!");
             error.addLines("Skipping, Stone will drop server-default values.");
-            error.logToConsole(Level.SEVERE, LogTag.CONFIG);
+            error.log(Level.SEVERE);
         } else {
             for (String entryName : customDropsSection.getKeys(false)) {
                 customDropsFound++;
 
                 final Message loadingMessage = new Message("Attempting to load drop entry: $_1");
-                loadingMessage.setVariable(1, entryName);
-                loadingMessage.logToConsole(Level.INFO, LogTag.DEBUG);
+                loadingMessage.replacePlaceholder(1, entryName);
+                loadingMessage.log(Level.INFO);
 
                 final DropEntryConfigReader customDropEntry = new DropEntryConfigReader(customDropsSection.getConfigurationSection(entryName));
 
                 dropCalculator.addDrop(customDropEntry.compileDropEntry());
 
                 final Message success = new Message("Loaded a custom drop: $_1");
-                success.setVariable(1, entryName);
-                success.logToConsole(Level.INFO, LogTag.CONFIG);
+                success.replacePlaceholder(1, entryName);
+                success.log(Level.INFO);
 
                 customDropsLoaded++;
             }
         }
 
         final Message customDropsInfo = new Message("Loaded $_1 of $_2 custom drop entries.");
-        customDropsInfo.setVariable(1, Integer.toString(customDropsLoaded));
-        customDropsInfo.setVariable(2, Integer.toString(customDropsFound));
-        customDropsInfo.logToConsole(LogTag.CONFIG);
+        customDropsInfo.replacePlaceholder(1, Integer.toString(customDropsLoaded));
+        customDropsInfo.replacePlaceholder(2, Integer.toString(customDropsFound));
+        customDropsInfo.log(Level.INFO);
 
         //Reading 'database' configuration
         if (!getConfig().isConfigurationSection("database")) {
             final Message error = new Message();
             error.addLines("Invalid Configuration file (missing the \"database\" section)!");
             error.addLines("Skipping, database won't work.");
-            error.logToConsole(Level.SEVERE, LogTag.CONFIG);
+            error.log(Level.SEVERE);
         } else {
             final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(getConfig().getConfigurationSection("database"));
             databaseConfig.readDatabaseConnectionDetails();
@@ -248,10 +256,10 @@ public final class StoneAge extends JavaPlugin {
                     final Message success = new Message();
                     success.addLines("Loaded PlayerStats ($_1) and PlayerConfigs ($_2) from the database");
                     success.addLines("Loading took $_3ms");
-                    success.setVariable(1, Integer.toString(statsCount));
-                    success.setVariable(2, Integer.toString(configsCount));
-                    success.setVariable(3, Long.toString(dbLoadFinishTime - dbLoadStartTime));
-                    success.logToConsole(Level.INFO, LogTag.DATABASE);
+                    success.replacePlaceholder(1, Integer.toString(statsCount));
+                    success.replacePlaceholder(2, Integer.toString(configsCount));
+                    success.replacePlaceholder(3, Long.toString(dbLoadFinishTime - dbLoadStartTime));
+                    success.log(Level.INFO);
 
                 }
             }.runTaskAsynchronously(this);
@@ -259,7 +267,7 @@ public final class StoneAge extends JavaPlugin {
             getDropCalculator().getDropMultiplier().readPreviousMultiplierFromDatabase();
         }
 
-        new Message("Config reloaded!").logToConsole(Level.INFO, LogTag.CONFIG);
+        new Message("Config reloaded!").log(Level.INFO);
     }
 
     public PlayersData getPlayersData() {
@@ -293,8 +301,24 @@ public final class StoneAge extends JavaPlugin {
         return expCalculator;
     }
 
+    public BukkitAudiences getAdventure() {
+        return adventure;
+    }
+
     public SQLManager getDatabaseController() {
         return sqlManager;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public String getLanguage(final String languageKey) {
+        return getLanguage(languageKey, 0);
+    }
+
+    public String getLanguage(final String languageKey, int line) {
+        return language.getText(languageKey)[line];
     }
 
     @NotNull

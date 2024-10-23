@@ -41,6 +41,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import pl.florke.stoneage.util.Message;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +82,8 @@ public class ItemStackConfigReader extends ConfigSectionReader {
         //Getting data magic value
         final byte magicValue = (byte) readMagicValue();
         if (magicValue < 0)
-            plugin.getLogger().log(Level.WARNING, "Magic value for " + itemMaterial + " wasn't specified correctly. Using default value...");
+            new Message("Magic value for $_1 wasn't specified correctly. Using default value...")
+                    .replacePlaceholder(1, itemMaterial.toString()).log(Level.WARNING);
 
         itemStack.getData().setData(magicValue < 0 ? 0 : magicValue);
 
@@ -147,7 +149,7 @@ public class ItemStackConfigReader extends ConfigSectionReader {
             if (enchantment != null) {
                 enchantments.put(enchantment, enchantmentLevel);
             } else {
-                plugin.getLogger().log(Level.WARNING, "Invalid Enchantment for the item found - please double check the config.yml file!");
+                new Message("Invalid Enchantment for the item found - please double check the config.yml file!").log(Level.WARNING);
             }
         }
 
