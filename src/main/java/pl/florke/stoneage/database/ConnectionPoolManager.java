@@ -56,10 +56,16 @@ public class ConnectionPoolManager {
 
     private void setupPool() {
         HikariConfig config = new HikariConfig();
-//        config.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
+//      config.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
 
-//        config.setJdbcUrl("jdbc:mysql://" +hostname+ ":" +port+ "/" +database);
-        config.setJdbcUrl("jdbc:mysql://" + hostname + "/" + database + "?user=" + username + "&password=" + password + "&useUnicode=true&characterEncoding=UTF-8&verifyServerCertificate=false&useSSL=false&requireSSL=false");
+        String security = databaseConfig.isSQLSafetyFeature()? "" :
+                "&verifyServerCertificate=false&useSSL=false&requireSSL=false";
+
+//      config.setJdbcUrl("jdbc:mysql://" +hostname+ ":" +port+ "/" +database);
+        config.setJdbcUrl("jdbc:mysql://" + hostname + "/" + database
+                + "?user=" + username + "&password=" + password
+                + "&useUnicode=true&characterEncoding=UTF-8" + security);
+
         config.setUsername(username);
         config.setPassword(password);
         config.setPoolName("StoneAgeDatabasePool");

@@ -6,6 +6,7 @@ database:
   db_name: 'stoneage'
   db_user: 'root'
   db_password: ''
+  db_ssl: true
 
 machines:
   default_drop_multiplier: 1.0
