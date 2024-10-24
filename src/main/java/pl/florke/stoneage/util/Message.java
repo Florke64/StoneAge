@@ -182,6 +182,15 @@ public class Message {
         return this.cachedCompiledMessage;
     }
 
+    public Component[] asComponents() {
+        Component[] components = new Component[this.cachedCompiledMessage.size()];
+        for (String s : this.cachedCompiledMessage) {
+            components[this.cachedCompiledMessage.indexOf(s)] = Component.text(s);
+        }
+
+        return components;
+    }
+
     @SuppressWarnings("unused")
     public boolean isUsingPrefixOnSend() {
         return usePrefixOnSend;
