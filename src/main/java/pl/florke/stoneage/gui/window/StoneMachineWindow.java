@@ -17,7 +17,6 @@
 
 package pl.florke.stoneage.gui.window;
 
-import org.bukkit.ChatColor;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -38,8 +37,8 @@ public class StoneMachineWindow extends Window {
     private final Dispenser stoneMachine;
 
     public StoneMachineWindow(Player owner, Dispenser stoneMachine) {
-        super(StoneAge.getPlugin(StoneAge.class)
-                .getLanguage("stone-drop-actions-title"));
+        super(Message.color(StoneAge.getPlugin(StoneAge.class)
+                .getLanguage("stone-drop-actions-title")));
 
         windowOwner = owner;
         this.stoneMachine = stoneMachine;
@@ -49,12 +48,8 @@ public class StoneMachineWindow extends Window {
         return stoneMachine;
     }
 
-    public Player getWindowOwner() {
-        return windowOwner;
-    }
-
     @Override
-    public boolean open(Player player) {
+    public boolean open(@NotNull Player player) {
         if (!super.open(player)) {
             new Message(plugin.getLanguage("stone-machine-gui-error")).send(player);
             return false;
@@ -68,7 +63,7 @@ public class StoneMachineWindow extends Window {
 
     @Override
     public void updateInventoryContent() {
-        final ItemButtonFactory buttonFactory = new ItemButtonFactory(windowOwner);
+        final ItemButtonFactory buttonFactory = new ItemButtonFactory();
 
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0, 0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_FILTER));
 //        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0,1).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_INFO));
@@ -105,7 +100,7 @@ public class StoneMachineWindow extends Window {
             final Message msg = new Message();
             if (usesLeft > 0) {
                 msg.addLines(plugin.getLanguage("stone-smelting-use"));
-                msg.replacePlaceholder(1, Integer.toString(usesLeft));
+                msg.placeholder(1, Integer.toString(usesLeft));
             } else {
                 msg.addLines(plugin.getLanguage("stone-smelting-hopper"));
             }

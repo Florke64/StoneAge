@@ -20,7 +20,6 @@ package pl.florke.stoneage.config;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
-import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.util.Message;
 
 import java.util.HashMap;
@@ -30,7 +29,7 @@ import java.util.logging.Level;
 
 public class ToolsConfigReader extends ConfigSectionReader {
 
-    private Map<Material, Integer> miningTools = new HashMap<>();
+    private final Map<Material, Integer> miningTools = new HashMap<>();
     private Material machineDestroyTool;
 
     public ToolsConfigReader(ConfigurationSection configurationSection) {
@@ -55,7 +54,7 @@ public class ToolsConfigReader extends ConfigSectionReader {
             final Material toolMaterial = Material.getMaterial(key);
             if (toolMaterial == null) {
                 new Message("Invalid $_1 in tool levels configuration! Skipping...")
-                        .replacePlaceholder(1, key).log(Level.WARNING);
+                        .placeholder(1, key).log(Level.WARNING);
                 continue;
             }
 
@@ -63,8 +62,8 @@ public class ToolsConfigReader extends ConfigSectionReader {
             miningTools.put(toolMaterial, level);
 
             new Message("Added applicable tool $_1 ($_2)")
-                    .replacePlaceholder(1, toolMaterial.toString())
-                    .replacePlaceholder(2, String.valueOf(level))
+                    .placeholder(1, toolMaterial.toString())
+                    .placeholder(2, String.valueOf(level))
                     .log(Level.INFO);
         }
     }

@@ -54,13 +54,13 @@ public class MinerLevelUpListener implements Listener {
         final int lvl = event.getUpToLevel();
         if (lvl > 40 || lvl % 5 == 0 || lvl == 2) {
             final Message congratulations = new Message("&dGratulacje! &c$_1 &dosiaga &6$_2 &dpoziom gornictwa!");
-            congratulations.replacePlaceholder(1, player.getName());
-            congratulations.replacePlaceholder(2, Integer.toString(lvl));
+            congratulations.placeholder(1, player.getName());
+            congratulations.placeholder(2, Integer.toString(lvl));
             congratulations.broadcast();
         } else {
             final Message congratulations = new Message("&dGratulacje! &c$_1 &dosiagasz &6$_2 &dpoziom gornictwa!");
-            congratulations.replacePlaceholder(1, player.getName());
-            congratulations.replacePlaceholder(2, Integer.toString(lvl));
+            congratulations.placeholder(1, player.getName());
+            congratulations.placeholder(2, Integer.toString(lvl));
             congratulations.send(player);
         }
     }

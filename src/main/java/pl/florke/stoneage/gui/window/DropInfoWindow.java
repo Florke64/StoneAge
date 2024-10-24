@@ -23,6 +23,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.drop.DropCalculator;
@@ -44,7 +45,8 @@ public class DropInfoWindow extends Window {
 
     //TODO: Support for pagination
     public DropInfoWindow(Player owner) {
-        super(Message.color("stone-drop-info-title"));
+        super(Message.color(StoneAge.getPlugin(StoneAge.class)
+                .getLanguage("stone-drop-info-title")));
 
         windowContentOwner = owner;
         personalDropConfig = plugin.getPlayersData().getPersonalDropConfig(windowContentOwner.getUniqueId());
@@ -98,7 +100,7 @@ public class DropInfoWindow extends Window {
         final List<String> lore = new ArrayList<>();
         if (!playerHasNeededLevelForDrop) {
             lore.add(new Message(plugin.getLanguage("stone-drop-info-lvl-required"))
-                    .replacePlaceholder(1, String.valueOf(drop.getNeededMinerLevel()))
+                    .placeholder(1, String.valueOf(drop.getNeededMinerLevel()))
                     .getCachedCompiledMessage().getFirst());
         } else {
             lore.add(Message.color("  &8+" + drop.getMinerExp() + "xp"));
@@ -107,12 +109,12 @@ public class DropInfoWindow extends Window {
                     plugin.getLanguage("system-enabled") : plugin.getLanguage("system-disabled"))
                     .getCachedCompiledMessage().getFirst();
             lore.add(new Message(plugin.getLanguage("stone-drop-info-entry-status"))
-                    .replacePlaceholder(1, dropEntryStatus).getCachedCompiledMessage().getFirst());
+                    .placeholder(1, dropEntryStatus).getCachedCompiledMessage().getFirst());
             lore.add(new Message(plugin.getLanguage("stone-drop-info-click-to-switch"))
                     .getCachedCompiledMessage().getFirst());
             lore.add(" ");
             lore.add(new Message(plugin.getLanguage("command-feedback-drop-print-summary"))
-                    .replacePlaceholder(1, String.valueOf(stats.getStatistic(drop.getEntryName())))
+                    .placeholder(1, String.valueOf(stats.getStatistic(drop.getEntryName())))
                     .getCachedCompiledMessage().getFirst());
         }
 
@@ -121,7 +123,7 @@ public class DropInfoWindow extends Window {
 
             final float realDropChance = getRealChancePercentage(drop);
             lore.add(new Message(plugin.getLanguage("stone-machine-drop-chance"))
-                    .replacePlaceholder(1, String.valueOf(realDropChance))
+                    .placeholder(1, String.valueOf(realDropChance))
                     .getCachedCompiledMessage().getFirst());
         }
 
@@ -179,8 +181,8 @@ public class DropInfoWindow extends Window {
         boolean isDropping = plugin.getPlayersData().getPersonalDropConfig(player.getUniqueId()).switchDropEntry(dropEntry);
 
         final Message infoMessage = new Message(plugin.getLanguage("stone-drop-info"));
-        infoMessage.replacePlaceholder(1, dropEntry.getCustomName());
-        infoMessage.replacePlaceholder(2, (isDropping ?
+        infoMessage.placeholder(1, dropEntry.getCustomName());
+        infoMessage.placeholder(2, (isDropping ?
                 plugin.getLanguage("system-enabled") :
                 plugin.getLanguage("system-disabled")));
         infoMessage.send(player);

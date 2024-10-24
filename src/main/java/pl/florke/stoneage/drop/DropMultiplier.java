@@ -18,7 +18,6 @@
 package pl.florke.stoneage.drop;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -161,14 +160,13 @@ public class DropMultiplier {
     }
 
     public void readPreviousMultiplierFromDatabase() {
-        final StringBuilder query = new StringBuilder();
 
-        query.append("SELECT * FROM `" + SQLManager.TABLE_DROP_MULTIPLIER + "` ");
-        query.append("ORDER BY `" + SQLManager.TABLE_DROP_MULTIPLIER + "`.`Timeout` DESC ");
-        query.append("LIMIT 1;");
+        String query = "SELECT * FROM `" + SQLManager.TABLE_DROP_MULTIPLIER + "` " +
+                "ORDER BY `" + SQLManager.TABLE_DROP_MULTIPLIER + "`.`Timeout` DESC " +
+                "LIMIT 1;";
 
         try (final Connection conn = plugin.getDatabaseController().getConnection();
-             final PreparedStatement ps = conn.prepareStatement(query.toString());
+             final PreparedStatement ps = conn.prepareStatement(query);
              final ResultSet response = ps.executeQuery()) {
 
             if (response == null) {
@@ -213,7 +211,7 @@ public class DropMultiplier {
             public void run() {
                 multiplierBossBar.removeAll();
                 if (!DropMultiplier.this.isActive()) {
-                    if (activeCheck == true) {
+                    if (activeCheck) {
                         activeCheck = false;
                         new Message(plugin.getLanguage("stone-multiplier-end")).broadcast();
                     }
@@ -251,8 +249,8 @@ public class DropMultiplier {
 
         multiplierBossBar.setTitle(
             new Message(plugin.getLanguage("stone-multiplier-title", bossBarTitleId))
-                    .replacePlaceholder(1, Float.toString(value))
-                    .replacePlaceholder(2, Integer.toString(leftTime))
+                    .placeholder(1, Float.toString(value))
+                    .placeholder(2, Integer.toString(leftTime))
                     .getCachedCompiledMessage().getFirst()
         );
 

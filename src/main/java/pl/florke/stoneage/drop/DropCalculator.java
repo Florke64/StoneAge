@@ -193,9 +193,6 @@ public class DropCalculator {
     }
 
     public List<DropEntry> getDropEntries() {
-        final List<DropEntry> dropEntryList = new ArrayList<>();
-        dropEntryList.addAll(dropEntries.values());
-
-        return dropEntryList;
+        return new ArrayList<>(dropEntries.values());
     }
 }

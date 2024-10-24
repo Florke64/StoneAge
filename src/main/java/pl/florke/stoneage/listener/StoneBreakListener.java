@@ -60,10 +60,7 @@ public class StoneBreakListener implements Listener {
     public void onStoneBreak(@NotNull BlockBreakEvent event) {
         if (event.isCancelled()) return;
 
-//        long start = System.currentTimeMillis();
-
         final Player player = event.getPlayer();
-        if (player == null) return;
 
         final Block brokenBlock = event.getBlock();
         if (!brokenBlock.getType().equals(Material.STONE)) return;
@@ -74,8 +71,8 @@ public class StoneBreakListener implements Listener {
             dropMultiplier.getMultiplierBossBar().setVisible(true);
         }
 
-        @SuppressWarnings("deprecation")
-        byte stoneType = brokenBlock.getState().getData().getData();
+        new Message(brokenBlock.getState().getBlockData().getAsString() + " stone broken");
+        byte stoneType = 0;
         if (stoneType != ((byte) 0)) return;
 
         final Block machineBlock = plugin.getStoneMachine().getConnectedStoneMachine(brokenBlock);
@@ -85,10 +82,6 @@ public class StoneBreakListener implements Listener {
         event.setDropItems(false);
 
         customizeStoneDrop(player, stoneMachine, brokenBlock);
-
-//        long stop = System.currentTimeMillis();
-//        new Message()"StoneBreakListener took " + (stop-start) + "ms of main thread time.");
-
     }
 
     private void customizeStoneDrop(@NotNull Player player, Dispenser stoneMachine, Block brokenBlock) {
@@ -101,8 +94,8 @@ public class StoneBreakListener implements Listener {
 
             if (finalDrop == null) {
                 new Message("DropLoot calculated is null (Player: $_1, Location: $_2)")
-                        .replacePlaceholder(1, player.getName())
-                        .replacePlaceholder(2, brokenBlock.getLocation().toString())
+                        .placeholder(1, player.getName())
+                        .placeholder(2, brokenBlock.getLocation().toString())
                         .log(Level.WARNING);
             }
 
@@ -121,7 +114,7 @@ public class StoneBreakListener implements Listener {
                 public void run() {
                     plugin.getStoneMachine().generateStone(brokenBlock.getLocation());
                 }
-            }.runTaskLater(plugin, 1l);
+            }.runTaskLater(plugin, 1L);
         }
     }
 
@@ -186,8 +179,8 @@ public class StoneBreakListener implements Listener {
 
             if (drop != plugin.getDropCalculator().getPrimitiveDropEntry()) {
                 final Message dropMessage = new Message(plugin.getLanguage("stone-machine-drop-alert"));
-                dropMessage.replacePlaceholder(1, drop.getCustomName());
-                dropMessage.replacePlaceholder(2, Integer.toString(totalAmount));
+                dropMessage.placeholder(1, drop.getCustomName());
+                dropMessage.placeholder(2, Integer.toString(totalAmount));
                 dropMessage.sendActionMessage(player);
             }
         }

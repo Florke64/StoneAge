@@ -48,11 +48,6 @@ public class StoneDropLootEvent extends Event implements Cancellable {
     }
 
     @Override
-    public String getEventName() {
-        return super.getEventName();
-    }
-
-    @Override
     public HandlerList getHandlers() {
         return handlers;
     }

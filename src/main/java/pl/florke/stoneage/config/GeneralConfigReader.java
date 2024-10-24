@@ -42,7 +42,7 @@ public class GeneralConfigReader extends ConfigSectionReader {
         super(section);
     }
 
-    public boolean compile() {
+    public void compile() {
         defaultDropMultiplier = Float.parseFloat(rootSection.getString("default_drop_multiplier", "1.0"));
         maxDropMultiplier = Float.parseFloat(rootSection.getString("max_drop_multiplier", "2.0"));
 
@@ -59,7 +59,6 @@ public class GeneralConfigReader extends ConfigSectionReader {
         allowHopperDropOutput = rootSection.getBoolean("allow_hopper_output", true);
         allowCoalUpgradesByHopper = rootSection.getBoolean("allow_hopper_input", true);
 
-        return true;
     }
 
     public int getCommandsCoolDown() {

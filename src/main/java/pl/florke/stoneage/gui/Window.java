@@ -34,7 +34,7 @@ public abstract class Window {
     protected final StoneAge plugin;
     protected final String windowTitle;
     private final List<Player> users;
-    protected Inventory inventory;
+    protected final Inventory inventory;
 
     public Window(final String windowName) {
         plugin = StoneAge.getPlugin(StoneAge.class);

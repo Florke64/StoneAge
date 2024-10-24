@@ -243,13 +243,11 @@ public class SQLManager {
     private void addTableColumnIfNotExist(final String tableName, final String columnName, final String columnType, final String defaultValue) {
         final String databaseName = getDatabaseName();
 
-        final StringBuilder query = new StringBuilder();
-
-        query.append("ALTER TABLE " + databaseName + ".`" + tableName + "` ");
-        query.append("ADD COLUMN `" + columnName + "` " + columnType + " NOT NULL default " + defaultValue + ";");
+        String query = "ALTER TABLE " + databaseName + ".`" + tableName + "` " +
+                "ADD COLUMN `" + columnName + "` " + columnType + " NOT NULL default " + defaultValue + ";";
 
         try (final Connection conn = connectionPool.getConnection();
-             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
+             final PreparedStatement ps = conn.prepareStatement(query)) {
             if (conn == null || ps == null) return;
 
             ps.executeUpdate();
@@ -265,21 +263,19 @@ public class SQLManager {
     private void makeDropMultiplierTable() {
         final String databaseName = getDatabaseName();
 
-        final StringBuilder query = new StringBuilder();
-
-        query.append("CREATE TABLE IF NOT EXISTS `" + databaseName + "`.`" + TABLE_DROP_MULTIPLIER + "`");
-        query.append(" (");
-        query.append(" `MultiplierId` INT NOT NULL AUTO_INCREMENT,");
-        query.append(" `SetOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,");
-        query.append(" `Timeout` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,");
-        query.append(" `MultiplierValue` FLOAT NOT NULL DEFAULT '1.0',");
-        query.append(" `CallerName` VARCHAR(16),");
-        query.append(" `CallerUUID` VARCHAR(36),");
-        query.append(" PRIMARY KEY (`MultiplierId`)");
-        query.append(") ");
+        String query = "CREATE TABLE IF NOT EXISTS `" + databaseName + "`.`" + TABLE_DROP_MULTIPLIER + "`" +
+                " (" +
+                " `MultiplierId` INT NOT NULL AUTO_INCREMENT," +
+                " `SetOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+                " `Timeout` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+                " `MultiplierValue` FLOAT NOT NULL DEFAULT '1.0'," +
+                " `CallerName` VARCHAR(16)," +
+                " `CallerUUID` VARCHAR(36)," +
+                " PRIMARY KEY (`MultiplierId`)" +
+                ") ";
 
         try (final Connection conn = connectionPool.getConnection();
-             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
+             final PreparedStatement ps = conn.prepareStatement(query)) {
             if (conn == null || ps == null) return;
             ps.executeUpdate();
 
@@ -292,18 +288,16 @@ public class SQLManager {
         final Timestamp startTime = new Timestamp(start);
         final Timestamp timeoutTime = new Timestamp(end);
 
-        final StringBuilder query = new StringBuilder();
-        query.append("INSERT INTO ").append(getDatabaseName() + ".`" + SQLManager.TABLE_DROP_MULTIPLIER + "` ");
-
-        query.append(" (`MultiplierId`, `SetOn`, `Timeout`, `MultiplierValue`, `CallerName`, `CallerUUID`) VALUES (NULL,");
-        query.append(" '" + startTime + "',");
-        query.append(" '" + timeoutTime + "',");
-        query.append(" '" + value + "', ");
-        query.append(" '" + callerName + "', ");
-        query.append(" '" + callerUniqueId.toString() + "');");
+        String query = "INSERT INTO " + getDatabaseName() + ".`" + SQLManager.TABLE_DROP_MULTIPLIER + "` " +
+                " (`MultiplierId`, `SetOn`, `Timeout`, `MultiplierValue`, `CallerName`, `CallerUUID`) VALUES (NULL," +
+                " '" + startTime + "'," +
+                " '" + timeoutTime + "'," +
+                " '" + value + "', " +
+                " '" + callerName + "', " +
+                " '" + callerUniqueId + "');";
 
         try (final Connection conn = connectionPool.getConnection();
-             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
+             final PreparedStatement ps = conn.prepareStatement(query)) {
             if (conn == null || ps == null) return;
 
             ps.executeUpdate();
@@ -315,17 +309,15 @@ public class SQLManager {
     private void makePlayerDropConfigTable() {
         final String databaseName = getDatabaseName();
 
-        final StringBuilder query = new StringBuilder();
-
-        query.append("CREATE TABLE IF NOT EXISTS " + databaseName + "." + TABLE_PLAYER_DROP_CONFIG);
-        query.append(" (");
-        query.append(" `PlayerUUID` VARCHAR(36),");
-        query.append(" `PlayerName` VARCHAR(16),");
-        query.append(" PRIMARY KEY (`PlayerUUID`)");
-        query.append(") ");
+        String query = "CREATE TABLE IF NOT EXISTS " + databaseName + "." + TABLE_PLAYER_DROP_CONFIG +
+                " (" +
+                " `PlayerUUID` VARCHAR(36)," +
+                " `PlayerName` VARCHAR(16)," +
+                " PRIMARY KEY (`PlayerUUID`)" +
+                ") ";
 
         try (final Connection conn = connectionPool.getConnection();
-             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
+             final PreparedStatement ps = conn.prepareStatement(query)) {
             if (conn == null || ps == null) return;
 
             ps.executeUpdate();
@@ -338,19 +330,17 @@ public class SQLManager {
     private void makePlayerStatsTable() {
         final String databaseName = connectionPool.getDatabaseConfig().getDatabaseName();
 
-        final StringBuilder query = new StringBuilder();
-
-        query.append("CREATE TABLE IF NOT EXISTS " + databaseName + "." + TABLE_PLAYER_STATS);
-        query.append(" (");
-        query.append(" `PlayerUUID` VARCHAR(36),");
-        query.append(" `PlayerName` VARCHAR(16),");
-        query.append(" `MinerExp` BIGINT UNSIGNED NOT NULL DEFAULT '0',");
-        query.append(" `MinerLvl` INT UNSIGNED NOT NULL DEFAULT '1',");
-        query.append(" PRIMARY KEY (`PlayerUUID`)");
-        query.append(") ");
+        String query = "CREATE TABLE IF NOT EXISTS " + databaseName + "." + TABLE_PLAYER_STATS +
+                " (" +
+                " `PlayerUUID` VARCHAR(36)," +
+                " `PlayerName` VARCHAR(16)," +
+                " `MinerExp` BIGINT UNSIGNED NOT NULL DEFAULT '0'," +
+                " `MinerLvl` INT UNSIGNED NOT NULL DEFAULT '1'," +
+                " PRIMARY KEY (`PlayerUUID`)" +
+                ") ";
 
         try (final Connection conn = connectionPool.getConnection();
-             final PreparedStatement ps = conn.prepareStatement(query.toString())) {
+             final PreparedStatement ps = conn.prepareStatement(query)) {
             if (conn == null || ps == null) return;
 
             ps.executeUpdate();
@@ -374,8 +364,8 @@ public class SQLManager {
                         final int savedCount = saveAllOnlinePlayersData();
 
                         new Message("Saved $_1 players in database. Next Auto-Save: $_2m")
-                            .replacePlaceholder(1, Integer.toString(savedCount))
-                            .replacePlaceholder(2, Long.toString(period))
+                            .placeholder(1, Integer.toString(savedCount))
+                            .placeholder(2, Long.toString(period))
                                 .log(Level.INFO);
 
                     }

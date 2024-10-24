@@ -41,12 +41,12 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dispenser;
+import org.bukkit.block.data.Directional;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Directional;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -130,7 +130,7 @@ public class StoneMachine {
      */
     public boolean repairStoneMachine(@NotNull final Dispenser machine) {
         boolean result = true;
-        final long repairCooldownLimit = (System.currentTimeMillis() - (1000 * getRepairCooldown()));
+        final long repairCooldownLimit = (System.currentTimeMillis() - (1000L * getRepairCooldown()));
         if (lastStoneMachineRepair.containsKey(machine) && lastStoneMachineRepair.get(machine) >= repairCooldownLimit) {
             //Player is trying to repair stone machine too frequently
             result = false;
@@ -152,7 +152,7 @@ public class StoneMachine {
     public Location getGeneratedStoneLocation(@NotNull final Dispenser stoneMachine) {
         Location result = null;
         if (isStoneMachine(stoneMachine.getInventory())) {
-            final Directional machine = (Directional) stoneMachine.getData();
+            final Directional machine = (Directional) stoneMachine.getBlockData();
             result = stoneMachine.getBlock().getRelative(machine.getFacing()).getLocation();
         }
 
@@ -160,11 +160,9 @@ public class StoneMachine {
     }
 
     public boolean isStoneMachine(@Nullable final Block block) {
-        if (block == null || !(block.getState() instanceof Dispenser)) {
+        if (block == null || !(block.getState() instanceof Dispenser machine)) {
             return false;
         }
-
-        final Dispenser machine = (Dispenser) block.getState();
 
         if (machine.getCustomName() == null) {
             return false;
@@ -197,10 +195,9 @@ public class StoneMachine {
             final Block relativeBlock = block.getRelative(BlockFace.values()[i], 1);
 
             if (isStoneMachine(relativeBlock)) {
-                final Dispenser stoneMachine = (Dispenser) relativeBlock.getState();
-                final Directional direction = (Directional) stoneMachine.getData();
+                final Directional machine = (Directional) relativeBlock.getBlockData();
 
-                if (direction.getFacing().getOppositeFace().equals(BlockFace.values()[i])) {
+                if (machine.getFacing().getOppositeFace().equals(BlockFace.values()[i])) {
                     return relativeBlock;
                 }
             }

@@ -59,7 +59,7 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         //If there was an error while reading those sections
         if (defaultToolItem == null && silkToolItem == null) {
             new Message("Error while reading DropEntry: $_1.")
-                    .replacePlaceholder(1, rootSection.getName())
+                    .placeholder(1, rootSection.getName())
                     .log(Level.SEVERE);
 
             return null;
@@ -113,13 +113,17 @@ public class DropEntryConfigReader extends ConfigSectionReader {
 
     private float readDropChanceWeight() {
         final String weightString = rootSection.getString("weight");
+        if (weightString == null) {
+            new Message("Error while reading DropEntry: null").log(Level.SEVERE);
+            return 0.0f;
+        }
 
         float weight;
         try {
             weight = Float.parseFloat(weightString);
         } catch (NumberFormatException ex) {
             weight = 0.0f;
-            ex.printStackTrace();
+            new Message("Null DropEntry weight: $_1").placeholder(1, weightString).log(Level.SEVERE);
         }
 
         return weight;

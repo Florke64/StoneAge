@@ -61,11 +61,6 @@ public class StoneMachineStoneBreakEvent extends Event {
     }
 
     @Override
-    public String getEventName() {
-        return super.getEventName();
-    }
-
-    @Override
     public HandlerList getHandlers() {
         return handlers;
     }

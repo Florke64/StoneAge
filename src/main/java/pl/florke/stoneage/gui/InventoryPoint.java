@@ -20,8 +20,6 @@ package pl.florke.stoneage.gui;
 import org.bukkit.event.inventory.InventoryType;
 import pl.florke.stoneage.StoneAge;
 
-import java.util.logging.Logger;
-
 /**
  * This object allows to easily convert raw slow value to
  * the Array of {x,y} and vice-versa.
@@ -29,16 +27,14 @@ import java.util.logging.Logger;
 public class InventoryPoint {
 
     private final StoneAge plugin;
-    private final Logger logger;
 
     private final InventoryType inventoryType;
 
     private int slotNumber;
-    private int[] point = new int[2];
+    private final int[] point = new int[2];
 
     public InventoryPoint(InventoryType usedFrame, int slotNumber) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
-        this.logger = plugin.getLogger();
 
         this.inventoryType = usedFrame;
         this.slotNumber = slotNumber;
@@ -48,7 +44,6 @@ public class InventoryPoint {
 
     public InventoryPoint(InventoryType usedFrame, int x, int y) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
-        this.logger = plugin.getLogger();
 
         this.inventoryType = usedFrame;
 
@@ -102,10 +97,9 @@ public class InventoryPoint {
 
     @Override
     public String toString() {
-        final StringBuilder text = new StringBuilder();
-        text.append("InventoryPoint#toString(): ").append(slotNumber).append(", ");
-        text.append(" [").append(point[0]).append("; ").append(point[1]).append("]");
+        String text = "InventoryPoint#toString(): " + slotNumber + ", " +
+                " [" + point[0] + "; " + point[1] + "]";
 
-        return text.toString();
+        return text;
     }
 }

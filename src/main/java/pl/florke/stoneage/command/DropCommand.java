@@ -39,6 +39,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.gui.window.DropInfoWindow;
 import pl.florke.stoneage.util.Message;
@@ -54,14 +55,14 @@ public class DropCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            new Message("&cTylko Gracz moze wykonac te komende!").send(sender);
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!(sender instanceof Player player)) {
+            new Message(plugin.getLanguage("command-error-cmd-executor")).send(sender);
             return true;
         }
 
         if (executionController.isCooldown(sender)) {
-            new Message("&cOdczekaj chwile przed wykonaniem kolejnej komendy.").send(sender);
+            new Message(plugin.getLanguage("command-error-cooldown")).send(sender);
             return true;
         }
 
@@ -82,7 +83,6 @@ public class DropCommand implements CommandExecutor {
 
         executionController.recordCommandExecution(sender);
 
-        final Player player = (Player) sender;
         final DropInfoWindow window = new DropInfoWindow(player);
 
         new BukkitRunnable() {

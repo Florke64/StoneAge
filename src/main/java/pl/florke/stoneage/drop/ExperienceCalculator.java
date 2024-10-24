@@ -57,35 +57,37 @@ public class ExperienceCalculator {
     }
 
     private void initExperienceTableValues() {
-        final int start_x = 1;
+        experienceTable.clear(); // clear cache
+
         final int maxLevel = getMaximumMinerLevel();
 
-        experienceTable.clear();
-
-        for (int x = start_x; x <= (maxLevel); x++) {
-            double nextLevelFormula = (double) INITIAL_XP;
-            if (x == start_x) {
-                nextLevelFormula += (double) INITIAL_XP;
-            } else {
-                nextLevelFormula += (double) experienceTable.get(experienceTable.size() - 1);
-            }
-            nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) x / 10d) * Math.pow(2, 0));
-            nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) x / 50d) * Math.pow(2, 16));
-            nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) x / 100d) * Math.pow(2, 16)) * 2;
+        for (int lvl=1; lvl <= (maxLevel); lvl++) {
+            double nextLevelFormula = getNextLevelFormula(lvl);
 
             experienceTable.add((long) nextLevelFormula);
         }
 
         new Message("ExperienceTable: Generated new Experience Table ($_1 level(s)) from the math formula.")
-            .replacePlaceholder(1, Integer.toString(experienceTable.size()))
+            .placeholder(1, Integer.toString(experienceTable.size()))
             .log(Level.INFO);
-
-//        int level = 2;
-//        for(final long exp : experienceTable) {
-//            new Message()"Level " + level + " - Exp needed: " + exp);
-//            level++;
-//        }
     }
+
+    private double getNextLevelFormula(int level) {
+        double nextLevelFormula = (double) INITIAL_XP;
+        if (level == 1)
+            nextLevelFormula += (double) INITIAL_XP;
+        else
+            nextLevelFormula += (double) experienceTable.getLast();
+
+        nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) level / 10d) * Math.pow(2, 0));
+        nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) level / 50d) * Math.pow(2, 16));
+        nextLevelFormula += ((double) INITIAL_XP * Math.floor((double) level / 100d) * Math.pow(2, 16)) * 2;
+
+        new Message("Level " + level + " - Exp needed: " + nextLevelFormula);
+
+        return nextLevelFormula;
+    }
+
 
     public int getMaximumMinerLevel() {
         return this.maximumMinerLevel;

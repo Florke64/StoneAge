@@ -115,7 +115,7 @@ public final class StoneAge extends JavaPlugin {
         final PluginCommand command = getCommand(commandLabel);
         if (command == null) {
             final Message error = new Message("&4Couldn't set CommandExecutor for /$_1: Command is null!");
-            error.replacePlaceholder(1, commandLabel);
+            error.placeholder(1, commandLabel);
             error.log(Level.SEVERE);
 
             return;
@@ -142,7 +142,7 @@ public final class StoneAge extends JavaPlugin {
         if (!getConfig().isConfigurationSection("machines")) {
             new Message("Invalid Configuration file (missing the \"machines\" section)!")
                 .addLines("$_1 plugin will now be disabled.")
-                .replacePlaceholder(1, this.getName())
+                .placeholder(1, this.getName())
                     .log(Level.SEVERE);
 
             Bukkit.getServer().getPluginManager().disablePlugin(this);
@@ -177,7 +177,7 @@ public final class StoneAge extends JavaPlugin {
             final Message error = new Message();
             error.addLines("Invalid Configuration file (missing the \"primitive_drop\" section)!");
             error.addLines("$_1 plugin will now be disabled.");
-            error.replacePlaceholder(1, this.getName());
+            error.placeholder(1, this.getName());
             error.log(Level.SEVERE);
 
             Bukkit.getServer().getPluginManager().disablePlugin(this);
@@ -211,7 +211,7 @@ public final class StoneAge extends JavaPlugin {
                 customDropsFound++;
 
                 final Message loadingMessage = new Message("Attempting to load drop entry: $_1");
-                loadingMessage.replacePlaceholder(1, entryName);
+                loadingMessage.placeholder(1, entryName);
                 loadingMessage.log(Level.INFO);
 
                 final DropEntryConfigReader customDropEntry = new DropEntryConfigReader(customDropsSection.getConfigurationSection(entryName));
@@ -219,7 +219,7 @@ public final class StoneAge extends JavaPlugin {
                 dropCalculator.addDrop(customDropEntry.compileDropEntry());
 
                 final Message success = new Message("Loaded a custom drop: $_1");
-                success.replacePlaceholder(1, entryName);
+                success.placeholder(1, entryName);
                 success.log(Level.INFO);
 
                 customDropsLoaded++;
@@ -227,8 +227,8 @@ public final class StoneAge extends JavaPlugin {
         }
 
         final Message customDropsInfo = new Message("Loaded $_1 of $_2 custom drop entries.");
-        customDropsInfo.replacePlaceholder(1, Integer.toString(customDropsLoaded));
-        customDropsInfo.replacePlaceholder(2, Integer.toString(customDropsFound));
+        customDropsInfo.placeholder(1, Integer.toString(customDropsLoaded));
+        customDropsInfo.placeholder(2, Integer.toString(customDropsFound));
         customDropsInfo.log(Level.INFO);
 
         //Reading 'database' configuration
@@ -256,9 +256,9 @@ public final class StoneAge extends JavaPlugin {
                     final Message success = new Message();
                     success.addLines("Loaded PlayerStats ($_1) and PlayerConfigs ($_2) from the database");
                     success.addLines("Loading took $_3ms");
-                    success.replacePlaceholder(1, Integer.toString(statsCount));
-                    success.replacePlaceholder(2, Integer.toString(configsCount));
-                    success.replacePlaceholder(3, Long.toString(dbLoadFinishTime - dbLoadStartTime));
+                    success.placeholder(1, Integer.toString(statsCount));
+                    success.placeholder(2, Integer.toString(configsCount));
+                    success.placeholder(3, Long.toString(dbLoadFinishTime - dbLoadStartTime));
                     success.log(Level.INFO);
 
                 }
@@ -321,16 +321,10 @@ public final class StoneAge extends JavaPlugin {
         return language.getText(languageKey)[line];
     }
 
-    @NotNull
-    @Override
-    public FileConfiguration getConfig() {
-        return super.getConfig();
-    }
-
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        this.getLogger().log(Level.INFO, "Called plugin's onDisable() method. Bye cruel world!");
+        new Message("Called plugin's onDisable() method. Bye cruel world!").log(Level.INFO);
 
         if (getDropCalculator() != null && getDropCalculator().getDropMultiplier() != null && getDropCalculator().getDropMultiplier().getMultiplierBossBar() != null)
             getDropCalculator().getDropMultiplier().getMultiplierBossBar().removeAll();

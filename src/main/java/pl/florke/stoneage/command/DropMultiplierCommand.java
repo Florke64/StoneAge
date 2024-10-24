@@ -37,7 +37,7 @@ public class DropMultiplierCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (args.length == 0) {
             printMultiplierInfo(sender, multiplier, false);
 
@@ -63,7 +63,6 @@ public class DropMultiplierCommand implements CommandExecutor {
                 time = Long.parseLong(args[1]) * 60 * 1000;
             } catch (NumberFormatException ex) {
                 new Message(lang.getText("command-feedback-invalid-time")).send(sender);
-                ex.printStackTrace();
                 return false;
             }
         }
@@ -89,9 +88,9 @@ public class DropMultiplierCommand implements CommandExecutor {
         if (!multiplier.isActive()) {
             multiplierMessage.addLines(lang.getText("command-feedback-multiplier-active"));
 
-            multiplierMessage.replacePlaceholder(1, multiplier.getCallerName());
-            multiplierMessage.replacePlaceholder(2, Float.toString(multiplier.getCurrentDropMultiplier()));
-            multiplierMessage.replacePlaceholder(3, Integer.toString(multiplier.getMinutesLeft()));
+            multiplierMessage.placeholder(1, multiplier.getCallerName());
+            multiplierMessage.placeholder(2, Float.toString(multiplier.getCurrentDropMultiplier()));
+            multiplierMessage.placeholder(3, Integer.toString(multiplier.getMinutesLeft()));
         } else {
             multiplierMessage.addLines(lang.getText("command-feedback-multiplier-inactive"));
         }

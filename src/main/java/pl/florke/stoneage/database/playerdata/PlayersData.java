@@ -197,8 +197,8 @@ public class PlayersData {
         }
 
         new Message("Saved $_1 personal configs (skipped: $_2)")
-                .replacePlaceholder(1, String.valueOf(saved))
-                .replacePlaceholder(2, String.valueOf(skipped))
+                .placeholder(1, String.valueOf(saved))
+                .placeholder(2, String.valueOf(skipped))
                 .log(Level.INFO);
 
         saved = 0;
@@ -215,8 +215,8 @@ public class PlayersData {
         }
 
         new Message("Saved " + saved + " player stats (skipped: " + skipped + ")")
-                .replacePlaceholder(1, String.valueOf(saved))
-                .replacePlaceholder(2, String.valueOf(skipped))
+                .placeholder(1, String.valueOf(saved))
+                .placeholder(2, String.valueOf(skipped))
                 .log(Level.INFO);
     }
 

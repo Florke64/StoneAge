@@ -1,5 +1,7 @@
+# noinspection PluginYml,YAMLSchemaValidation
 name: ${project.artifactId}
 version: ${project.version}
+# noinspection PluginYml,YAMLSchemaValidation
 main: ${project.groupId}.StoneAge
 api-version: 1.21
 prefix: ${project.name}

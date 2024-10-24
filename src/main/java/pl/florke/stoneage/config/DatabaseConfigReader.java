@@ -28,6 +28,8 @@ public class DatabaseConfigReader extends ConfigSectionReader {
     private String username;
     private String password;
 
+    private boolean security;
+
     public DatabaseConfigReader(ConfigurationSection configurationSection) {
         super(configurationSection);
     }
@@ -38,6 +40,7 @@ public class DatabaseConfigReader extends ConfigSectionReader {
         databaseName = rootSection.getString("db_name");
         username = rootSection.getString("db_user");
         password = rootSection.getString("db_password");
+        security = rootSection.getBoolean("db_ssl");
     }
 
     public String getServerAddress() {
@@ -58,6 +61,10 @@ public class DatabaseConfigReader extends ConfigSectionReader {
 
     public String getPassword() {
         return password;
+    }
+
+    public boolean isSQLSafetyFeature() {
+        return security;
     }
 
 }

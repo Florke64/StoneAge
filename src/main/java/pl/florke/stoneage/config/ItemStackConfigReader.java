@@ -34,19 +34,21 @@
 
 package pl.florke.stoneage.config;
 
-import org.bukkit.ChatColor;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import pl.florke.stoneage.util.Message;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 public class ItemStackConfigReader extends ConfigSectionReader {
@@ -62,14 +64,13 @@ public class ItemStackConfigReader extends ConfigSectionReader {
             try {
                 cachedItemStack = compileItemStack();
             } catch (InvalidConfigurationException ex) {
-                ex.printStackTrace();
+                new Message("Invalid Configuration of ItemStack");
             }
         }
 
         return cachedItemStack;
     }
 
-    @SuppressWarnings("deprecation")
     public ItemStack compileItemStack() throws InvalidConfigurationException {
         //Getting material type from config section
         final Material itemMaterial = readMaterial();
@@ -78,26 +79,23 @@ public class ItemStackConfigReader extends ConfigSectionReader {
 
         final ItemStack itemStack = new ItemStack(itemMaterial);
 
-        //FIXME: Magic value was already depreciated at the time of writing original code
-        //Getting data magic value
-        final byte magicValue = (byte) readMagicValue();
+        final int magicValue = readMagicValue();
         if (magicValue < 0)
             new Message("Magic value for $_1 wasn't specified correctly. Using default value...")
-                    .replacePlaceholder(1, itemMaterial.toString()).log(Level.WARNING);
+                    .placeholder(1, itemMaterial.toString()).log(Level.WARNING);
 
-        itemStack.getData().setData(magicValue < 0 ? 0 : magicValue);
+        itemStack.getItemMeta().setCustomModelData(magicValue);
 
         final ItemMeta itemMeta = itemStack.getItemMeta();
 
         //Getting item's custom name
-        final String customName = readCustomName();
-        if (!customName.equals(""))
-            itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', customName));
+        final Component customName = readCustomName();
+        if (customName != null)
+            itemMeta.displayName(customName);
 
         //Reading item's lore
-        final List<String> lore = readLore();
-        if (lore != null && !lore.isEmpty())
-            itemMeta.setLore(lore);
+        final Message lore = readLore();
+        itemMeta.lore(Arrays.asList(lore.asComponents()));
 
         //Reading enchantments
         final Map<Enchantment, Integer> enchants = readEnchantments();
@@ -111,8 +109,12 @@ public class ItemStackConfigReader extends ConfigSectionReader {
         return itemStack;
     }
 
+    @Nullable
     private Material readMaterial() {
         final String materialName = rootSection.getString("material");
+        if (materialName == null)
+            return null;
+
         return Material.getMaterial(materialName.toUpperCase());
     }
 
@@ -120,37 +122,43 @@ public class ItemStackConfigReader extends ConfigSectionReader {
         return rootSection.getInt("magic_data", -1);
     }
 
-    private String readCustomName() {
-        return rootSection.getString("custom_name", "");
+    @Nullable
+    private Component readCustomName() {
+        final String customName = rootSection.getString("custom_name");
+        if (customName == null)
+            return null;
+
+        return Component.text(customName);
     }
 
-    private List<String> readLore() {
-        final List<String> lore = new ArrayList<>();
-        for (String line : rootSection.getStringList("lore")) {
-            lore.add(ChatColor.translateAlternateColorCodes('&', line));
-        }
-
-        return lore;
+    @NotNull
+    private Message readLore() {
+        return new Message(rootSection.getStringList("lore"));
     }
 
+    @NotNull
     private Map<Enchantment, Integer> readEnchantments() {
+        final RegistryAccess registryAccess = RegistryAccess.registryAccess();
+
         final List<String> enchantmentList = rootSection.getStringList("enchantments");
         final Map<Enchantment, Integer> enchantments = new HashMap<>();
 
         for (String enchant : enchantmentList) {
+            // In config you declare: "enchant_name level"
             final String[] enchantmentData = enchant.split(" ", 2);
 
+            final NamespacedKey enchantmentNamespacedKey = NamespacedKey.minecraft(enchantmentData[0].toLowerCase());
             final Enchantment enchantment;
             final int enchantmentLevel;
 
-            enchantment = Enchantment.getByName(enchantmentData[0].toUpperCase());
+            enchantment = registryAccess.getRegistry(RegistryKey.ENCHANTMENT).get(enchantmentNamespacedKey);
             enchantmentLevel = (enchantmentData.length < 2) ? 1 : Integer.parseInt(enchantmentData[1]);
 
-            if (enchantment != null) {
+            if (enchantment != null)
                 enchantments.put(enchantment, enchantmentLevel);
-            } else {
-                new Message("Invalid Enchantment for the item found - please double check the config.yml file!").log(Level.WARNING);
-            }
+            else
+                new Message("Invalid Enchantment for the item found - please double check the config.yml file!")
+                        .log(Level.WARNING);
         }
 
         return enchantments;

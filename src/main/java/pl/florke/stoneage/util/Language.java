@@ -110,7 +110,7 @@ public class Language {
 
     private void collisionWarning(final String key) {
         new Message("Language key collision detected: `" + key + "`. Check your lang.yml!")
-                .replacePlaceholder(0, key).log(Level.WARNING);
+                .placeholder(0, key).log(Level.WARNING);
     }
 
 }

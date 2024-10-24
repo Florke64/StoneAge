@@ -114,11 +114,11 @@ public class DropStatCommand implements CommandExecutor {
         message.addLines(lang.getText("command-feedback-drop-print-summary"));
 
         final long nextLevelExperience = experienceCalculator.getExpNeededToLevel(miningLevel + 1);
-        message.replacePlaceholder(1, Integer.toString(miningLevel));
-        message.replacePlaceholder(2, Long.toString(miningExp));
-        message.replacePlaceholder(3, Long.toString(nextLevelExperience));
-        message.replacePlaceholder(4, Integer.toString(summary));
-        message.replacePlaceholder(5, playerStats.getPlayerName());
+        message.placeholder(1, Integer.toString(miningLevel));
+        message.placeholder(2, Long.toString(miningExp));
+        message.placeholder(3, Long.toString(nextLevelExperience));
+        message.placeholder(4, Integer.toString(summary));
+        message.placeholder(5, playerStats.getPlayerName());
 
         message.send(sender);
     }

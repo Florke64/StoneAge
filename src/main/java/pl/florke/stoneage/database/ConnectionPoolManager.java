@@ -27,7 +27,6 @@ import java.sql.SQLException;
 
 public class ConnectionPoolManager {
 
-    private final StoneAge plugin;
     private final DatabaseConfigReader databaseConfig;
 
     private HikariDataSource dataSource;
@@ -39,7 +38,6 @@ public class ConnectionPoolManager {
     private String password;
 
     public ConnectionPoolManager(DatabaseConfigReader databaseConfig) {
-        this.plugin = StoneAge.getPlugin(StoneAge.class);
         this.databaseConfig = databaseConfig;
 
         init();
@@ -76,7 +74,6 @@ public class ConnectionPoolManager {
             dataSource = new HikariDataSource(config);
         } catch (Exception e) {
             e.printStackTrace();
-            return;
         }
     }
 

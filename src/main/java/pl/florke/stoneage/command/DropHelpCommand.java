@@ -65,7 +65,7 @@ public class DropHelpCommand implements CommandExecutor {
 
         executionController.recordCommandExecution(sender);
 
-        new Message(lang.getText("command-drop-help")).send(sender);
+        new Message(lang.getText("command-feedback-drop-help")).send(sender);
 
         return true;
     }

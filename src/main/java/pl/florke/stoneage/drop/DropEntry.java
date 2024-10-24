@@ -27,7 +27,7 @@ public class DropEntry {
     private final StoneAge plugin;
     private final ItemStack defaultItemStack;
     private final float chanceWeight;
-    private String entryName;
+    private final String entryName;
     private String customName;
     private int minAmount;
     private int maxAmount;

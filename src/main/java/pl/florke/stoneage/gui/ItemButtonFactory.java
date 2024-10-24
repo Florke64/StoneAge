@@ -19,26 +19,23 @@ package pl.florke.stoneage.gui;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.drop.DropMultiplier;
+import pl.florke.stoneage.util.Message;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ItemButtonFactory {
 
     private final StoneAge plugin;
 
-    private final Player player;
-
-    public ItemButtonFactory(Player player) {
+    public ItemButtonFactory() {
         plugin = StoneAge.getPlugin(StoneAge.class);
-
-        this.player = player;
     }
 
     public ItemStack getButton(@NotNull ItemButtonType buttonType) {
@@ -51,6 +48,7 @@ public class ItemButtonFactory {
             case MACHINE_REPAIR:
             case MACHINE_UPGRADE:
             case STONE_STATISTICS:
+            case AUTO_SMELTING_STATUS:
             default:
                 return buttonType.getItemIcon();
         }
@@ -73,7 +71,7 @@ public class ItemButtonFactory {
             lore.add(ChatColor.translateAlternateColorCodes('&', "&7Mnoznik dropu nie jest aktywny..."));
         }
 
-        meta.setLore(lore);
+        meta.lore(Arrays.asList(new Message(lore).asComponents()));
         item.setItemMeta(meta);
 
         return item;

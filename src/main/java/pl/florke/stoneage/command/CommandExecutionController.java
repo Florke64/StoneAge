@@ -20,7 +20,6 @@ package pl.florke.stoneage.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import pl.florke.stoneage.StoneAge;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class CommandExecutionController {
 
     private boolean isCooldown(@NotNull final UUID playerUniqueId) {
         final long currentTime = System.currentTimeMillis();
-        final long lastExecution = this.commandExecutionHistory.getOrDefault(playerUniqueId, 0l);
+        final long lastExecution = this.commandExecutionHistory.getOrDefault(playerUniqueId, 0L);
 
         return (lastExecution + commandCooldownMillis) > currentTime;
     }

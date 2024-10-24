@@ -42,10 +42,8 @@ public class WindowClickListener implements Listener {
     @EventHandler
     public void onInventoryClick(@NotNull InventoryClickEvent event) {
         // Only players can use GUI.
-        if (!(event.getWhoClicked() instanceof Player))
+        if (!(event.getWhoClicked() instanceof Player player))
             return;
-
-        final Player player = (Player) event.getWhoClicked();
 
         final Inventory clickedInventory = event.getWhoClicked().getOpenInventory().getTopInventory();
 

@@ -20,6 +20,7 @@ package pl.florke.stoneage.event;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 
 public class MinerLevelUpEvent extends Event implements Cancellable {
@@ -46,12 +47,7 @@ public class MinerLevelUpEvent extends Event implements Cancellable {
         return playerStats;
     }
 
-    @Override
-    public String getEventName() {
-        return super.getEventName();
-    }
-
-    @Override
+    @Override @NotNull
     public HandlerList getHandlers() {
         return handlers;
     }

@@ -55,10 +55,9 @@ public class ItemAutoSmelter {
 
         while (recipeIterator.hasNext()) {
             final Recipe recipe = recipeIterator.next();
-            if (!(recipe instanceof FurnaceRecipe))
+            if (!(recipe instanceof FurnaceRecipe smeltingRecipe))
                 continue;
 
-            final FurnaceRecipe smeltingRecipe = (FurnaceRecipe) recipe;
             this.smeltingRecipeList.add(smeltingRecipe);
             index++;
         }
@@ -134,11 +133,10 @@ public class ItemAutoSmelter {
     }
 
     public boolean addAutoSmeltingUse(@NotNull final Block stoneMachineBlock, final int usesToAdd) {
-        if (!(stoneMachineBlock.getState() instanceof Dispenser)) {
+        if (!(stoneMachineBlock.getState() instanceof Dispenser dispenserStoneMachine)) {
             return false;
         }
 
-        final Dispenser dispenserStoneMachine = (Dispenser) stoneMachineBlock.getState();
         final ItemStack magicCoal = getMagicCoal(dispenserStoneMachine.getInventory());
 
         if (magicCoal == null) {

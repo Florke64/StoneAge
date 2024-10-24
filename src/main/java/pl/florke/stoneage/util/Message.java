@@ -24,6 +24,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 
@@ -35,8 +36,13 @@ public class Message {
 
     private static final String LINE_PREFIX = "&l&8> ";
 
-    private final Logger logger = StoneAge.getPlugin(StoneAge.class).getLogger();
-    private final BukkitAudiences adventure = StoneAge.getPlugin(StoneAge.class).getAdventure();
+    private static Logger logger;
+    private static BukkitAudiences adventure;
+
+    public static void initMessenger(JavaPlugin plugin) {
+        logger = plugin.getLogger();
+        adventure = ((StoneAge) plugin).getAdventure();
+    }
 
     // TODO: Automatically color different data types
     // private ChatColor genericTextColor = ChatColor.GRAY;
@@ -115,7 +121,7 @@ public class Message {
     }
 
     @SuppressWarnings("unused")
-    public Message replacePlaceholder(int n, String value) {
+    public Message placeholder(int n, String value) {
         this.variables.put(n, value);
         return prepare();
     }

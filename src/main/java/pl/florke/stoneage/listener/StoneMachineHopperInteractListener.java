@@ -33,12 +33,11 @@ import pl.florke.stoneage.machine.StoneMachine;
 
 public class StoneMachineHopperInteractListener implements Listener {
 
-    private final StoneAge plugin;
     private final StoneMachine stoneMachine;
     private final ItemAutoSmelter autoSmelter;
 
     public StoneMachineHopperInteractListener() {
-        plugin = StoneAge.getPlugin(StoneAge.class);
+        StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
 
         this.stoneMachine = plugin.getStoneMachine();
         this.autoSmelter = plugin.getStoneMachine().getItemSmelter();
@@ -52,7 +51,7 @@ public class StoneMachineHopperInteractListener implements Listener {
         final Inventory sourceInventory = event.getSource();
         final Inventory destinationInventory = event.getDestination();
 
-        if (!isDispenser(sourceInventory.getHolder()) && !isDispenser(destinationInventory.getHolder())) {
+        if (!isDispenserInventory(sourceInventory) && !isDispenserInventory(destinationInventory)) {
             return;
         }
 
@@ -80,8 +79,10 @@ public class StoneMachineHopperInteractListener implements Listener {
 
     }
 
-    private boolean isDispenser(@Nullable final InventoryHolder inventoryHolder) {
-        return inventoryHolder instanceof Dispenser;
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    // Yes, it just is.
+    private boolean isDispenserInventory(@NotNull final Inventory inventoryHolder) {
+        return inventoryHolder.getHolder() instanceof Dispenser;
     }
 
 }
