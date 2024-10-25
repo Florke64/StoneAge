@@ -17,10 +17,10 @@
 
 package pl.florke.stoneage.gui;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +41,7 @@ public abstract class Window {
         users = new ArrayList<>();
 
         windowTitle = windowName;
-        inventory = Bukkit.createInventory(null, InventoryType.CHEST, windowTitle);
+        inventory = Bukkit.createInventory(null, 3*9, Component.text(windowName));
     }
 
     public boolean open(@NotNull Player player) {

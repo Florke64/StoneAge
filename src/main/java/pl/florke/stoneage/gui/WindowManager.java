@@ -20,6 +20,7 @@ package pl.florke.stoneage.gui;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class WindowManager {
     public void closeAllWindows() {
         for (Player player : cachedWindows.keySet()) {
             if (player != null && player.isOnline()) {
-                if (player.getOpenInventory() == null)
+                if (player.getOpenInventory() instanceof PlayerInventory)
                     continue;
 
                 final Inventory openInventory = player.getOpenInventory().getTopInventory();
