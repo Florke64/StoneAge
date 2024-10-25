@@ -41,7 +41,7 @@ stone:
     - "&7Click to upgrade your Stone Machine!"
     - "&4Warning! &eStoneMach looses upgrades"
     - "&eafter picking it up!"
-  stone-drop-gui-icon-machine-smelting-status:
+  stone-drop-gui-icon-smelting-status:
     - "&5&lAutomatic Smelting"
     - "&7Click here to check how can your &6Stone&5Mach"
     - "&7have an &6automatic smelting enabled&7!"
