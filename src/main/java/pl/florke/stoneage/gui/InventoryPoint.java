@@ -97,9 +97,7 @@ public class InventoryPoint {
 
     @Override
     public String toString() {
-        String text = "InventoryPoint#toString(): " + slotNumber + ", " +
+        return"InventoryPoint#toString(): " + slotNumber + ", " +
                 " [" + point[0] + "; " + point[1] + "]";
-
-        return text;
     }
 }

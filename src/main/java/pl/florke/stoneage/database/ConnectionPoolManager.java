@@ -55,7 +55,7 @@ public class ConnectionPoolManager {
         HikariConfig config = new HikariConfig();
 //      config.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
 
-        String security = databaseConfig.isSQLSafetyFeature()? "" :
+        String security = databaseConfig.isSQLSafetyFeature() ? "" :
                 "&verifyServerCertificate=false&useSSL=false&requireSSL=false";
 
 //      config.setJdbcUrl("jdbc:mysql://" +hostname+ ":" +port+ "/" +database);

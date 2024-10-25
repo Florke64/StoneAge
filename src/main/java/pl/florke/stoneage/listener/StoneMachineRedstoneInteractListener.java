@@ -24,6 +24,7 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 
+@SuppressWarnings("CommentedOutCode")
 public class StoneMachineRedstoneInteractListener implements Listener {
 
     private final StoneAge plugin;

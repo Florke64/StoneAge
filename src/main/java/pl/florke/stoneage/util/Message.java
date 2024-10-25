@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@SuppressWarnings("CommentedOutCode")
 public class Message {
     private static Logger logger;
     private static BukkitAudiences adventure;

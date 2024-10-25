@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
+@SuppressWarnings("CallToPrintStackTrace")
 public class SQLManager {
 
     public static final String TABLE_PLAYER_STATS = "stoneage_stats";

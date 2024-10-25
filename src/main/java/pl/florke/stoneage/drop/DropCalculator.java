@@ -32,6 +32,7 @@ import pl.florke.stoneage.machine.ItemAutoSmelter;
 
 import java.util.*;
 
+@SuppressWarnings("CommentedOutCode")
 public class DropCalculator {
 
     private final StoneAge plugin;

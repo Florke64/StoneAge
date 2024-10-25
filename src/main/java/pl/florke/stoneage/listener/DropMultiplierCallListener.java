@@ -58,6 +58,7 @@ public class DropMultiplierCallListener implements Listener {
                     plugin.getDatabaseController().insertDropMultiplierRecord(callerName, callerUUID, value, startMillis, timeoutTime);
                 } catch (SQLException ex) {
                     new Message("Unable to save multiplier data into the database! Multiplier won't recover after server restart!").log(Level.WARNING);
+                    //noinspection CallToPrintStackTrace
                     ex.printStackTrace();
                 }
             }

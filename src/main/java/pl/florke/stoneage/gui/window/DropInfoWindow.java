@@ -35,6 +35,7 @@ import pl.florke.stoneage.util.Message;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DropInfoWindow extends Window {
@@ -94,39 +95,38 @@ public class DropInfoWindow extends Window {
             dropEntryNameDetails = "";
         }
 
-        meta.setDisplayName(ChatColor.GREEN + Message.constNamePrettify(drop.getCustomName()) + dropEntryNameDetails);
+        meta.displayName(new Message(
+                "&6" + Message.constNamePrettify(drop.getCustomName()) + dropEntryNameDetails
+        ).asComponents()[0]);
 
-        final List<String> lore = new ArrayList<>();
+        final Message lore = new Message();
         if (!playerHasNeededLevelForDrop) {
-            lore.add(new Message(plugin.getLanguage("stone-drop-info-lvl-required"))
-                    .placeholder(1, String.valueOf(drop.getNeededMinerLevel()))
-                    .getCachedCompiledMessage().getFirst());
+            lore.addLines(plugin.getLanguage("stone-drop-info-lvl-required"))
+                    .placeholder(1, String.valueOf(drop.getNeededMinerLevel()));
         } else {
-            lore.add(Message.color("  &8+" + drop.getMinerExp() + "xp"));
+            lore.addLines("  &8+" + drop.getMinerExp() + "xp");
 
-            final String dropEntryStatus = new Message(personalDropConfig.isDropping(drop) ?
-                    plugin.getLanguage("system-enabled") : plugin.getLanguage("system-disabled"))
-                    .getCachedCompiledMessage().getFirst();
-            lore.add(new Message(plugin.getLanguage("stone-drop-info-entry-status"))
-                    .placeholder(1, dropEntryStatus).getCachedCompiledMessage().getFirst());
-            lore.add(new Message(plugin.getLanguage("stone-drop-info-click-to-switch"))
-                    .getCachedCompiledMessage().getFirst());
-            lore.add(" ");
-            lore.add(new Message(plugin.getLanguage("command-feedback-drop-print-summary"))
-                    .placeholder(1, String.valueOf(stats.getStatistic(drop.getEntryName())))
-                    .getCachedCompiledMessage().getFirst());
+            final String dropEntryStatusRaw = personalDropConfig.isDropping(drop) ?
+                    plugin.getLanguage("system-enabled") : plugin.getLanguage("system-disabled");
+            lore.addLines(plugin.getLanguage("stone-drop-info-entry-status"))
+                    .placeholder(2, dropEntryStatusRaw);
+            lore.addLines(plugin.getLanguage("stone-drop-info-click-to-switch"));
+
+            lore.addLines(" ");
+            // command-feedback-drop-print-summary is used multiple times and its placeholder handler is $_4
+            lore.addLines(plugin.getLanguage("command-feedback-drop-print-summary"))
+                    .placeholder(4, String.valueOf(stats.getStatistic(drop.getEntryName())));
         }
 
         if (calculator.getDropMultiplier().isActive()) {
-            lore.add(" "); // spacer
+            lore.addLines(" "); // spacer
 
             final float realDropChance = getRealChancePercentage(drop);
-            lore.add(new Message(plugin.getLanguage("stone-machine-drop-chance"))
-                    .placeholder(1, String.valueOf(realDropChance))
-                    .getCachedCompiledMessage().getFirst());
+            lore.addLines(plugin.getLanguage("stone-machine-drop-chance"))
+                    .placeholder(3, String.valueOf(realDropChance));
         }
 
-        meta.setLore(lore);
+        meta.lore(Arrays.asList(lore.asComponents()));
 
         icon.setItemMeta(meta);
 

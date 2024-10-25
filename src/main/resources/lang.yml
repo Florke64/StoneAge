@@ -6,7 +6,7 @@ stone:
   stone-machine-destroyed-deny: "&7This machine can only be removed with the help of a &cGold Pickaxe&7!"
   stone-machine-drop-switch: "&7Dropping &c$_1 &7set $_2&7."
   stone-machine-drop-alert: "&7You've dropped &c$_1 &7x&6$_2"
-  stone-machine-drop-chance: "&7Actual chance: &c$_1%"
+  stone-machine-drop-chance: "&7Actual chance: &c$_3%"
   stone-machine-item-lore:
     - "&7Place the machine in any direction,"
     - "&7it will start generating stone there!"
@@ -19,7 +19,7 @@ stone:
     - "&eDrop multiplier from stone is active, don't miss the opportunity!"
     - "&cDrop multiplier will end soon!"
   stone-drop-info-title: "&7&lStoneMach &8&l> &5&lDROP INFO"
-  stone-drop-info-entry-status: "&7Status: $_1"
+  stone-drop-info-entry-status: "&7Status: $_2"
   stone-drop-info-click-to-switch: "&7(Click to switch)"
   stone-drop-info-lvl-required: "&cRequired level: $_1"
   stone-drop-actions-title: "&7&lStoneMach &8&l> &5&lACTIONS"
