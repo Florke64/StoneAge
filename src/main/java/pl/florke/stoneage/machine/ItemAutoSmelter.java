@@ -17,6 +17,8 @@
 
 package pl.florke.stoneage.machine;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
@@ -67,10 +69,10 @@ public class ItemAutoSmelter {
 
     public ItemStack getSmelted(@NotNull final Dispenser stoneMachine, @NotNull final ItemStack itemToSmelt) {
         for (final FurnaceRecipe recipe : this.smeltingRecipeList) {
-            final ItemStack input = recipe.getInput();
+            final RecipeChoice input = recipe.getInputChoice();
 
             //Checking if input is similar to the item provided as argument
-            if (input.getType() == itemToSmelt.getType()) {
+            if (input.test(itemToSmelt)) {
                 final ItemStack smeltedItemStack = recipe.getResult();
                 smeltedItemStack.setAmount(itemToSmelt.getAmount());
 
@@ -95,11 +97,12 @@ public class ItemAutoSmelter {
 
         // Asserting that Magic Coal and it's data ain't null as #hasAutoSmelting(...) returned true
         assert magicCoal != null && magicCoal.getItemMeta() != null;
-        final String coalCustomName = magicCoal.getItemMeta().getDisplayName();
+        final TextComponent coalCustomName = (TextComponent) magicCoal.getItemMeta().displayName();
 
         try {
-            return Integer.parseInt(coalCustomName);
+            return Integer.parseInt(coalCustomName == null? "<?>" : coalCustomName.content());
         } catch (final NumberFormatException ex) {
+            //noinspection CallToPrintStackTrace
             ex.printStackTrace();
             return 0;
         }
@@ -118,7 +121,7 @@ public class ItemAutoSmelter {
         assert magicCoal != null && magicCoal.getItemMeta() != null;
         final ItemMeta coalIm = magicCoal.getItemMeta();
 
-        coalIm.setDisplayName(Integer.toString(availableSmeltingUses - usesToTake));
+        coalIm.displayName(Component.text(Integer.toString(availableSmeltingUses - usesToTake)));
         magicCoal.setItemMeta(coalIm);
     }
 
@@ -154,12 +157,13 @@ public class ItemAutoSmelter {
          *  which means that #hasAutoSmelting(...) will also return true */
         assert magicCoalItemMeta != null;
 
-        magicCoalItemMeta.setDisplayName(Integer.toString(availableSmeltingUses + usesToAdd));
+        magicCoalItemMeta.displayName(Component.text(Integer.toString(availableSmeltingUses + usesToAdd)));
         magicCoal.setItemMeta(magicCoalItemMeta);
 
         return true;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean hasAutoSmelting(@NotNull final InventoryHolder inventoryHolder) {
         if (!(inventoryHolder instanceof Dispenser)) {
             return false;
@@ -208,7 +212,7 @@ public class ItemAutoSmelter {
         assert im != null;
 
         // Setting the Display Name of Magic Coal
-        im.setDisplayName(Integer.toString(startingUses));
+        im.displayName(Component.text(Integer.toString(startingUses)));
         magicCoal.setItemMeta(im);
 
         // Placing an ItemStack in the slot
