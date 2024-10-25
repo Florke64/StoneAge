@@ -19,7 +19,6 @@ package pl.florke.stoneage.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.config.DatabaseConfigReader;
 
 import java.sql.Connection;
@@ -60,7 +59,7 @@ public class ConnectionPoolManager {
                 "&verifyServerCertificate=false&useSSL=false&requireSSL=false";
 
 //      config.setJdbcUrl("jdbc:mysql://" +hostname+ ":" +port+ "/" +database);
-        config.setJdbcUrl("jdbc:mysql://" + hostname + "/" + database
+        config.setJdbcUrl("jdbc:mysql://" + hostname + ":" + port + "/" + database
                 + "?user=" + username + "&password=" + password
                 + "&useUnicode=true&characterEncoding=UTF-8" + security);
 
