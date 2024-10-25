@@ -35,12 +35,12 @@ public class DatabaseConfigReader extends ConfigSectionReader {
     }
 
     public void readDatabaseConnectionDetails() {
-        serverAddress = rootSection.getString("server_address");
-        serverPort = rootSection.getInt("server_port");
-        databaseName = rootSection.getString("db_name");
-        username = rootSection.getString("db_user");
+        serverAddress = rootSection.getString("server_address", "localhost");
+        serverPort = rootSection.getInt("server_port", 3306);
+        databaseName = rootSection.getString("db_name", "stoneage");
+        username = rootSection.getString("db_user", "root");
         password = rootSection.getString("db_password");
-        security = rootSection.getBoolean("db_ssl");
+        security = rootSection.getBoolean("db_ssl", true);
     }
 
     public String getServerAddress() {

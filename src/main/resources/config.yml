@@ -2,7 +2,7 @@ config_version: 1
 
 database:
   server_address: 'localhost'
-  server_port: '3306'
+  server_port: 3306
   db_name: 'stoneage'
   db_user: 'root'
   db_password: ''

@@ -52,22 +52,26 @@ public class ConnectionPoolManager {
     }
 
     private void setupPool() {
-        HikariConfig config = new HikariConfig();
-//      config.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
+        final HikariConfig config = new HikariConfig();
+        config.setPoolName("StoneAgeDatabasePool");
+//        config.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
 
-        String security = databaseConfig.isSQLSafetyFeature() ? "" :
-                "&verifyServerCertificate=false&useSSL=false&requireSSL=false";
-
-//      config.setJdbcUrl("jdbc:mysql://" +hostname+ ":" +port+ "/" +database);
-        config.setJdbcUrl("jdbc:mysql://" + hostname + ":" + port + "/" + database
-                + "?user=" + username + "&password=" + password
-                + "&useUnicode=true&characterEncoding=UTF-8" + security);
+        config.setJdbcUrl("jdbc:mysql://" + hostname + ":" + port + "/" + database);
 
         config.setUsername(username);
         config.setPassword(password);
-        config.setPoolName("StoneAgeDatabasePool");
-        config.setConnectionTestQuery("SELECT 1;");
+
+        config.addDataSourceProperty("useUnicode", true);
+        config.addDataSourceProperty("characterEncoding", "UTF-8");
         config.addDataSourceProperty("autoReconnect", true);
+
+        if (!databaseConfig.isSQLSafetyFeature()) {
+            config.addDataSourceProperty("verifyServerCertificate", "false");
+            config.addDataSourceProperty("useSSL", "false");
+            config.addDataSourceProperty("requireSSL", "false");
+        }
+
+        config.setConnectionTestQuery("SELECT 1;");
 
         try {
             dataSource = new HikariDataSource(config);
