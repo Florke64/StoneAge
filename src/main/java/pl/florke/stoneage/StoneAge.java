@@ -17,13 +17,11 @@
 
 package pl.florke.stoneage;
 
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -59,13 +57,13 @@ public final class StoneAge extends JavaPlugin {
     private ExperienceCalculator expCalculator;
 
     private Language language;
-    private BukkitAudiences adventure;
     private SQLManager sqlManager;
+
 
     @Override
     public void onEnable() {
         // Dependency check
-        adventure = BukkitAudiences.create(this);
+        Message.initMessenger(this);
         language = new Language("lang");
 
         // Plugin startup logic
@@ -128,7 +126,9 @@ public final class StoneAge extends JavaPlugin {
         final List<String> machineLore = StoneMachine.createDefaultMachineLore();
 
         // TODO: Move to config.yml
-        final String machineName = new Message(getLanguage("stone-machine-item-name")).getCachedCompiledMessage().getFirst();
+        new Message(language.getText("stone-machine-item-name")).log(Level.INFO);
+        final String machineName = new Message(language.getText("stone-machine-item-name"))
+                .getCachedCompiledMessage().getFirst();
 
         stoneMachine = new StoneMachine(machineName, machineLore);
     }
@@ -301,10 +301,6 @@ public final class StoneAge extends JavaPlugin {
         return expCalculator;
     }
 
-    public BukkitAudiences getAdventure() {
-        return adventure;
-    }
-
     public SQLManager getDatabaseController() {
         return sqlManager;
     }
@@ -329,13 +325,13 @@ public final class StoneAge extends JavaPlugin {
         if (getDropCalculator() != null && getDropCalculator().getDropMultiplier() != null && getDropCalculator().getDropMultiplier().getMultiplierBossBar() != null)
             getDropCalculator().getDropMultiplier().getMultiplierBossBar().removeAll();
 
-        this.getLogger().log(Level.INFO, "Closing all Window Manager's GUIs... ");
+        new Message("Closing all Window Manager's GUIs... ").log(Level.INFO);
         getWindowManager().closeAllWindows();
 
-        this.getLogger().log(Level.INFO, "Syncing all unsaved data with the database...");
+        new Message("Syncing all unsaved data with the database...").log(Level.INFO);
         playersData.onDisable();
 
-        this.getLogger().log(Level.INFO, "Disconnecting database, closing connection pool...");
+        new Message("Disconnecting database, closing connection pool...").log(Level.INFO);
         sqlManager.onDisable();
     }
 

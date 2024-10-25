@@ -32,15 +32,12 @@ import pl.florke.stoneage.util.Message;
 
 public class StoneMachineWindow extends Window {
 
-    private final Player windowOwner;
-
     private final Dispenser stoneMachine;
 
     public StoneMachineWindow(Player owner, Dispenser stoneMachine) {
         super(Message.color(StoneAge.getPlugin(StoneAge.class)
                 .getLanguage("stone-drop-actions-title")));
 
-        windowOwner = owner;
         this.stoneMachine = stoneMachine;
     }
 
@@ -69,12 +66,12 @@ public class StoneMachineWindow extends Window {
 //        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 0,1).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_INFO));
 
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4, 0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_MULTIPLIER));
-        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8, 0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.AUTO_SMELTING_STATUS));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8, 0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.SMELTING_STATUS));
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 4, 2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_REPAIR));
 
 //        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8,0).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_UPGRADE));
 
-        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 7, 2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.STONE_STATISTICS));
+        inventory.setItem(new InventoryPoint(InventoryType.CHEST, 7, 2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.DROP_STATISTICS));
         inventory.setItem(new InventoryPoint(InventoryType.CHEST, 8, 2).getSlotNumber(), buttonFactory.getButton(ItemButtonType.MACHINE_INFO));
     }
 

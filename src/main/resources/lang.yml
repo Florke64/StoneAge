@@ -23,7 +23,31 @@ stone:
   stone-drop-info-click-to-switch: "&7(Click to switch)"
   stone-drop-info-lvl-required: "&cRequired level: $_1"
   stone-drop-actions-title: "&7&lStoneMach &8&l> &5&lACTIONS"
+
+  stone-drop-gui-icon-drop-info: "&3&lCheck drop"
+  stone-drop-gui-icon-drop-filter: "&3&lFilter"
+  stone-drop-gui-icon-drop-statistics:
+    - "&3&lStatistics"
+    - "&7Check your stats!"
+  stone-drop-gui-icon-drop-multiplier: "&3&lMultiplier"
+  stone-drop-gui-icon-machine-info:
+    - "&5&lLearn more"
+    - "&7Click here and learn more about &5Stone Generators&7!"
+  stone-drop-gui-icon-machine-repair:
+    - "&4&lStuck?"
+    - "&7Click here to repair the mach!"
+  stone-drop-gui-icon-machine-upgrade:
+    - "&6&lUpgrade"
+    - "&7Click to upgrade your Stone Machine!"
+    - "&4Warning! &eStoneMach looses upgrades"
+    - "&eafter picking it up!"
+  stone-drop-gui-icon-machine-smelting-status:
+    - "&5&lAutomatic Smelting"
+    - "&7Click here to check how can your &6Stone&5Mach"
+    - "&7have an &6automatic smelting enabled&7!"
+
   stone-drop-gui-error: "&cError! &7Cannot open GUI."
+
   stone-smelting-use: "&7AutoSmelting fuel left: &6$_1"
   stone-smelting-hopper: "&6Input coal with a Hopper, then drop will be smelt automatically!"
   stone-multiplier-end: "  &cDrop multiplier ended."

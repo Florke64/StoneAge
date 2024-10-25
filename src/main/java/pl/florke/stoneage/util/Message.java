@@ -33,15 +33,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Message {
-
-    private static final String LINE_PREFIX = "&l&8> ";
-
     private static Logger logger;
     private static BukkitAudiences adventure;
 
-    public static void initMessenger(JavaPlugin plugin) {
+    public static void initMessenger(@NotNull JavaPlugin plugin) {
         logger = plugin.getLogger();
-        adventure = ((StoneAge) plugin).getAdventure();
+        adventure = BukkitAudiences.create(plugin);
     }
 
     // TODO: Automatically color different data types
@@ -53,31 +50,27 @@ public class Message {
     private final List<String> cachedCompiledMessage = new ArrayList<>();
     private final Map<Integer, String> variables = new HashMap<>();
 
-    private boolean usePrefixOnSend = false;
-
     public Message(@NotNull String... message) {
-        this.rawMessage.addAll(Arrays.asList(message));
-        prepare();
+        this(Arrays.asList(message));
     }
 
     public Message(@NotNull List<String> message) {
         this.rawMessage.addAll(message);
-        prepare();
+        recalculate();
     }
 
     @SuppressWarnings("unused")
     public Message addLines(@NotNull final String... lines) {
-        this.rawMessage.addAll(Arrays.asList(lines));
-        return prepare();
+        return addLines(Arrays.asList(lines));
     }
 
     @SuppressWarnings("unused")
     public Message addLines(@NotNull final List<String> lines) {
         this.rawMessage.addAll(lines);
-        return prepare();
+        return recalculate();
     }
 
-    private Message prepare() {
+    private Message recalculate() {
         clearCache();
 
         // Inserting values in respective $_n variables
@@ -99,15 +92,14 @@ public class Message {
 
     public void send(@NotNull Audience recipient) {
         for (final String line : this.cachedCompiledMessage) {
-            TextComponent textMessage = Component.text((usePrefixOnSend ? LINE_PREFIX : "") + line);
+            TextComponent textMessage = Component.text(line);
             recipient.sendMessage(textMessage);
         }
     }
 
     public void sendActionMessage(@NotNull Player recipient) {
         for (final String line : this.cachedCompiledMessage) {
-            final String text = (usePrefixOnSend ? LINE_PREFIX : "") + line;
-            final Component actionBarMessage = Component.text(text, NamedTextColor.WHITE);
+            final Component actionBarMessage = Component.text(line, NamedTextColor.WHITE);
 
             final Audience audience = adventure.player(recipient);
             audience.sendActionBar(actionBarMessage);
@@ -120,16 +112,35 @@ public class Message {
         }
     }
 
-    @SuppressWarnings("unused")
+    public Message placeholder(@NotNull final String ...values) {
+        for (int i = 0; i < values.length; i++) {
+            placeholder(i, values[i], false);
+        }
+
+        return recalculate();
+    }
+
     public Message placeholder(int n, String value) {
+        return placeholder(n, value, true);
+    }
+
+    private Message placeholder(int n, String value, boolean recalculate) {
         this.variables.put(n, value);
-        return prepare();
+        return recalculate? recalculate() : this;
     }
 
     private String insertVariableValues(String line) {
-        for (int var : this.variables.keySet()) {
-            final String variable = capitalize(this.variables.get(var));
-            line = line.replace(("$_" + var), variable);
+        for (int placeholderId : this.variables.keySet()) {
+            if (!line.contains(("$_" + placeholderId))) continue;
+
+            String placeholderValue = this.variables.get(placeholderId);
+            if (placeholderValue == null) {
+                placeholderValue = "<?>";
+            }
+
+            String value = capitalize(placeholderValue);
+
+            line = line.replace(("$_" + placeholderId), value);
         }
 
         return line;
@@ -168,7 +179,7 @@ public class Message {
     /**
      * Prettifies a constant name. Like "DIAMOND_PICKAXE" -> "Diamond Pickaxe"
      * @see #color(String)
-     * @see #prepare()
+     * @see #recalculate()
      */
     public static String constNamePrettify(String text) {
         if (text == null || text.isEmpty()) return text;
@@ -195,16 +206,6 @@ public class Message {
         }
 
         return components;
-    }
-
-    @SuppressWarnings("unused")
-    public boolean isUsingPrefixOnSend() {
-        return usePrefixOnSend;
-    }
-
-    @SuppressWarnings("unused")
-    public void setUsePrefixOnSend(boolean usePrefix) {
-        this.usePrefixOnSend = usePrefix;
     }
 
     private void clearCache() {

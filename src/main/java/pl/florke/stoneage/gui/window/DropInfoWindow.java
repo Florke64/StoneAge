@@ -90,7 +90,7 @@ public class DropInfoWindow extends Window {
 
         final String dropEntryNameDetails;
         if (playerHasNeededLevelForDrop) {
-            dropEntryNameDetails = ChatColor.GOLD + " (" + df.format(dropChance) + "%)";
+            dropEntryNameDetails = Message.color("&6 (" + df.format(dropChance) + "%)");
         } else {
             dropEntryNameDetails = "";
         }
@@ -180,7 +180,7 @@ public class DropInfoWindow extends Window {
 
         boolean isDropping = plugin.getPlayersData().getPersonalDropConfig(player.getUniqueId()).switchDropEntry(dropEntry);
 
-        final Message infoMessage = new Message(plugin.getLanguage("stone-drop-info"));
+        final Message infoMessage = new Message(plugin.getLanguage("stone-machine-drop-switch"));
         infoMessage.placeholder(1, dropEntry.getCustomName());
         infoMessage.placeholder(2, (isDropping ?
                 plugin.getLanguage("system-enabled") :
