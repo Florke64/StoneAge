@@ -19,7 +19,8 @@ package pl.florke.stoneage.database.playerdata;
 
 import org.bukkit.Bukkit;
 import pl.florke.stoneage.StoneAge;
-import pl.florke.stoneage.database.SQLManager;
+import pl.florke.stoneage.database.DatabaseManager;
+import pl.florke.stoneage.database.wrapper.MySQLWrapper;
 import pl.florke.stoneage.util.Message;
 
 import java.sql.*;
@@ -63,110 +64,8 @@ public class PlayersData {
         return playerPersonalDropConfig.get(uuid);
     }
 
-    public int loadPersonalStoneStatsFromDatabase() {
-        final String databaseName = plugin.getDatabaseController().getDatabaseName();
-        final String queryStatement = "SELECT * FROM " + databaseName + ".`" + SQLManager.TABLE_PLAYER_STATS + "`";
-
-        final PlayersData playerSetup = plugin.getPlayersData();
-
-        try (final Connection conn = plugin.getDatabaseController().getConnection();
-             final PreparedStatement ps = conn.prepareStatement(queryStatement);
-             final ResultSet result = ps.executeQuery()) {
-
-            if (result == null) {
-                new Message("Couldn't load Personal Stone Stats on start!").log(Level.SEVERE);
-                return -1;
-            }
-
-            int loadCount = 0;
-            while (result.next()) {
-                final ResultSetMetaData metaData = result.getMetaData();
-                final UUID uuid = UUID.fromString(result.getString("PlayerUUID"));
-                final long minerExp = result.getLong("MinerExp");
-                final int minerLvl = result.getInt("MinerLvl");
-
-                final PlayerStats stats = playerSetup.getPlayerStoneMachineStats(uuid);
-                stats.setMinerExp(minerExp, false);
-                stats.setMinerLvl(minerLvl, false);
-
-                //new Message()"Loading drop stats for " + result.getString("PlayerUUID"));
-
-                final int columnCount = metaData.getColumnCount();
-                for (int i = 1; i <= columnCount; i++) {
-                    final String columnName = metaData.getColumnName(i);
-                    if (columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
-                        continue;
-                    else if (columnName.contentEquals("MinerExp") || columnName.contentEquals("MinerLvl"))
-                        continue;
-
-                    stats.setStatistic(columnName, result.getInt(columnName));
-                }
-
-                stats.markUnsaved(false);
-
-                loadCount++;
-            }
-
-            return loadCount;
-        } catch (SQLException ex) {
-            new Message("Couldn't query results!").log(Level.SEVERE);
-            //noinspection CallToPrintStackTrace
-            ex.printStackTrace();
-        }
-
-        return 0;
-    }
-
-    public int loadPersonalDropConfigFromDatabase() {
-        final String databaseName = plugin.getDatabaseController().getDatabaseName();
-        final String queryStatement = "SELECT * FROM " + databaseName + ".`" + SQLManager.TABLE_PLAYER_DROP_CONFIG + "`";
-
-        final PlayersData playerSetup = plugin.getPlayersData();
-
-        try (final Connection conn = plugin.getDatabaseController().getConnection();
-             final PreparedStatement ps = conn.prepareStatement(queryStatement);
-             final ResultSet result = ps.executeQuery()) {
-
-            if (result == null) {
-                new Message("Couldn't load Personal Stone Stats on start!").log(Level.SEVERE);
-                return -1;
-            }
-
-            int loadCount = 0;
-            while (result.next()) {
-                final ResultSetMetaData metaData = result.getMetaData();
-                final UUID uuid = UUID.fromString(result.getString("PlayerUUID"));
-                final PlayerConfig config = playerSetup.getPersonalDropConfig(uuid);
-
-                //new Message()"Loading drop configuration for " + result.getString("PlayerUUID"));
-
-                final int columnCount = metaData.getColumnCount();
-                for (int i = 1; i <= columnCount; i++) {
-                    final String columnName = metaData.getColumnName(i);
-                    if (columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
-                        continue;
-
-                    config.setDropEntry(columnName, result.getBoolean(columnName));
-
-                }
-
-                config.markUnsaved(false);
-
-                loadCount++;
-            }
-
-            return loadCount;
-        } catch (SQLException e) {
-            new Message("Couldn't query results!").log(Level.SEVERE);
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
     public int savePersonalDropConfigInDatabase(PlayerConfig config) {
-        final int response = plugin.getDatabaseController().runUpdateForPersonalDropConfig(config);
+        final int response = plugin.getSQLWrapper().runUpdateForPersonalDropConfig(config);
 
         if (response > 0) {
             config.onDatabaseSave();
@@ -176,7 +75,7 @@ public class PlayersData {
     }
 
     public int savePersonalStoneStatsInDatabase(PlayerStats stats) {
-        final int response = plugin.getDatabaseController().runUpdateForPersonalStoneStats(stats);
+        final int response = plugin.getSQLWrapper().runUpdateForPersonalStoneStats(stats);
 
         if (response > 0) {
             stats.onDatabaseSave();

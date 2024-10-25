@@ -23,14 +23,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.command.*;
 import pl.florke.stoneage.config.DatabaseConfigReader;
 import pl.florke.stoneage.config.DropEntryConfigReader;
 import pl.florke.stoneage.config.GeneralConfigReader;
 import pl.florke.stoneage.config.ToolsConfigReader;
-import pl.florke.stoneage.database.SQLManager;
+import pl.florke.stoneage.database.DatabaseManager;
+import pl.florke.stoneage.database.wrapper.SQLWrapper;
 import pl.florke.stoneage.database.playerdata.PlayersData;
 import pl.florke.stoneage.drop.DropCalculator;
 import pl.florke.stoneage.drop.DropMultiplier;
@@ -57,7 +57,7 @@ public final class StoneAge extends JavaPlugin {
     private ExperienceCalculator expCalculator;
 
     private Language language;
-    private SQLManager sqlManager;
+    private DatabaseManager dbManager;
 
 
     @Override
@@ -105,7 +105,8 @@ public final class StoneAge extends JavaPlugin {
         //TODO: Add this setting to the config.yml (open issue #17)
         final long period = 15; // autosave period in minutes
 
-        getDatabaseController().initAsyncAutosave(period);
+        // DBManager is initialized in reloadConfig()
+        getDBManager().initAsyncAutosave(period);
         getDropCalculator().getDropMultiplier().initMultiplierBossBar();
     }
 
@@ -240,31 +241,11 @@ public final class StoneAge extends JavaPlugin {
         } else {
             final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(getConfig().getConfigurationSection("database"));
             databaseConfig.readDatabaseConnectionDetails();
-            sqlManager = new SQLManager(databaseConfig);
 
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    final long dbLoadStartTime = System.currentTimeMillis();
+            dbManager = new DatabaseManager(databaseConfig);
+            dbManager.loadAllPlayers(playersData);
 
-                    //Loading data of all players from database
-                    final int statsCount = playersData.loadPersonalStoneStatsFromDatabase();
-                    final int configsCount = playersData.loadPersonalDropConfigFromDatabase();
-
-                    final long dbLoadFinishTime = System.currentTimeMillis();
-
-                    final Message success = new Message();
-                    success.addLines("Loaded PlayerStats ($_1) and PlayerConfigs ($_2) from the database");
-                    success.addLines("Loading took $_3ms");
-                    success.placeholder(1, Integer.toString(statsCount));
-                    success.placeholder(2, Integer.toString(configsCount));
-                    success.placeholder(3, Long.toString(dbLoadFinishTime - dbLoadStartTime));
-                    success.log(Level.INFO);
-
-                }
-            }.runTaskAsynchronously(this);
-
-            getDropCalculator().getDropMultiplier().readPreviousMultiplierFromDatabase();
+            dbManager.getSQLWrapper().readPreviousMultiplierFromDatabase(dropCalculator.getDropMultiplier());
         }
 
         new Message("Config reloaded!").log(Level.INFO);
@@ -301,8 +282,12 @@ public final class StoneAge extends JavaPlugin {
         return expCalculator;
     }
 
-    public SQLManager getDatabaseController() {
-        return sqlManager;
+    public DatabaseManager getDBManager() {
+        return dbManager;
+    }
+
+    public SQLWrapper getSQLWrapper() {
+        return getDBManager().getSQLWrapper();
     }
 
     public Language getLanguage() {
@@ -332,7 +317,7 @@ public final class StoneAge extends JavaPlugin {
         playersData.onDisable();
 
         new Message("Disconnecting database, closing connection pool...").log(Level.INFO);
-        sqlManager.onDisable();
+        dbManager.onDisable();
     }
 
 }

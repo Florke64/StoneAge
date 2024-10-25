@@ -25,11 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.event.DropMultiplierStartEvent;
-import pl.florke.stoneage.util.Message;
-
-import java.sql.SQLException;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class DropMultiplierCallListener implements Listener {
 
@@ -54,13 +50,7 @@ public class DropMultiplierCallListener implements Listener {
                 final long startMillis = event.getStartTime();
                 final long timeoutTime = event.getTimeout();
 
-                try {
-                    plugin.getDatabaseController().insertDropMultiplierRecord(callerName, callerUUID, value, startMillis, timeoutTime);
-                } catch (SQLException ex) {
-                    new Message("Unable to save multiplier data into the database! Multiplier won't recover after server restart!").log(Level.WARNING);
-                    //noinspection CallToPrintStackTrace
-                    ex.printStackTrace();
-                }
+                plugin.getSQLWrapper().insertDropMultiplierRecord(callerName, callerUUID, value, startMillis, timeoutTime);
             }
         }.runTaskAsynchronously(plugin);
 

@@ -15,39 +15,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.florke.stoneage.database;
+/*
+ * @Florke64 <Daniel Chojnacki>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package pl.florke.stoneage.database.wrapper;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.config.DatabaseConfigReader;
+import pl.florke.stoneage.database.ConnectionPoolManager;
+import pl.florke.stoneage.database.DatabaseManager;
 import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
+import pl.florke.stoneage.database.playerdata.PlayersData;
 import pl.florke.stoneage.drop.DropEntry;
+import pl.florke.stoneage.drop.DropMultiplier;
 import pl.florke.stoneage.util.Message;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
 @SuppressWarnings("CallToPrintStackTrace")
-public class SQLManager {
+public class MySQLWrapper implements SQLWrapper {
 
-    public static final String TABLE_PLAYER_STATS = "stoneage_stats";
-    public static final String TABLE_PLAYER_DROP_CONFIG = "stoneage_config";
-    public static final String TABLE_DROP_MULTIPLIER = "stoneage_multiplier";
     private final StoneAge plugin;
     private final ConnectionPoolManager connectionPool;
-    private BukkitRunnable autosaveRunnable;
 
-    public SQLManager(DatabaseConfigReader databaseConfig) {
+    public MySQLWrapper(DatabaseConfigReader databaseConfig) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
         connectionPool = new ConnectionPoolManager(databaseConfig);
 
@@ -70,7 +83,7 @@ public class SQLManager {
         // Init query
         query.append("INSERT INTO ")
                 // "database_name.`table_name` ("
-                .append(getDatabaseName()).append(".`").append(SQLManager.TABLE_PLAYER_DROP_CONFIG).append("` (");
+                .append(getDatabaseName()).append(".`").append(DatabaseManager.TABLE_PLAYER_DROP_CONFIG).append("` (");
 
         // Obligatory fields
         fields.append("`PlayerUUID`, "); // appends PlayerUUID field
@@ -126,7 +139,7 @@ public class SQLManager {
         // Init query
         query.append("INSERT INTO ")
                 // "database_name.`table_name` ("
-                .append(getDatabaseName()).append(".`").append(SQLManager.TABLE_PLAYER_STATS).append("` (");
+                .append(getDatabaseName()).append(".`").append(DatabaseManager.TABLE_PLAYER_STATS).append("` (");
 
         // Obligatory fields
         fields.append("`PlayerUUID`, ");
@@ -170,6 +183,152 @@ public class SQLManager {
         return queryUpdate(query.toString());
     }
 
+    public int loadPersonalStoneStatsFromDatabase() {
+        final String databaseName = plugin.getSQLWrapper().getDatabaseName();
+        final String queryStatement = "SELECT * FROM " + databaseName + ".`" + DatabaseManager.TABLE_PLAYER_STATS + "`";
+
+        final PlayersData playerSetup = plugin.getPlayersData();
+
+        try (final Connection conn = getConnection();
+             final PreparedStatement ps = conn.prepareStatement(queryStatement);
+             final ResultSet result = ps.executeQuery()) {
+
+            if (result == null) {
+                new Message("Couldn't load Personal Stone Stats on start!").log(Level.SEVERE);
+                return -1;
+            }
+
+            int loadCount = 0;
+            while (result.next()) {
+                final ResultSetMetaData metaData = result.getMetaData();
+                final UUID uuid = UUID.fromString(result.getString("PlayerUUID"));
+                final long minerExp = result.getLong("MinerExp");
+                final int minerLvl = result.getInt("MinerLvl");
+
+                final PlayerStats stats = playerSetup.getPlayerStoneMachineStats(uuid);
+                stats.setMinerExp(minerExp, false);
+                stats.setMinerLvl(minerLvl, false);
+
+                //new Message()"Loading drop stats for " + result.getString("PlayerUUID"));
+
+                final int columnCount = metaData.getColumnCount();
+                for (int i = 1; i <= columnCount; i++) {
+                    final String columnName = metaData.getColumnName(i);
+                    if (columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
+                        continue;
+                    else if (columnName.contentEquals("MinerExp") || columnName.contentEquals("MinerLvl"))
+                        continue;
+
+                    stats.setStatistic(columnName, result.getInt(columnName));
+                }
+
+                stats.markUnsaved(false);
+
+                loadCount++;
+            }
+
+            return loadCount;
+        } catch (SQLException ex) {
+            new Message("Couldn't query results!").log(Level.SEVERE);
+            //noinspection CallToPrintStackTrace
+            ex.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public int loadPersonalDropConfigFromDatabase() {
+        final String databaseName = getDatabaseName();
+        final String queryStatement = "SELECT * FROM " + databaseName + ".`" + DatabaseManager.TABLE_PLAYER_DROP_CONFIG + "`";
+
+        final PlayersData playerSetup = plugin.getPlayersData();
+
+        try (final Connection conn = getConnection();
+             final PreparedStatement ps = conn.prepareStatement(queryStatement);
+             final ResultSet result = ps.executeQuery()) {
+
+            if (result == null) {
+                new Message("Couldn't load Personal Stone Stats on start!").log(Level.SEVERE);
+                return -1;
+            }
+
+            int loadCount = 0;
+            while (result.next()) {
+                final ResultSetMetaData metaData = result.getMetaData();
+                final UUID uuid = UUID.fromString(result.getString("PlayerUUID"));
+                final PlayerConfig config = playerSetup.getPersonalDropConfig(uuid);
+
+                //new Message()"Loading drop configuration for " + result.getString("PlayerUUID"));
+
+                final int columnCount = metaData.getColumnCount();
+                for (int i = 1; i <= columnCount; i++) {
+                    final String columnName = metaData.getColumnName(i);
+                    if (columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
+                        continue;
+
+                    config.setDropEntry(columnName, result.getBoolean(columnName));
+
+                }
+
+                config.markUnsaved(false);
+
+                loadCount++;
+            }
+
+            return loadCount;
+        } catch (SQLException e) {
+            new Message("Couldn't query results!").log(Level.SEVERE);
+            //noinspection CallToPrintStackTrace
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public void insertDropMultiplierRecord(String callerName, @NotNull UUID callerUniqueId, float value, long start, long end) {
+        final Timestamp startTime = new Timestamp(start);
+        final Timestamp timeoutTime = new Timestamp(end);
+
+        String query = "INSERT INTO " + getDatabaseName() + ".`" + DatabaseManager.TABLE_DROP_MULTIPLIER + "` " +
+                " (`MultiplierId`, `SetOn`, `Timeout`, `MultiplierValue`, `CallerName`, `CallerUUID`) VALUES (NULL," +
+                " '" + startTime + "'," +
+                " '" + timeoutTime + "'," +
+                " '" + value + "', " +
+                " '" + callerName + "', " +
+                " '" + callerUniqueId + "');";
+
+        queryUpdate(query);
+    }
+
+    public void readPreviousMultiplierFromDatabase(final DropMultiplier multiplier) {
+        String query = "SELECT * FROM `" + DatabaseManager.TABLE_DROP_MULTIPLIER + "` " +
+                "ORDER BY `" + DatabaseManager.TABLE_DROP_MULTIPLIER + "`.`Timeout` DESC " +
+                "LIMIT 1;";
+
+        try (final Connection conn = getConnection();
+             final PreparedStatement ps = conn.prepareStatement(query);
+             final ResultSet response = ps.executeQuery()) {
+
+            if (response == null) {
+                new Message("Couldn't recover drop multiplier from database!").log(Level.WARNING);
+                return;
+            }
+
+            while (response.next()) {
+                final Timestamp startTime = response.getTimestamp("SetOn");
+                final Timestamp timeoutTime = response.getTimestamp("Timeout");
+                final float multiplierValue = response.getFloat("MultiplierValue");
+                final String callerName = response.getString("CallerName");
+                final String callerUUID = response.getString("CallerUUID");
+
+                multiplier.setDropMultiplier(callerName, UUID.fromString(callerUUID), multiplierValue, timeoutTime, startTime);
+            }
+        } catch (SQLException ex) {
+            //noinspection CallToPrintStackTrace
+            ex.printStackTrace();
+        }
+    }
+
     private int queryUpdate(@NotNull final String query) {
         try (final Connection conn = connectionPool.getConnection();
              final PreparedStatement ps = conn.prepareStatement(query)) {
@@ -204,15 +363,15 @@ public class SQLManager {
 
         for (DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
             final String dropEntryName = entry.getEntryName();
-            addTableColumnIfNotExist(TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
-            addTableColumnIfNotExist(TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
+            addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
+            addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
 
-        addTableColumnIfNotExist(TABLE_PLAYER_STATS, "primitive_drop", "INT", "0");
-        addTableColumnIfNotExist(TABLE_PLAYER_DROP_CONFIG, "primitive_drop", "BOOLEAN", "true");
+        addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, "primitive_drop", "INT", "0");
+        addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, "primitive_drop", "BOOLEAN", "true");
     }
 
-    public Connection getConnection() throws SQLException {
+    private Connection getConnection() throws SQLException {
         return connectionPool.getConnection();
     }
 
@@ -222,13 +381,13 @@ public class SQLManager {
 
     private void addTableColumnIfNotExist(final String tableName, final String columnName, final String columnType, final String defaultValue) {
         queryUpdate("ALTER TABLE " + getDatabaseName() + ".`" + tableName + "` " +
-                "ADD COLUMN `" + columnName + "` " + columnType + " NOT NULL default " + defaultValue + ";");
+                "ADD COLUMN `" + columnName + "` " + columnType + " NOT NULL default " + defaultValue);
     }
 
     private void makeDropMultiplierTable() {
         final String databaseName = getDatabaseName();
 
-        String query = "CREATE TABLE IF NOT EXISTS `" + databaseName + "`.`" + TABLE_DROP_MULTIPLIER + "`" +
+        String query = "CREATE TABLE IF NOT EXISTS `" + databaseName + "`.`" + DatabaseManager.TABLE_DROP_MULTIPLIER + "`" +
                 " (" +
                 " `MultiplierId` INT NOT NULL AUTO_INCREMENT," +
                 " `SetOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
@@ -242,25 +401,10 @@ public class SQLManager {
         queryUpdate(query);
     }
 
-    public void insertDropMultiplierRecord(String callerName, @NotNull UUID callerUniqueId, float value, long start, long end) throws SQLException {
-        final Timestamp startTime = new Timestamp(start);
-        final Timestamp timeoutTime = new Timestamp(end);
-
-        String query = "INSERT INTO " + getDatabaseName() + ".`" + SQLManager.TABLE_DROP_MULTIPLIER + "` " +
-                " (`MultiplierId`, `SetOn`, `Timeout`, `MultiplierValue`, `CallerName`, `CallerUUID`) VALUES (NULL," +
-                " '" + startTime + "'," +
-                " '" + timeoutTime + "'," +
-                " '" + value + "', " +
-                " '" + callerName + "', " +
-                " '" + callerUniqueId + "');";
-
-        queryUpdate(query);
-    }
-
     private void makePlayerDropConfigTable() {
         final String databaseName = getDatabaseName();
 
-        String query = "CREATE TABLE IF NOT EXISTS " + databaseName + "." + TABLE_PLAYER_DROP_CONFIG +
+        String query = "CREATE TABLE IF NOT EXISTS " + databaseName + "." + DatabaseManager.TABLE_PLAYER_DROP_CONFIG +
                 " (" +
                 " `PlayerUUID` VARCHAR(36)," +
                 " `PlayerName` VARCHAR(16)," +
@@ -273,7 +417,7 @@ public class SQLManager {
     private void makePlayerStatsTable() {
         final String databaseName = connectionPool.getDatabaseConfig().getDatabaseName();
 
-        String query = "CREATE TABLE IF NOT EXISTS " + databaseName + "." + TABLE_PLAYER_STATS +
+        String query = "CREATE TABLE IF NOT EXISTS " + databaseName + "." + DatabaseManager.TABLE_PLAYER_STATS +
                 " (" +
                 " `PlayerUUID` VARCHAR(36)," +
                 " `PlayerName` VARCHAR(16)," +
@@ -283,32 +427,6 @@ public class SQLManager {
                 ") ";
 
         queryUpdate(query);
-    }
-
-    public void initAsyncAutosave(final long period) {
-
-        new Message("Initialized Async Autosave.").log(Level.INFO);
-
-        autosaveRunnable = new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        final int savedCount = saveAllOnlinePlayersData();
-
-                        new Message("Saved $_1 players in database. Next Auto-Save: $_2m")
-                            .placeholder(1, Integer.toString(savedCount))
-                            .placeholder(2, Long.toString(period))
-                                .log(Level.INFO);
-
-                    }
-                }.runTaskAsynchronously(plugin);
-            }
-        };
-
-        autosaveRunnable.runTaskTimer(plugin, period * 60 * 20, period * 60 * 20);
     }
 
     public int saveAllOnlinePlayersData() {
@@ -326,10 +444,6 @@ public class SQLManager {
         }
 
         return savedCount;
-    }
-
-    public BukkitRunnable getAutosaveRunnable() {
-        return autosaveRunnable;
     }
 
     public void onDisable() {

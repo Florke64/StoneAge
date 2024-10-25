@@ -27,10 +27,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
-import pl.florke.stoneage.database.SQLManager;
+import pl.florke.stoneage.database.DatabaseManager;
+import pl.florke.stoneage.database.wrapper.MySQLWrapper;
 import pl.florke.stoneage.event.DropMultiplierStartEvent;
 import pl.florke.stoneage.util.Message;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -121,16 +123,22 @@ public class DropMultiplier {
     }
 
     public boolean setDropMultiplier(String callerName, UUID callerUniqueId, float value, long time) {
+        final long startTime = System.currentTimeMillis();
+
+        return setDropMultiplier(callerName, callerUniqueId, value, new Timestamp(time), new Timestamp(startTime));
+    }
+
+    public boolean setDropMultiplier(String callerName, UUID callerUniqueId, float value, Timestamp timeoutTime, Timestamp startTime) {
         if (value <= defaultDropMultiplier || value > maxDropMultiplier)
             return false;
 
-        if (time < (60 * 1000) || time > (24 * 60 * 60 * 1000))
+        if (timeoutTime.getTime() < (60 * 1000) || timeoutTime.getTime() > (24 * 60 * 60 * 1000))
             return false;
 
-        final long startTime = System.currentTimeMillis();
-        final long timeout = System.currentTimeMillis() + time;
+        final long timeout = System.currentTimeMillis() + timeoutTime.getTime();
 
-        DropMultiplierStartEvent event = new DropMultiplierStartEvent(callerName, callerUniqueId, value, startTime, timeout);
+        final DropMultiplierStartEvent event =
+                new DropMultiplierStartEvent(callerName, callerUniqueId, value, startTime.getTime(), timeout);
         plugin.getServer().getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {
@@ -138,7 +146,7 @@ public class DropMultiplier {
         }
 
         setCurrentDropMultiplier(value);
-        setMultiplierStartTime(startTime);
+        setMultiplierStartTime(startTime.getTime());
         setMultiplierTimeout(timeout);
 
         setCallerName(callerName);
@@ -156,41 +164,6 @@ public class DropMultiplier {
             return false;
 
         return defaultDropMultiplier != currentDropMultiplier;
-    }
-
-    public void readPreviousMultiplierFromDatabase() {
-
-        String query = "SELECT * FROM `" + SQLManager.TABLE_DROP_MULTIPLIER + "` " +
-                "ORDER BY `" + SQLManager.TABLE_DROP_MULTIPLIER + "`.`Timeout` DESC " +
-                "LIMIT 1;";
-
-        try (final Connection conn = plugin.getDatabaseController().getConnection();
-             final PreparedStatement ps = conn.prepareStatement(query);
-             final ResultSet response = ps.executeQuery()) {
-
-            if (response == null) {
-                new Message("Couldn't recover drop multiplier from database!").log(Level.WARNING);
-                return;
-            }
-
-            while (response.next()) {
-                final Timestamp startTime = response.getTimestamp("SetOn");
-                final Timestamp timeoutTime = response.getTimestamp("Timeout");
-                final float multiplierValue = response.getFloat("MultiplierValue");
-                final String callerName = response.getString("CallerName");
-                final String callerUUID = response.getString("CallerUUID");
-
-                setCurrentDropMultiplier(multiplierValue);
-                setMultiplierStartTime(startTime.getTime());
-                setMultiplierTimeout(timeoutTime.getTime());
-
-                setCallerName(callerName);
-                setCallerUniqueId(UUID.fromString(callerUUID));
-            }
-        } catch (SQLException ex) {
-            //noinspection CallToPrintStackTrace
-            ex.printStackTrace();
-        }
     }
 
     public void initMultiplierBossBar() {

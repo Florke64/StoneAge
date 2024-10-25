@@ -18,8 +18,12 @@
 package pl.florke.stoneage.config;
 
 import org.bukkit.configuration.ConfigurationSection;
+import pl.florke.stoneage.database.wrapper.MySQLWrapper;
+import pl.florke.stoneage.database.wrapper.SQLWrapper;
 
 public class DatabaseConfigReader extends ConfigSectionReader {
+
+    private String wrapperType;
 
     private String serverAddress;
     private int serverPort;
@@ -35,6 +39,8 @@ public class DatabaseConfigReader extends ConfigSectionReader {
     }
 
     public void readDatabaseConnectionDetails() {
+        wrapperType = rootSection.getString("connector", "sqlite");
+
         serverAddress = rootSection.getString("server_address", "localhost");
         serverPort = rootSection.getInt("server_port", 3306);
         databaseName = rootSection.getString("db_name", "stoneage");
@@ -67,4 +73,7 @@ public class DatabaseConfigReader extends ConfigSectionReader {
         return security;
     }
 
+    public String getSQLWrapperType() {
+        return wrapperType;
+    }
 }
