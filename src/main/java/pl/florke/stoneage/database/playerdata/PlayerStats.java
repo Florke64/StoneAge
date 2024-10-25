@@ -56,6 +56,7 @@ public class PlayerStats {
         statistics.put(key, value);
     }
 
+    @SuppressWarnings("unused")
     public int increaseStatistic(String key) {
         return increaseStatistic(key, 1);
     }

@@ -40,10 +40,6 @@ public class StoneMachineStoneBreakEvent extends Event {
         this.location = stoneMachine.getLocation();
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
     public Dispenser getStoneMachine() {
         return stoneMachine;
     }
@@ -60,7 +56,7 @@ public class StoneMachineStoneBreakEvent extends Event {
         return player;
     }
 
-    @Override
+    @Override @NotNull
     public HandlerList getHandlers() {
         return handlers;
     }

@@ -46,7 +46,6 @@ public class DropMultiplier {
     private long multiplierTimeout = 0;
     private long multiplierSetOn = 0;
 
-    private BukkitRunnable multiplierBossBarRunnable;
     private BossBar multiplierBossBar;
 
     private String callerName;
@@ -189,6 +188,7 @@ public class DropMultiplier {
                 setCallerUniqueId(UUID.fromString(callerUUID));
             }
         } catch (SQLException ex) {
+            //noinspection CallToPrintStackTrace
             ex.printStackTrace();
         }
     }
@@ -202,7 +202,7 @@ public class DropMultiplier {
         multiplierBossBar = Bukkit.createBossBar(bossBarKey, Message.color(bossBarTitle), BarColor.BLUE, BarStyle.SEGMENTED_10);
         multiplierBossBar.setVisible(false);
 
-        multiplierBossBarRunnable = new BukkitRunnable() {
+        final BukkitRunnable multiplierBossBarRunnable = new BukkitRunnable() {
 
             private boolean activeCheck = false;
             private boolean textSwitch = false;

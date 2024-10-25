@@ -27,13 +27,10 @@ import java.util.logging.Level;
 public class ExperienceCalculator {
 
     public final long INITIAL_XP = 500;
-    private final StoneAge plugin;
     private final List<Long> experienceTable = new LinkedList<>();
     private int maximumMinerLevel = 99;
 
     public ExperienceCalculator() {
-        this.plugin = StoneAge.getPlugin(StoneAge.class);
-
         initExperienceTableValues();
     }
 
@@ -51,7 +48,7 @@ public class ExperienceCalculator {
     public long getExpNeededToLevel(final int level) {
         if (level < 2) return 0;
         else if (level > getMaximumMinerLevel())
-            return experienceTable.get(experienceTable.size());
+            return experienceTable.getLast();
 
         return experienceTable.get(level - 2);
     }

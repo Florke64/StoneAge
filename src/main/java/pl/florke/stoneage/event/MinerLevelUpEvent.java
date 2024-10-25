@@ -35,10 +35,6 @@ public class MinerLevelUpEvent extends Event implements Cancellable {
         this.upToLevel = level;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
     public int getUpToLevel() {
         return upToLevel;
     }

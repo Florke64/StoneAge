@@ -53,11 +53,12 @@ public class SQLManager {
             init();
         } catch (Exception e) {
             new Message("Failed to initialize db! Running without DB!").log(Level.SEVERE);
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
         }
     }
 
-    public int runUpdateForPersonalDropConfig(PlayerConfig config) {
+    public int runUpdateForPersonalDropConfig(@NotNull PlayerConfig config) {
 
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();
@@ -127,7 +128,7 @@ public class SQLManager {
         return -1;
     }
 
-    public int runUpdateForPersonalStoneStats(PlayerStats stats) {
+    public int runUpdateForPersonalStoneStats(@NotNull PlayerStats stats) {
 
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();

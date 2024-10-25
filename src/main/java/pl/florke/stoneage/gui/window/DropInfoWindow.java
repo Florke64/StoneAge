@@ -78,7 +78,6 @@ public class DropInfoWindow extends Window {
     private ItemStack createIconItem(@NotNull DropEntry drop, @NotNull PlayerStats stats) {
         //Preparing data to be placed on the item
         final DropCalculator calculator = plugin.getDropCalculator();
-        final float currentDropMultiplier = calculator.getDropMultiplier().getCurrentDropMultiplier();
         final float dropChance = getChancePercentage(drop);
 
         final ItemStack icon = drop.getDropEntryIcon();
@@ -148,7 +147,7 @@ public class DropInfoWindow extends Window {
     }
 
     @Override
-    public boolean open(Player player) {
+    public boolean open(@NotNull Player player) {
         if (!super.open(player)) {
             new Message(plugin.getLanguage("stone-drop-gui-error")).send(player);
             return false;

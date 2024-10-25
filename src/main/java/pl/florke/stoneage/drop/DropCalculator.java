@@ -64,21 +64,17 @@ public class DropCalculator {
         calculateTotalWeight();
     }
 
-    public int addDrop(DropEntry dropEntry) {
+    public void addDrop(DropEntry dropEntry) {
         dropEntries.put(dropEntry.getEntryName(), dropEntry);
         calculateTotalWeight();
-
-        return dropEntries.size();
     }
 
-    private float calculateTotalWeight() {
+    private void calculateTotalWeight() {
         float weight = 0.0f;
         for (DropEntry drop : dropEntries.values())
             weight += drop.getChanceWeight();
 
         totalWeight = weight + primitiveDrop.getChanceWeight();
-
-        return weight;
     }
 
     public float getTotalWeight() {
@@ -86,8 +82,6 @@ public class DropCalculator {
     }
 
     public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable Dispenser stoneMachine) {
-        //TODO: Check StoneMachine's configuration book inside its Inventory
-
         //No tool was used to break a block
         if (tool == null) return null;
 

@@ -110,6 +110,7 @@ public class PlayersData {
             return loadCount;
         } catch (SQLException ex) {
             new Message("Couldn't query results!").log(Level.SEVERE);
+            //noinspection CallToPrintStackTrace
             ex.printStackTrace();
         }
 
@@ -157,6 +158,7 @@ public class PlayersData {
             return loadCount;
         } catch (SQLException e) {
             new Message("Couldn't query results!").log(Level.SEVERE);
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
         }
 

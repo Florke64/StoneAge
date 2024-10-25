@@ -46,10 +46,6 @@ public class DropMultiplierStartEvent extends Event implements Cancellable {
         this.timeout = timeout;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
     public float getValue() {
         return value;
     }

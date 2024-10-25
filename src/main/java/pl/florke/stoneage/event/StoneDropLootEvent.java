@@ -22,6 +22,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class StoneDropLootEvent extends Event implements Cancellable {
 
@@ -35,10 +36,6 @@ public class StoneDropLootEvent extends Event implements Cancellable {
         this.player = player;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
     public ItemStack getDrop() {
         return this.itemDrop;
     }
@@ -47,7 +44,7 @@ public class StoneDropLootEvent extends Event implements Cancellable {
         return player;
     }
 
-    @Override
+    @Override @NotNull
     public HandlerList getHandlers() {
         return handlers;
     }

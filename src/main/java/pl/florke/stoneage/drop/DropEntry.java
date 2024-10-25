@@ -18,13 +18,11 @@
 package pl.florke.stoneage.drop;
 
 import org.bukkit.inventory.ItemStack;
-import pl.florke.stoneage.StoneAge;
 
 import java.util.Random;
 
 public class DropEntry {
 
-    private final StoneAge plugin;
     private final ItemStack defaultItemStack;
     private final float chanceWeight;
     private final String entryName;
@@ -47,15 +45,13 @@ public class DropEntry {
     //TODO: Store type of item to reduce ItemStack#getType() calls count
 
     public DropEntry(String entryName, ItemStack itemStack, float weight) {
-        plugin = StoneAge.getPlugin(StoneAge.class);
-
         this.entryName = entryName;
 
         chanceWeight = weight;
         defaultItemStack = itemStack;
 
         minAmount = 1;
-        maxAmount = minAmount;
+        maxAmount = minAmount; // Initially the same; can be set with #setMaxAmount() - only values greater than 0!
 
         minExp = 1;
         maxExp = 5;
@@ -71,7 +67,6 @@ public class DropEntry {
     public ItemStack getDrop(boolean silkTouch, int fortuneLevel) {
         final ItemStack itemStack;
         if (silkTouch) {
-            //TODO: Check without cloning
             itemStack = silkTouchItemStack.clone();
             itemStack.setAmount(1);
 
@@ -113,7 +108,7 @@ public class DropEntry {
     }
 
     public void setMinAmount(int amount) {
-        this.minAmount = (amount < 1) ? 1 : amount;
+        this.minAmount = Math.max(amount, 1);
     }
 
     public int getMaxAmount() {
@@ -121,7 +116,7 @@ public class DropEntry {
     }
 
     public void setMaxAmount(int amount) {
-        this.maxAmount = (amount > this.minAmount) ? amount : this.minAmount;
+        this.maxAmount = Math.max(amount, this.minAmount);
     }
 
     public void setSilkTouchItemStack(ItemStack itemStack) {
@@ -152,7 +147,7 @@ public class DropEntry {
     }
 
     public void setMinimalExp(int exp) {
-        minExp = (exp < 0) ? 0 : exp;
+        minExp = Math.max(exp, 0);
     }
 
     public int getMaximalExp() {
@@ -160,7 +155,7 @@ public class DropEntry {
     }
 
     public void setMaximalExp(int exp) {
-        maxExp = (exp < minExp) ? minExp : exp;
+        maxExp = Math.max(exp, minExp);
     }
 
     public int calculateFinalExpValue() {

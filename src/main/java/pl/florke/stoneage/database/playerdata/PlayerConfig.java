@@ -48,7 +48,7 @@ public class PlayerConfig {
     }
 
     public boolean isDropping(DropEntry dropEntry) {
-        return customDropEntries.containsKey(dropEntry) && customDropEntries.get(dropEntry).booleanValue();
+        return customDropEntries.containsKey(dropEntry) && customDropEntries.get(dropEntry);
     }
 
     public void setDropEntry(String entryKey, boolean shouldDrop) {

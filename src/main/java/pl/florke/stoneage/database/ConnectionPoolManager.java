@@ -72,6 +72,7 @@ public class ConnectionPoolManager {
         try {
             dataSource = new HikariDataSource(config);
         } catch (Exception e) {
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
         }
     }
