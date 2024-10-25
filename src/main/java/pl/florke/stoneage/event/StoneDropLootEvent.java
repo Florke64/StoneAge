@@ -49,6 +49,10 @@ public class StoneDropLootEvent extends Event implements Cancellable {
         return handlers;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     /**
      * Gets the cancellation state of this event. A cancelled event will not
      * be executed in the server, but will still pass to other plugins
