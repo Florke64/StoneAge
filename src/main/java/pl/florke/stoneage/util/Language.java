@@ -19,6 +19,7 @@ package pl.florke.stoneage.util;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 
 import java.io.File;
@@ -89,7 +90,7 @@ public class Language {
         /* Modules were made to make language files more modular and easier to read. */
     }
 
-    private void readYamlLangModule(final YamlConfiguration yaml, final String langModule) {
+    private void readYamlLangModule(final @NotNull YamlConfiguration yaml, final String langModule) {
         final ConfigurationSection section = yaml.getConfigurationSection(langModule);
         if (section == null) return;
 

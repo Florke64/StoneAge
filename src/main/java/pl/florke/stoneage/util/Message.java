@@ -113,7 +113,7 @@ public class Message {
         }
     }
 
-    public Message placeholder(@NotNull final String ...values) {
+    public Message placeholder(final String @NotNull ...values) {
         for (int i = 0; i < values.length; i++) {
             placeholder(i, values[i], false);
         }
