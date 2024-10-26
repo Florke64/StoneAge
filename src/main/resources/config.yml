@@ -44,12 +44,10 @@ primitive_drop:
   multipliable: false
   default_tool:
     material: 'COBBLESTONE'
-    magic_data: 0
     lore:
       - '&7Default Drop'
   silk_touch_tool:
     material: 'STONE'
-    magic_data: 0
     lore:
       - '&7Drop Silktouch'
 
@@ -62,14 +60,12 @@ custom_drops:
     multipliable: true #If set to 'true' then accepts current drop multiplication set by server admin
     default_tool:
       material: 'COAL' # Bukkit Material
-      magic_data: 0
       custom_name: '' # for default item name leave empty: '' or don't include in config section
       lore: # for no lore don't include this config section
         - '&7Default Drop'
       minimal_amount: 1
     silk_touch_tool:
       material: 'COAL_ORE'
-      magic_data: 0
       custom_name: ''
       lore:
         - '&7Drop Silktouch'
@@ -81,7 +77,6 @@ custom_drops:
     multipliable: true
     default_tool:
       material: 'IRON_ORE'
-      magic_data: 0
       custom_name: ''
       lore:
         - '&7Default drop only'
@@ -93,7 +88,6 @@ custom_drops:
     multipliable: true
     default_tool:
       material: 'GOLD_ORE'
-      magic_data: 0
       custom_name: ''
       lore:
         - '&7Default drop only'
@@ -108,14 +102,12 @@ custom_drops:
     multipliable: true #If set to 'true' then accepts current drop multiplication set by server admin
     default_tool:
       material: 'DIAMOND' # Bukkit Material
-      magic_data: 0
       custom_name: '' # for default item name leave empty: '' or don't include in config section
       lore: # for no lore don't include this config section
         - '&7Default Drop'
       minimal_amount: 1
     silk_touch_tool:
       material: 'DIAMOND_ORE'
-      magic_data: 0
       custom_name: ''
       lore:
         - '&7Drop Silktouch'
@@ -128,7 +120,6 @@ custom_drops:
     multipliable: true
     default_tool:
       material: 'REDSTONE' # Bukkit Material
-      magic_data: 0
       custom_name: '' # for default item name leave empty: '' or don't include in config section
       lore: # for no lore don't include this config section
         - '&7Default Drop'
@@ -136,7 +127,6 @@ custom_drops:
       maximal_amount: 5
     silk_touch_tool:
       material: 'REDSTONE_ORE'
-      magic_data: 0
       custom_name: ''
       lore:
         - '&7Drop Silktouch'
@@ -149,7 +139,6 @@ custom_drops:
     multipliable: true
     default_tool:
       material: 'LAPIS_LAZULI' # Bukkit Material enum name
-      magic_data: 0
       custom_name: '' # for default item name leave empty: '' or don't include in config section
       lore: # for no lore don't include this config section
         - '&7Default Drop'
@@ -157,7 +146,6 @@ custom_drops:
       maximal_amount: 8
     silk_touch_tool:
       material: 'LAPIS_ORE'
-      magic_data: 0
       custom_name: ''
       lore:
         - '&7Drop Silktouch'

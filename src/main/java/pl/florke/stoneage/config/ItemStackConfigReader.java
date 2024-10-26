@@ -82,13 +82,6 @@ public class ItemStackConfigReader extends ConfigSectionReader {
 
         final ItemStack itemStack = new ItemStack(itemMaterial);
 
-        final int magicValue = readMagicValue();
-        if (magicValue < 0)
-            new Message("Magic value for $_1 wasn't specified correctly. Using default value...")
-                    .placeholder(1, itemMaterial.toString()).log(Level.WARNING);
-
-        itemStack.getItemMeta().setCustomModelData(magicValue);
-
         final ItemMeta itemMeta = itemStack.getItemMeta();
 
         //Getting item's custom name
@@ -119,10 +112,6 @@ public class ItemStackConfigReader extends ConfigSectionReader {
             return null;
 
         return Material.getMaterial(materialName.toUpperCase());
-    }
-
-    private int readMagicValue() {
-        return rootSection.getInt("magic_data", -1);
     }
 
     @Nullable

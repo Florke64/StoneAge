@@ -71,10 +71,6 @@ public class StoneBreakListener implements Listener {
             dropMultiplier.getMultiplierBossBar().setVisible(true);
         }
 
-        new Message(brokenBlock.getState().getBlockData().getAsString() + " stone broken");
-        byte stoneType = 0;
-        if (stoneType != ((byte) 0)) return;
-
         final Block machineBlock = plugin.getStoneMachine().getConnectedStoneMachine(brokenBlock);
         final Dispenser stoneMachine = machineBlock != null ? (Dispenser) machineBlock.getState() : null;
 
@@ -104,7 +100,8 @@ public class StoneBreakListener implements Listener {
             finalDrop = null;
         }
 
-        if (stoneMachine != null && stoneMachine.getBlock() != null) {
+        if (stoneMachine != null) {
+            stoneMachine.getBlock();
             final StoneMachineStoneBreakEvent stoneBreakEvent = new StoneMachineStoneBreakEvent(player, stoneMachine, finalDrop);
             Bukkit.getServer().getPluginManager().callEvent(stoneBreakEvent);
 
@@ -128,7 +125,7 @@ public class StoneBreakListener implements Listener {
         //Verifying plugin's config and using hopper output if allowed
         if (stoneMachine != null && plugin.getStoneMachine().isHopperOutputAllowed()) {
             blockUnderStoneMachine = stoneMachine.getBlock().getRelative(BlockFace.DOWN);
-            if (blockUnderStoneMachine != null && blockUnderStoneMachine.getState() instanceof Hopper) {
+            if (blockUnderStoneMachine.getState() instanceof Hopper) {
                 hasHopper = true;
             }
         }
@@ -169,13 +166,13 @@ public class StoneBreakListener implements Listener {
             }
 
             //Drop under player's feet if there is no hopper under Stone Machine
-            if (!hasHopper && drop != null && itemLoot != null) {
+            if (!hasHopper)
                 itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, itemLoot);
-            }
+
             //Drop under player's feet in case if hopper cannot handle them all
-            else if (hasHopper && hopperLeftItem != null) {
+            else if (hopperLeftItem != null)
                 itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, hopperLeftItem);
-            }
+
 
             if (drop != plugin.getDropCalculator().getPrimitiveDropEntry()) {
                 final Message dropMessage = new Message(plugin.getLanguage("stone-machine-drop-alert"));
@@ -188,7 +185,6 @@ public class StoneBreakListener implements Listener {
 
     @Nullable
     private ItemStack addItemToInventory(@NotNull ItemStack itemStack, @NotNull Inventory inventory) {
-        int slot = 0;
         int leftToAdd = itemStack.getAmount();
         for (ItemStack itemInInv : inventory.getContents()) {
 
@@ -212,8 +208,6 @@ public class StoneBreakListener implements Listener {
 
                 if (leftToAdd < 1) break;
             }
-
-            slot++;
         }
 
         itemStack.setAmount(leftToAdd);
