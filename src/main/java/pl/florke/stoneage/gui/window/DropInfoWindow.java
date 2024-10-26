@@ -17,7 +17,6 @@
 
 package pl.florke.stoneage.gui.window;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -34,9 +33,7 @@ import pl.florke.stoneage.gui.Window;
 import pl.florke.stoneage.util.Message;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class DropInfoWindow extends Window {
 

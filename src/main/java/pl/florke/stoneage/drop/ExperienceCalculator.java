@@ -17,7 +17,6 @@
 
 package pl.florke.stoneage.drop;
 
-import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.util.Message;
 
 import java.util.LinkedList;

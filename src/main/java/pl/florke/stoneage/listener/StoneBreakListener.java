@@ -205,13 +205,12 @@ public class StoneBreakListener implements Listener {
             final int maxStackSize = itemInInv.getMaxStackSize();
             if (itemInInv.isSimilar(itemStack) && itemInInv.getAmount() < maxStackSize) {
                 final int handleSize = maxStackSize - itemInInv.getAmount();
-                final int adding = itemStack.getAmount() < handleSize ? itemStack.getAmount() : handleSize;
-                itemInInv.setAmount(itemInInv.getAmount() + ((adding > 0) ? adding : 0));
+                final int adding = Math.min(itemStack.getAmount(), handleSize);
+                itemInInv.setAmount(itemInInv.getAmount() + (Math.max(adding, 0)));
 
-                leftToAdd -= adding > 0 ? adding : 0;
+                leftToAdd -= Math.max(adding, 0);
 
                 if (leftToAdd < 1) break;
-
             }
 
             slot++;

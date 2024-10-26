@@ -40,6 +40,7 @@ public class ItemButtonFactory {
     }
 
     public ItemStack getButton(@NotNull ItemButtonType buttonType) {
+        //noinspection EnhancedSwitchMigration
         switch (buttonType) {
             case DROP_MULTIPLIER:
                 return getUpdatedDropMultiplier();

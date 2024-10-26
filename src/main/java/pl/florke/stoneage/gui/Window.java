@@ -74,6 +74,6 @@ public abstract class Window {
         return inventory;
     }
 
-    public abstract void onClick(ClickType clickType, Player player, InventoryPoint clickedPoint);
+    public abstract void onClick(@SuppressWarnings("unused") ClickType clickType, Player player, InventoryPoint clickedPoint);
 
 }

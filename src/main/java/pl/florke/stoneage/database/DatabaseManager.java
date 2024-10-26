@@ -20,7 +20,6 @@ package pl.florke.stoneage.database;
 import org.bukkit.scheduler.BukkitRunnable;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.config.DatabaseConfigReader;
-import pl.florke.stoneage.database.playerdata.PlayersData;
 import pl.florke.stoneage.database.wrapper.MySQLWrapper;
 import pl.florke.stoneage.database.wrapper.SQLWrapper;
 import pl.florke.stoneage.util.Message;
@@ -74,7 +73,7 @@ public class DatabaseManager {
         autosaveRunnable.runTaskTimer(plugin, period * 60 * 20, period * 60 * 20);
     }
 
-    public void loadAllPlayers(PlayersData playersData) {
+    public void loadAllPlayers() {
 
         new BukkitRunnable() {
             @Override

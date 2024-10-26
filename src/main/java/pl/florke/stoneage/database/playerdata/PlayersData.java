@@ -19,11 +19,8 @@ package pl.florke.stoneage.database.playerdata;
 
 import org.bukkit.Bukkit;
 import pl.florke.stoneage.StoneAge;
-import pl.florke.stoneage.database.DatabaseManager;
-import pl.florke.stoneage.database.wrapper.MySQLWrapper;
 import pl.florke.stoneage.util.Message;
 
-import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;

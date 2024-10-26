@@ -48,6 +48,7 @@ public class StoneMachineStoneBreakEvent extends Event {
         return loot;
     }
 
+    @SuppressWarnings("unused")
     public Location getLocation() {
         return location;
     }
@@ -61,6 +62,7 @@ public class StoneMachineStoneBreakEvent extends Event {
         return handlers;
     }
 
+    @SuppressWarnings("unused")
     public static HandlerList getHandlerList() {
         return handlers;
     }

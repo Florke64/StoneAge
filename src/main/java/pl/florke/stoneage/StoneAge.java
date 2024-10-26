@@ -243,7 +243,7 @@ public final class StoneAge extends JavaPlugin {
             databaseConfig.readDatabaseConnectionDetails();
 
             dbManager = new DatabaseManager(databaseConfig);
-            dbManager.loadAllPlayers(playersData);
+            dbManager.loadAllPlayers();
 
             dbManager.getSQLWrapper().readPreviousMultiplierFromDatabase(dropCalculator.getDropMultiplier());
         }

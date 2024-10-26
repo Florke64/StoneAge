@@ -18,8 +18,6 @@
 package pl.florke.stoneage.config;
 
 import org.bukkit.configuration.ConfigurationSection;
-import pl.florke.stoneage.database.wrapper.MySQLWrapper;
-import pl.florke.stoneage.database.wrapper.SQLWrapper;
 
 public class DatabaseConfigReader extends ConfigSectionReader {
 

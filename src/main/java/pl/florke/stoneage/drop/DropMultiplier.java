@@ -27,12 +27,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
-import pl.florke.stoneage.database.DatabaseManager;
-import pl.florke.stoneage.database.wrapper.MySQLWrapper;
 import pl.florke.stoneage.event.DropMultiplierStartEvent;
 import pl.florke.stoneage.util.Message;
 
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -65,6 +62,7 @@ public class DropMultiplier {
         return defaultDropMultiplier;
     }
 
+    @SuppressWarnings("unused")
     public float getMaxDropMultiplier() {
         return maxDropMultiplier;
     }
@@ -93,6 +91,7 @@ public class DropMultiplier {
         this.multiplierSetOn = multiplierSetOn;
     }
 
+    @SuppressWarnings("unused")
     public UUID getCallerUniqueId() {
         return callerUniqueId;
     }
