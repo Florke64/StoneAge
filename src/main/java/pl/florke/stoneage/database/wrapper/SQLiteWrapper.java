@@ -31,7 +31,6 @@ import pl.florke.stoneage.drop.DropMultiplier;
 import pl.florke.stoneage.util.Message;
 
 import java.sql.*;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -40,13 +39,10 @@ public class SQLiteWrapper implements DatabaseWrapper {
 
     private final StoneAge stoneAge;
 
-    private final String databaseName;
     private final HikariDataSource hikariDataSource;
 
     public SQLiteWrapper(@NotNull DatabaseConfigReader databaseConfig) {
         this.stoneAge = StoneAge.getPlugin(StoneAge.class);
-
-        this.databaseName = databaseConfig.getDatabaseName();
         this.hikariDataSource = setupConnectionPool(databaseConfig);
 
         init();
@@ -74,6 +70,7 @@ public class SQLiteWrapper implements DatabaseWrapper {
         try {
             dataSource = new HikariDataSource(config);
         } catch (Exception ex) {
+            //noinspection CallToPrintStackTrace
             ex.printStackTrace();
         }
 
@@ -103,7 +100,6 @@ public class SQLiteWrapper implements DatabaseWrapper {
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();
         final StringBuilder values = new StringBuilder();
-        final StringBuilder keyDuplicate = new StringBuilder();
 
         // Initialize query
         query.append("INSERT OR REPLACE INTO ")
@@ -333,6 +329,7 @@ public class SQLiteWrapper implements DatabaseWrapper {
                                 " NOT NULL DEFAULT " + defaultValue);
             }
         } catch (SQLException e) {
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
         }
     }
