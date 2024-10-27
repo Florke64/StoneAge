@@ -23,6 +23,8 @@ import java.util.Random;
 
 public class DropEntry {
 
+    final Random random = new Random();
+
     private final ItemStack defaultItemStack;
     private final float chanceWeight;
     private final String entryName;
@@ -128,16 +130,14 @@ public class DropEntry {
     }
 
     public int calculateFinalAmount(int fortuneLevel) {
-        final Random random = new Random();
         int amount = minAmount == maxAmount ? minAmount : random.nextInt(maxAmount - minAmount) + minAmount;
 
         if (isIgnoreFortuneEnchant())
             return amount;
 
-        for (int i = 0; i < fortuneLevel; i++) {
+        for (int i = 0; i < fortuneLevel; i++)
             if (random.nextFloat() <= 0.35f)
                 amount += 1;
-        }
 
         return amount;
     }
@@ -159,8 +159,6 @@ public class DropEntry {
     }
 
     public int calculateFinalExpValue() {
-        final Random random = new Random();
-
         return random.nextInt(maxExp - minExp) + (minAmount);
     }
 
