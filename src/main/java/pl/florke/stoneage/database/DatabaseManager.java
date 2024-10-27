@@ -17,13 +17,25 @@
 
 package pl.florke.stoneage.database;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.config.DatabaseConfigReader;
+import pl.florke.stoneage.database.playerdata.PlayerConfig;
+import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.database.wrapper.MySQLWrapper;
-import pl.florke.stoneage.database.wrapper.SQLWrapper;
+import pl.florke.stoneage.database.wrapper.DatabaseWrapper;
+import pl.florke.stoneage.database.wrapper.SQLiteWrapper;
 import pl.florke.stoneage.util.Message;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class DatabaseManager {
@@ -33,24 +45,19 @@ public class DatabaseManager {
     public static final String TABLE_DROP_MULTIPLIER = "stoneage_multiplier";
 
     private final DatabaseConfigReader databaseConfig;
-    private final SQLWrapper sqlWrapper;
+    private final DatabaseWrapper databaseWrapper;
 
     private BukkitRunnable autosaveRunnable;
 
     public DatabaseManager(DatabaseConfigReader databaseConfig) {
         this.databaseConfig = databaseConfig;
-        this.sqlWrapper = createSQLWrapper();
-    }
-
-    public SQLWrapper getSQLWrapper() {
-        return sqlWrapper;
+        this.databaseWrapper = createSQLWrapper();
     }
 
     public void initAsyncAutosave(final long period) {
         new Message("Initialized Async Autosave.").log(Level.INFO);
 
         final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
-        final SQLWrapper sqlWrapper = plugin.getSQLWrapper();
         autosaveRunnable = new BukkitRunnable() {
 
             @Override
@@ -58,7 +65,7 @@ public class DatabaseManager {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        final int savedCount = sqlWrapper.saveAllOnlinePlayersData();
+                        final int savedCount = saveAllOnlinePlayersData();
 
                         new Message("Saved $_1 players in database. Next Auto-Save: $_2m")
                                 .placeholder(1, Integer.toString(savedCount))
@@ -98,18 +105,64 @@ public class DatabaseManager {
         }.runTaskAsynchronously(StoneAge.getPlugin(StoneAge.class));
     }
 
-    @SuppressWarnings("ConditionalExpressionWithIdenticalBranches")
-    public SQLWrapper createSQLWrapper() {
+    public DatabaseWrapper createSQLWrapper() {
         return databaseConfig.getSQLWrapperType().equals("mysql") ?
-                new MySQLWrapper(databaseConfig) : new MySQLWrapper(databaseConfig); //new SQLiteWrapper(this);
+                new MySQLWrapper(databaseConfig) : new SQLiteWrapper(databaseConfig);
+    }
+
+    public static int queryUpdate(final @NotNull HikariDataSource connectionPool, final @NotNull String query) {
+        new Message("Query: " + query).log(Level.INFO);
+
+        try (final Connection conn = connectionPool.getConnection();
+             final PreparedStatement ps = conn.prepareStatement(query)) {
+
+            if (ps == null) return -1;
+
+            final int response = ps.executeUpdate();
+
+            if (!ps.isClosed()) {
+                ps.close();
+            }
+
+            return response;
+        } catch (SQLException | NullPointerException ex) {
+            //Checks the error code and skipping exception's stack trace printing
+            if (!(ex instanceof SQLException) || ((SQLException) ex).getErrorCode() != 1060) {
+                ex.printStackTrace();
+            }
+        }
+
+        return -1;
+    }
+
+    public int saveAllOnlinePlayersData() {
+        final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
+
+        int savedCount = 0;
+
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            final UUID playerUUID = player.getUniqueId();
+            final PlayerConfig dropConfig = plugin.getPlayersData().getPersonalDropConfig(playerUUID);
+            final PlayerStats dropStats = plugin.getPlayersData().getPlayerStoneMachineStats(playerUUID);
+
+            plugin.getPlayersData().savePersonalDropConfigInDatabase(dropConfig);
+            plugin.getPlayersData().savePersonalStoneStatsInDatabase(dropStats);
+
+            savedCount++;
+        }
+
+        return savedCount;
     }
 
     public void onDisable() {
-        if (autosaveRunnable != null) {
+        if (autosaveRunnable != null)
             autosaveRunnable.cancel();
-        }
 
-        sqlWrapper.onDisable();
+        databaseWrapper.onDisable();
+    }
+
+    public DatabaseWrapper getSQLWrapper() {
+        return databaseWrapper;
     }
 
 }

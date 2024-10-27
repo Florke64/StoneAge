@@ -30,7 +30,7 @@ import pl.florke.stoneage.config.DropEntryConfigReader;
 import pl.florke.stoneage.config.GeneralConfigReader;
 import pl.florke.stoneage.config.ToolsConfigReader;
 import pl.florke.stoneage.database.DatabaseManager;
-import pl.florke.stoneage.database.wrapper.SQLWrapper;
+import pl.florke.stoneage.database.wrapper.DatabaseWrapper;
 import pl.florke.stoneage.database.playerdata.PlayersData;
 import pl.florke.stoneage.drop.DropCalculator;
 import pl.florke.stoneage.drop.DropMultiplier;
@@ -286,7 +286,7 @@ public final class StoneAge extends JavaPlugin {
         return dbManager;
     }
 
-    public SQLWrapper getSQLWrapper() {
+    public DatabaseWrapper getSQLWrapper() {
         return getDBManager().getSQLWrapper();
     }
 

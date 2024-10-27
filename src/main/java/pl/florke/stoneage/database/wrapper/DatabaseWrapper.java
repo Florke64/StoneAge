@@ -34,18 +34,14 @@
 
 package pl.florke.stoneage.database.wrapper;
 
+import pl.florke.stoneage.database.DatabaseManager;
 import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.drop.DropMultiplier;
 
 import java.util.UUID;
 
-public interface SQLWrapper {
-
-    /**
-     * @return name of database used by this wrapper.
-     */
-    String getDatabaseName();
+public interface DatabaseWrapper {
 
     /**
      * Tries to load player personal drop configuration from database.
@@ -94,13 +90,6 @@ public interface SQLWrapper {
      * @param multiplier the DropMultiplier object to receive the loaded data
      */
     void readPreviousMultiplierFromDatabase(final DropMultiplier multiplier);
-
-    /**
-     * Saves the data of all currently online players to the database.
-     *
-     * @return the number of players whose data was successfully saved.
-     */
-    int saveAllOnlinePlayersData();
 
     /**
      * Performs any necessary cleanup before the plugin is disabled.

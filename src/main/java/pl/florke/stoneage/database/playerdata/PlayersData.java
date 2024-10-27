@@ -37,14 +37,25 @@ public class PlayersData {
         plugin = StoneAge.getPlugin(StoneAge.class);
     }
 
+    /**
+     * Retrieves the {@link PlayerStats} instance for the given player UUID.
+     * If an instance doesn't exist yet, it will be created and stored in the cache.
+     * @param uuid the UUID of the player
+     * @return the retrieved {@link PlayerStats} instance
+     */
     public PlayerStats getPlayerStoneMachineStats(UUID uuid) {
-        if (!stoneMachinePlayerStats.containsKey(uuid)) {
+        if (!stoneMachinePlayerStats.containsKey(uuid))
             stoneMachinePlayerStats.put(uuid, createStoneMachinePlayerStats(uuid));
-        }
 
         return stoneMachinePlayerStats.get(uuid);
     }
 
+    /**
+     * Creates a new {@link PlayerStats} instance for the given player UUID and stores it in the cache.
+     * This method is used by {@link #getPlayerStoneMachineStats(UUID)} when an instance doesn't exist yet.
+     * @param uuid the UUID of the player
+     * @return the created {@link PlayerStats} instance
+     */
     private PlayerStats createStoneMachinePlayerStats(UUID uuid) {
         final String playerName = Bukkit.getOfflinePlayer(uuid).getName();
         final PlayerStats stats = new PlayerStats(uuid, playerName);
@@ -53,10 +64,29 @@ public class PlayersData {
         return stoneMachinePlayerStats.get(uuid);
     }
 
+    /**
+     * Retrieves the {@link PlayerConfig} instance for the given player UUID.
+     * If an instance doesn't exist yet, it will be created and stored in the cache.
+     * @param uuid the UUID of the player
+     * @return the retrieved or newly created {@link PlayerConfig} instance
+     */
     public PlayerConfig getPersonalDropConfig(UUID uuid) {
-        if (!playerPersonalDropConfig.containsKey(uuid)) {
+        if (!playerPersonalDropConfig.containsKey(uuid))
             return createPersonalDropConfig(uuid);
-        }
+
+        return playerPersonalDropConfig.get(uuid);
+    }
+
+    /**
+     * Creates a new {@link PlayerConfig} instance for the given player UUID and stores it in the cache.
+     * This method is used by {@link #getPersonalDropConfig(UUID)} when an instance doesn't exist yet.
+     * @param uuid the UUID of the player
+     * @return the created {@link PlayerConfig} instance
+     */
+    private PlayerConfig createPersonalDropConfig(UUID uuid) {
+        final String playerName = Bukkit.getOfflinePlayer(uuid).getName();
+        final PlayerConfig config = new PlayerConfig(uuid, playerName);
+        playerPersonalDropConfig.put(uuid, config);
 
         return playerPersonalDropConfig.get(uuid);
     }
@@ -64,9 +94,8 @@ public class PlayersData {
     public int savePersonalDropConfigInDatabase(PlayerConfig config) {
         final int response = plugin.getSQLWrapper().runUpdateForPersonalDropConfig(config);
 
-        if (response > 0) {
+        if (response > 0)
             config.onDatabaseSave();
-        }
 
         return response;
     }
@@ -74,9 +103,8 @@ public class PlayersData {
     public int savePersonalStoneStatsInDatabase(PlayerStats stats) {
         final int response = plugin.getSQLWrapper().runUpdateForPersonalStoneStats(stats);
 
-        if (response > 0) {
+        if (response > 0)
             stats.onDatabaseSave();
-        }
 
         return response;
     }
@@ -120,13 +148,5 @@ public class PlayersData {
 
     public void onDisable() {
         saveAllUnsavedDropData();
-    }
-
-    private PlayerConfig createPersonalDropConfig(UUID uuid) {
-        final String playerName = Bukkit.getOfflinePlayer(uuid).getName();
-        final PlayerConfig config = new PlayerConfig(uuid, playerName);
-        playerPersonalDropConfig.put(uuid, config);
-
-        return playerPersonalDropConfig.get(uuid);
     }
 }
