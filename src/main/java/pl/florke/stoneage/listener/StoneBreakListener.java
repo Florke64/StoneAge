@@ -197,6 +197,9 @@ public class StoneBreakListener implements Listener {
                 }
             }
 
+            if (itemInInv == null)
+                new Message("StoneBreakListener: Hej! Null item in inventory! This is probably an error.").log(Level.SEVERE);
+
             //Adding as much as possible to the Inventory
             final int maxStackSize = itemInInv.getMaxStackSize();
             if (itemInInv.isSimilar(itemStack) && itemInInv.getAmount() < maxStackSize) {
