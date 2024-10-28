@@ -82,16 +82,22 @@ public class DropCalculator {
         return totalWeight;
     }
 
+/**
+ * Calculates the drop loot for a player based on the tool used and the stone machine.
+ *
+ * @param player the player who is breaking the block
+ * @param tool the tool used by the player to break the block
+ * @param stoneMachine the stone machine involved, can be null
+ * @return a DropLoot object containing the items and experience to be dropped
+ *         or null if no applicable tool was used
+ */
     public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable Dispenser stoneMachine) {
         //No tool was used to break a block
         if (tool == null) return null;
 
-        //Not applicable tool was used, means no drops
-        if (!plugin.getApplicableTools().isApplicableTool(tool.getType())) {
-            return null;
-        }
-
         final int usedToolLevel = plugin.getApplicableTools().getToolLevel(tool);
+
+        if (usedToolLevel == 0) return null;
 
         //Checking tool properties
         boolean hasSilkTouch = false;

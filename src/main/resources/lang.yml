@@ -7,6 +7,7 @@ stone:
   stone-machine-drop-switch: "&7Dropping &c$_1 &7set $_2&7."
   stone-machine-drop-alert: "&7You've dropped &c$_1 &7x&6$_2"
   stone-machine-drop-chance: "&7Actual chance: &c$_3%"
+  stone-machine-drop-fail-tool: "&cYou need a proper tool to drop from this machine!"
   stone-machine-item-lore:
     - "&7Place the machine in any direction,"
     - "&7it will start generating stone there!"

@@ -74,6 +74,9 @@ public class StoneBreakListener implements Listener {
         final Block machineBlock = plugin.getStoneMachine().getConnectedStoneMachine(brokenBlock);
         final Dispenser stoneMachine = machineBlock != null ? (Dispenser) machineBlock.getState() : null;
 
+        if (stoneMachine == null)
+            return;
+
         //Cancelling default drops
         event.setDropItems(false);
 
@@ -81,44 +84,50 @@ public class StoneBreakListener implements Listener {
     }
 
     private void customizeStoneDrop(@NotNull Player player, Dispenser stoneMachine, Block brokenBlock) {
-        final GameMode playerGameMode = player.getGameMode();
-        final DropLoot finalDrop;
-        if (playerGameMode != GameMode.CREATIVE && playerGameMode != GameMode.SPECTATOR) {
-            final ItemStack usedTool = player.getInventory().getItemInMainHand();
-            //TODO: Async calculation
-            finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
+        if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR)
+            return;
 
-            if (finalDrop == null) {
-                new Message("DropLoot calculated is null (Player: $_1, Location: $_2)")
-                        .placeholder(1, player.getName())
-                        .placeholder(2, brokenBlock.getLocation().toString())
-                        .log(Level.WARNING);
+        if (stoneMachine == null)
+            return;
+
+        stoneMachine.getBlock();
+
+        final ItemStack usedTool = player.getInventory().getItemInMainHand();
+
+        //Not applicable tool was used, means no drops
+        if (!plugin.getApplicableTools().isApplicableTool(usedTool.getType()))
+            new Message(plugin.getLanguage("stone-machine-drop-fail-tool")).send(player);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                final DropLoot finalDrop;
+                finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
+
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        final StoneMachineStoneBreakEvent stoneBreakEvent = new StoneMachineStoneBreakEvent(player, stoneMachine, finalDrop);
+                        Bukkit.getServer().getPluginManager().callEvent(stoneBreakEvent);
+
+                        dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
+                    }
+                }.runTask(plugin);
             }
+        }.runTaskAsynchronously(plugin);
 
-            dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
-        } else {
-            finalDrop = null;
-        }
-
-        if (stoneMachine != null) {
-            stoneMachine.getBlock();
-            final StoneMachineStoneBreakEvent stoneBreakEvent = new StoneMachineStoneBreakEvent(player, stoneMachine, finalDrop);
-            Bukkit.getServer().getPluginManager().callEvent(stoneBreakEvent);
-
-            //Replacing broken stone with new one
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    plugin.getStoneMachine().generateStone(brokenBlock.getLocation());
-                }
-            }.runTaskLater(plugin, 1L);
-        }
+        //Replacing broken stone with new one
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                plugin.getStoneMachine().generateStone(brokenBlock.getLocation());
+            }
+        }.runTaskLater(plugin, 1L);
     }
 
     private void dropLoot(Player player, Location stoneLoc, @Nullable Dispenser stoneMachine, DropLoot dropLoot) {
-        if (dropLoot == null) {
+        if (dropLoot == null)
             return;
-        }
 
         boolean hasHopper = false;
         Block blockUnderStoneMachine = null;
