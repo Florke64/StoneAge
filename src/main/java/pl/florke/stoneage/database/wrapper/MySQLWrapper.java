@@ -18,7 +18,6 @@
 package pl.florke.stoneage.database.wrapper;
 
 import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.config.DatabaseConfigReader;
@@ -37,21 +36,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 @SuppressWarnings("CallToPrintStackTrace")
-public class MySQLWrapper implements DatabaseWrapper {
-
-    private final StoneAge stoneAge;
-    
-    private final String databaseName;
-    private final HikariDataSource hikariDataSource;
+public class MySQLWrapper extends DatabaseWrapper {
 
     public MySQLWrapper(@NotNull DatabaseConfigReader databaseConfig) {
-        this.stoneAge = StoneAge.getPlugin(StoneAge.class);
-
-        createDatabaseIfNotExists(databaseConfig);
-
-        this.databaseName = databaseConfig.getDatabaseName();
-        this.hikariDataSource = setupConnectionPool(databaseConfig);
-
+        super(databaseConfig);
         initDatabase();
     }
 
@@ -60,7 +48,7 @@ public class MySQLWrapper implements DatabaseWrapper {
         makePlayerDropConfigTable();
         makeDropMultiplierTable();
 
-        for (DropEntry entry : stoneAge.getDropCalculator().getDropEntries()) {
+        for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getDropEntries()) {
             final String dropEntryName = entry.getEntryName();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
@@ -89,20 +77,12 @@ public class MySQLWrapper implements DatabaseWrapper {
         }
     }
 
-    public HikariDataSource setupConnectionPool(final @NotNull DatabaseConfigReader databaseConfig) {
-        final HikariConfig config = getHikariConfig(databaseConfig);
+    protected @NotNull HikariConfig getHikariConfig(@NotNull DatabaseConfigReader databaseConfig) {
+        /* This method shall be called before first call to setupConnectionPool.
+         * Setup connection pool relies on an existing database. This is specific to MySQL. */
+        if (getHikariDataSource() == null)
+            createDatabaseIfNotExists(databaseConfig);
 
-        HikariDataSource dataSource = null;
-        try {
-             dataSource = new HikariDataSource(config);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return dataSource;
-    }
-
-    private static @NotNull HikariConfig getHikariConfig(@NotNull DatabaseConfigReader databaseConfig) {
         final HikariConfig config = new HikariConfig();
         config.setPoolName("StoneAgeDatabasePool");
 
@@ -131,7 +111,7 @@ public class MySQLWrapper implements DatabaseWrapper {
         // Init query
         query.append("INSERT INTO ")
                 // "database_name.`table_name` ("
-                .append(databaseName).append(".`").append(DatabaseManager.TABLE_PLAYER_DROP_CONFIG).append("` (");
+                .append(getDatabaseName()).append(".`").append(DatabaseManager.TABLE_PLAYER_DROP_CONFIG).append("` (");
 
         // Obligatory fields
         fields.append("`PlayerUUID`, "); // appends PlayerUUID field
@@ -174,7 +154,7 @@ public class MySQLWrapper implements DatabaseWrapper {
                 .append(") ON DUPLICATE KEY UPDATE ")
                 .append(keyDuplicate);
 
-        return DatabaseManager.queryUpdate(hikariDataSource, query.toString());
+        return DatabaseManager.queryUpdate(getHikariDataSource(), query.toString());
     }
 
     public int runUpdateForPersonalStoneStats(@NotNull PlayerStats stats) {
@@ -187,7 +167,7 @@ public class MySQLWrapper implements DatabaseWrapper {
         // Init query
         query.append("INSERT INTO ")
                 // "database_name.`table_name` ("
-                .append(databaseName).append(".`").append(DatabaseManager.TABLE_PLAYER_STATS).append("` (");
+                .append(getDatabaseName()).append(".`").append(DatabaseManager.TABLE_PLAYER_STATS).append("` (");
 
         // Obligatory fields
         fields.append("`PlayerUUID`, ");
@@ -228,15 +208,15 @@ public class MySQLWrapper implements DatabaseWrapper {
 
         query.append(keyDuplicate);
 
-        return DatabaseManager.queryUpdate(hikariDataSource, query.toString());
+        return DatabaseManager.queryUpdate(getHikariDataSource(), query.toString());
     }
 
     public int loadPersonalStoneStatsFromDatabase() {
-        final String queryStatement = "SELECT * FROM " + databaseName + ".`" + DatabaseManager.TABLE_PLAYER_STATS + "`";
+        final String queryStatement = "SELECT * FROM " + getDatabaseName() + ".`" + DatabaseManager.TABLE_PLAYER_STATS + "`";
 
-        final PlayersData playerSetup = stoneAge.getPlayersData();
+        final PlayersData playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
 
-        try (final Connection conn = hikariDataSource.getConnection();
+        try (final Connection conn = getHikariDataSource().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
              final ResultSet result = ps.executeQuery()) {
 
@@ -285,11 +265,11 @@ public class MySQLWrapper implements DatabaseWrapper {
     }
 
     public int loadPersonalDropConfigFromDatabase() {
-        final String queryStatement = "SELECT * FROM " + databaseName + ".`" + DatabaseManager.TABLE_PLAYER_DROP_CONFIG + "`";
+        final String queryStatement = "SELECT * FROM " + getDatabaseName() + ".`" + DatabaseManager.TABLE_PLAYER_DROP_CONFIG + "`";
 
-        final PlayersData playerSetup = stoneAge.getPlayersData();
+        final PlayersData playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
 
-        try (final Connection conn = hikariDataSource.getConnection();
+        try (final Connection conn = getHikariDataSource().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
              final ResultSet result = ps.executeQuery()) {
 
@@ -335,7 +315,7 @@ public class MySQLWrapper implements DatabaseWrapper {
         final Timestamp startTime = new Timestamp(start);
         final Timestamp timeoutTime = new Timestamp(end);
 
-        String query = "INSERT INTO " + databaseName + ".`" + DatabaseManager.TABLE_DROP_MULTIPLIER + "` " +
+        String query = "INSERT INTO " + getDatabaseName() + ".`" + DatabaseManager.TABLE_DROP_MULTIPLIER + "` " +
                 " (`MultiplierId`, `SetOn`, `Timeout`, `MultiplierValue`, `CallerName`, `CallerUUID`) VALUES (NULL," +
                 " '" + startTime + "'," +
                 " '" + timeoutTime + "'," +
@@ -343,7 +323,7 @@ public class MySQLWrapper implements DatabaseWrapper {
                 " '" + callerName + "', " +
                 " '" + callerUniqueId + "');";
 
-        DatabaseManager.queryUpdate(hikariDataSource, query);
+        DatabaseManager.queryUpdate(getHikariDataSource(), query);
     }
 
     public void readPreviousMultiplierFromDatabase(final DropMultiplier multiplier) {
@@ -351,7 +331,7 @@ public class MySQLWrapper implements DatabaseWrapper {
                 "ORDER BY `" + DatabaseManager.TABLE_DROP_MULTIPLIER + "`.`Timeout` DESC " +
                 "LIMIT 1;";
 
-        try (final Connection conn = hikariDataSource.getConnection();
+        try (final Connection conn = getHikariDataSource().getConnection();
              final PreparedStatement ps = conn.prepareStatement(query);
              final ResultSet response = ps.executeQuery()) {
 
@@ -376,12 +356,12 @@ public class MySQLWrapper implements DatabaseWrapper {
     }
 
     private void addTableColumnIfNotExist(final String tableName, final String columnName, final String columnType, final String defaultValue) {
-        DatabaseManager.queryUpdate(hikariDataSource, "ALTER TABLE " + databaseName + ".`" + tableName + "` " +
+        DatabaseManager.queryUpdate(getHikariDataSource(), "ALTER TABLE " + getDatabaseName() + ".`" + tableName + "` " +
                 "ADD COLUMN `" + columnName + "` " + columnType + " NOT NULL default " + defaultValue);
     }
 
     private void makeDropMultiplierTable() {
-        String query = "CREATE TABLE IF NOT EXISTS `" + databaseName + "`.`" + DatabaseManager.TABLE_DROP_MULTIPLIER + "`" +
+        String query = "CREATE TABLE IF NOT EXISTS `" + getDatabaseName() + "`.`" + DatabaseManager.TABLE_DROP_MULTIPLIER + "`" +
                 " (" +
                 " `MultiplierId` INT NOT NULL AUTO_INCREMENT," +
                 " `SetOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
@@ -392,22 +372,22 @@ public class MySQLWrapper implements DatabaseWrapper {
                 " PRIMARY KEY (`MultiplierId`)" +
                 ") ";
 
-        DatabaseManager.queryUpdate(hikariDataSource, query);
+        DatabaseManager.queryUpdate(getHikariDataSource(), query);
     }
 
     private void makePlayerDropConfigTable() {
-        String query = "CREATE TABLE IF NOT EXISTS " + databaseName + "." + DatabaseManager.TABLE_PLAYER_DROP_CONFIG +
+        String query = "CREATE TABLE IF NOT EXISTS " + getDatabaseName() + "." + DatabaseManager.TABLE_PLAYER_DROP_CONFIG +
                 " (" +
                 " `PlayerUUID` VARCHAR(36)," +
                 " `PlayerName` VARCHAR(16)," +
                 " PRIMARY KEY (`PlayerUUID`)" +
                 ") ";
 
-        DatabaseManager.queryUpdate(hikariDataSource, query);
+        DatabaseManager.queryUpdate(getHikariDataSource(), query);
     }
 
     private void makePlayerStatsTable() {
-        String query = "CREATE TABLE IF NOT EXISTS " + databaseName + "." + DatabaseManager.TABLE_PLAYER_STATS +
+        String query = "CREATE TABLE IF NOT EXISTS " + getDatabaseName() + "." + DatabaseManager.TABLE_PLAYER_STATS +
                 " (" +
                 " `PlayerUUID` VARCHAR(36)," +
                 " `PlayerName` VARCHAR(16)," +
@@ -416,12 +396,7 @@ public class MySQLWrapper implements DatabaseWrapper {
                 " PRIMARY KEY (`PlayerUUID`)" +
                 ") ";
 
-        DatabaseManager.queryUpdate(hikariDataSource, query);
-    }
-
-    public void onDisable() {
-        if (hikariDataSource != null && !hikariDataSource.isClosed())
-            hikariDataSource.close();
+        DatabaseManager.queryUpdate(getHikariDataSource(), query);
     }
 
 }

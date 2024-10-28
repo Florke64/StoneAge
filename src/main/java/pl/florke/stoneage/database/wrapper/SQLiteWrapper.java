@@ -18,7 +18,6 @@
 package pl.florke.stoneage.database.wrapper;
 
 import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.config.DatabaseConfigReader;
@@ -35,25 +34,19 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class SQLiteWrapper implements DatabaseWrapper {
-
-    private final StoneAge stoneAge;
-
-    private final HikariDataSource hikariDataSource;
+public class SQLiteWrapper extends DatabaseWrapper {
 
     public SQLiteWrapper(@NotNull DatabaseConfigReader databaseConfig) {
-        this.stoneAge = StoneAge.getPlugin(StoneAge.class);
-        this.hikariDataSource = setupConnectionPool(databaseConfig);
-
-        init();
+        super(databaseConfig);
+        initDatabase();
     }
 
-    private void init() {
+    private void initDatabase() {
         makePlayerStatsTable();
         makePlayerDropConfigTable();
         makeDropMultiplierTable();
 
-        for (DropEntry entry : stoneAge.getDropCalculator().getDropEntries()) {
+        for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getDropEntries()) {
             final String dropEntryName = entry.getEntryName();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
@@ -63,22 +56,8 @@ public class SQLiteWrapper implements DatabaseWrapper {
         addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, "primitive_drop", "BOOLEAN", "true");
     }
 
-    public HikariDataSource setupConnectionPool(final @NotNull DatabaseConfigReader databaseConfig) {
-        final HikariConfig config = getHikariConfig(databaseConfig);
-
-        HikariDataSource dataSource = null;
-        try {
-            dataSource = new HikariDataSource(config);
-        } catch (Exception ex) {
-            //noinspection CallToPrintStackTrace
-            ex.printStackTrace();
-        }
-
-        return dataSource;
-    }
-
     @NotNull
-    private HikariConfig getHikariConfig(final @NotNull DatabaseConfigReader databaseConfig) {
+    protected HikariConfig getHikariConfig(@NotNull DatabaseConfigReader databaseConfig) {
         final HikariConfig config = new HikariConfig();
         config.setPoolName("StoneAgeDatabasePool");
 
@@ -131,7 +110,7 @@ public class SQLiteWrapper implements DatabaseWrapper {
                 .append(values).append(")");
 
         // Execute query
-        return DatabaseManager.queryUpdate(hikariDataSource, query.toString());
+        return DatabaseManager.queryUpdate(getHikariDataSource(), query.toString());
     }
 
     public int runUpdateForPersonalStoneStats(@NotNull PlayerStats stats) {
@@ -162,15 +141,15 @@ public class SQLiteWrapper implements DatabaseWrapper {
 
         query.append(fields).append(") VALUES (").append(values).append(");");
 
-        return DatabaseManager.queryUpdate(hikariDataSource, query.toString());
+        return DatabaseManager.queryUpdate(getHikariDataSource(), query.toString());
     }
 
     public int loadPersonalStoneStatsFromDatabase() {
         final String queryStatement = "SELECT * FROM " + "`" + DatabaseManager.TABLE_PLAYER_STATS + "`";
 
-        final PlayersData playerSetup = stoneAge.getPlayersData();
+        final PlayersData playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
 
-        try (final Connection conn = hikariDataSource.getConnection();
+        try (final Connection conn = getHikariDataSource().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
              final ResultSet result = ps.executeQuery()) {
 
@@ -221,9 +200,9 @@ public class SQLiteWrapper implements DatabaseWrapper {
     public int loadPersonalDropConfigFromDatabase() {
         final String queryStatement = "SELECT * FROM " + "`" + DatabaseManager.TABLE_PLAYER_DROP_CONFIG + "`";
 
-        final PlayersData playerSetup = stoneAge.getPlayersData();
+        final PlayersData playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
 
-        try (final Connection conn = hikariDataSource.getConnection();
+        try (final Connection conn = getHikariDataSource().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
              final ResultSet result = ps.executeQuery()) {
 
@@ -277,7 +256,7 @@ public class SQLiteWrapper implements DatabaseWrapper {
                 " '" + callerName + "', " +
                 " '" + callerUniqueId + "');";
 
-        DatabaseManager.queryUpdate(hikariDataSource, query);
+        DatabaseManager.queryUpdate(getHikariDataSource(), query);
     }
 
     public void readPreviousMultiplierFromDatabase(final DropMultiplier multiplier) {
@@ -285,7 +264,7 @@ public class SQLiteWrapper implements DatabaseWrapper {
                 "ORDER BY `" + DatabaseManager.TABLE_DROP_MULTIPLIER + "`.`Timeout` DESC " +
                 "LIMIT 1;";
 
-        try (final Connection conn = hikariDataSource.getConnection();
+        try (final Connection conn = getHikariDataSource().getConnection();
              final PreparedStatement ps = conn.prepareStatement(query);
              final ResultSet response = ps.executeQuery()) {
 
@@ -310,7 +289,7 @@ public class SQLiteWrapper implements DatabaseWrapper {
     }
 
     private void addTableColumnIfNotExist(final String tableName, final String columnName, final String columnType, final String defaultValue) {
-        try (Connection conn = hikariDataSource.getConnection();
+        try (Connection conn = getHikariDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement("PRAGMA table_info(" + tableName + ");");
              ResultSet rs = stmt.executeQuery()) {
 
@@ -324,7 +303,7 @@ public class SQLiteWrapper implements DatabaseWrapper {
             }
 
             if (!columnExists) {
-                DatabaseManager.queryUpdate(hikariDataSource,
+                DatabaseManager.queryUpdate(getHikariDataSource(),
                         "ALTER TABLE `" + tableName + "` ADD COLUMN `" + columnName + "` " + columnType +
                                 " NOT NULL DEFAULT " + defaultValue);
             }
@@ -333,7 +312,6 @@ public class SQLiteWrapper implements DatabaseWrapper {
             e.printStackTrace();
         }
     }
-
 
     private void makeDropMultiplierTable() {
         String query = "CREATE TABLE IF NOT EXISTS `" + DatabaseManager.TABLE_DROP_MULTIPLIER + "`" +
@@ -346,7 +324,7 @@ public class SQLiteWrapper implements DatabaseWrapper {
                 " `CallerUUID` TEXT" +
                 ") ";
 
-        DatabaseManager.queryUpdate(hikariDataSource, query);
+        DatabaseManager.queryUpdate(getHikariDataSource(), query);
     }
 
     private void makePlayerDropConfigTable() {
@@ -356,7 +334,7 @@ public class SQLiteWrapper implements DatabaseWrapper {
                 " `PlayerName` TEXT" +
                 ") ";
 
-        DatabaseManager.queryUpdate(hikariDataSource, query);
+        DatabaseManager.queryUpdate(getHikariDataSource(), query);
     }
 
     private void makePlayerStatsTable() {
@@ -368,9 +346,6 @@ public class SQLiteWrapper implements DatabaseWrapper {
                 " `MinerLvl` INT UNSIGNED NOT NULL DEFAULT '1'" +
                 ") ";
 
-        DatabaseManager.queryUpdate(hikariDataSource, query);
+        DatabaseManager.queryUpdate(getHikariDataSource(), query);
     }
-
-    @Override
-    public void onDisable() {}
 }

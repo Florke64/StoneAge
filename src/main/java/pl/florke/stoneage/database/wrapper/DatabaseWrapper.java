@@ -17,19 +17,48 @@
 
 package pl.florke.stoneage.database.wrapper;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.jetbrains.annotations.NotNull;
+import pl.florke.stoneage.config.DatabaseConfigReader;
 import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.drop.DropMultiplier;
 
 import java.util.UUID;
 
-public interface DatabaseWrapper {
+public abstract class DatabaseWrapper {
+
+    private final String databaseName;
+
+    private final HikariDataSource hikariDataSource;
+
+    public DatabaseWrapper(@NotNull DatabaseConfigReader databaseConfig) {
+        this.hikariDataSource = setupConnectionPool(databaseConfig);
+        this.databaseName = databaseConfig.getDatabaseName();
+    }
+
+    public HikariDataSource setupConnectionPool(final @NotNull DatabaseConfigReader databaseConfig) {
+        final HikariConfig config = getHikariConfig(databaseConfig);
+
+        HikariDataSource dataSource = null;
+        try {
+            dataSource = new HikariDataSource(config);
+        } catch (Exception ex) {
+            //noinspection CallToPrintStackTrace
+            ex.printStackTrace();
+        }
+
+        return dataSource;
+    }
+
+    abstract protected HikariConfig getHikariConfig(final @NotNull DatabaseConfigReader databaseConfig);
 
     /**
      * Tries to load player personal drop configuration from database.
      * @return number of loaded configurations.
      */
-    int loadPersonalDropConfigFromDatabase();
+    abstract public int loadPersonalDropConfigFromDatabase();
 
     /**
      * Executes an update operation for the specified player's drop configuration in the database.
@@ -37,13 +66,13 @@ public interface DatabaseWrapper {
      * @param config the PlayerConfig containing the player's drop settings to be updated
      * @return an integer representing the result of the update operation, indicating success or failure
      */
-    int runUpdateForPersonalDropConfig(PlayerConfig config);
+    abstract public int runUpdateForPersonalDropConfig(PlayerConfig config);
 
     /**
      * Loads all player stone machine statistics from the database.
      * @return the number of loaded statistics.
      */
-    int loadPersonalStoneStatsFromDatabase();
+    abstract public int loadPersonalStoneStatsFromDatabase();
 
     /**
      * Executes an update operation for the specified player's stone statistics in the database.
@@ -51,7 +80,7 @@ public interface DatabaseWrapper {
      * @param stats the PlayerStats containing the player's stone statistics to be updated
      * @return an integer representing the result of the update operation, indicating success or failure
      */
-    int runUpdateForPersonalStoneStats(PlayerStats stats);
+    abstract public int runUpdateForPersonalStoneStats(PlayerStats stats);
 
     /**
      * Inserts a new record into the database to store a drop multiplier.
@@ -62,7 +91,7 @@ public interface DatabaseWrapper {
      * @param startMillis the timestamp when the multiplier was set
      * @param timeoutTime the timestamp when the multiplier will expire
      */
-    void insertDropMultiplierRecord(String callerName, UUID callerUUID, float value, long startMillis, long timeoutTime);
+    abstract public void insertDropMultiplierRecord(String callerName, UUID callerUUID, float value, long startMillis, long timeoutTime);
 
     /**
      * Retrieves the most recent drop multiplier record from the database
@@ -71,7 +100,15 @@ public interface DatabaseWrapper {
      *
      * @param multiplier the DropMultiplier object to receive the loaded data
      */
-    void readPreviousMultiplierFromDatabase(final DropMultiplier multiplier);
+    abstract public void readPreviousMultiplierFromDatabase(final DropMultiplier multiplier);
+
+    protected HikariDataSource getHikariDataSource() {
+        return hikariDataSource;
+    }
+
+    protected String getDatabaseName() {
+        return databaseName;
+    }
 
     /**
      * Performs any necessary cleanup before the plugin is disabled.
@@ -79,5 +116,8 @@ public interface DatabaseWrapper {
      * It is the responsibility of the implementing class to make sure
      * that any resources allocated by the plugin are cleaned up.
      */
-    void onDisable();
+    public void onDisable() {
+        if (hikariDataSource != null && !hikariDataSource.isClosed())
+            hikariDataSource.close();
+    }
 }
