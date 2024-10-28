@@ -33,6 +33,7 @@ tools:
     IRON_PICKAXE: 3
     GOLDEN_PICKAXE: 2
     DIAMOND_PICKAXE: 4
+    NETHERITE_PICKAXE: 4
 
 primitive_drop:
   custom_name: 'Stone'
