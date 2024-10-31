@@ -18,11 +18,10 @@
 package pl.florke.stoneage.listener;
 
 import org.bukkit.Material;
-import org.bukkit.block.Dispenser;
+import org.bukkit.block.TileState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
@@ -46,41 +45,26 @@ public class StoneMachineHopperInteractListener implements Listener {
         if (event.isCancelled())
             return;
 
-        final Inventory sourceInventory = event.getSource();
-        final Inventory destinationInventory = event.getDestination();
-
-        if (!isDispenserInventory(sourceInventory) && !isDispenserInventory(destinationInventory)) {
+        if (event.getSource().getHolder() instanceof TileState sourceState && stoneMachine.isStoneMachine(sourceState)) {
+            event.setCancelled(true);
             return;
         }
 
-        //Blocking hopper output
-        if (stoneMachine.isStoneMachine(sourceInventory)) {
-//            new Message()"InventoryMoveItemEvent: source inventory is a stone machine!");
-            event.setCancelled(true);
+        if (!(event.getDestination().getHolder() instanceof TileState machineState) || !stoneMachine.isStoneMachine(machineState))
+            return;
+
+        final ItemStack fuelItem = event.getItem();
+        if (stoneMachine.isHopperInputAllowed() && fuelItem.getType() == Material.COAL) {
+            final int fuelAmount = fuelItem.getAmount() * 8;
+
+
+            if (autoSmelter.addAutoSmeltingUse(machineState, fuelAmount))
+                event.setItem(new ItemStack(Material.AIR, 1));
+
+            return;
         }
 
-        if (stoneMachine.isStoneMachine(destinationInventory)) {
-//            new Message()"InventoryMoveItemEvent: destination inventory is a stone machine!");
-            final ItemStack fuelItem = event.getItem();
-            if (stoneMachine.isHopperInputAllowed() && fuelItem.getType() == Material.COAL) {
-                final int fuelAmount = fuelItem.getAmount() * 8;
-
-                final boolean success = autoSmelter.addAutoSmeltingUse(destinationInventory, fuelAmount);
-
-                if (success) event.setItem(new ItemStack(Material.AIR, 1));
-
-                return;
-            }
-
-            event.setCancelled(true);
-        }
-
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    // Yes, it just is.
-    private boolean isDispenserInventory(@NotNull final Inventory inventoryHolder) {
-        return inventoryHolder.getHolder() instanceof Dispenser;
+        event.setCancelled(true);
     }
 
 }

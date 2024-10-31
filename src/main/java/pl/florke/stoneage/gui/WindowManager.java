@@ -17,7 +17,7 @@
 
 package pl.florke.stoneage.gui;
 
-import org.bukkit.block.Dispenser;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
@@ -28,13 +28,13 @@ import java.util.Map;
 public class WindowManager {
 
     private final Map<Player, Window> cachedWindows = new HashMap<>();
-    private final Map<Dispenser, Window> cachedMachines = new HashMap<>();
+    private final Map<TileState, Window> cachedMachines = new HashMap<>();
 
     public Window getWindow(Player player) {
         return cachedWindows.get(player);
     }
 
-    public Window getWindow(Dispenser machineBlockState) {
+    public Window getWindow(TileState machineBlockState) {
         return cachedMachines.get(machineBlockState);
     }
 
@@ -42,8 +42,8 @@ public class WindowManager {
         cachedWindows.put(player, window);
     }
 
-    public void cacheMachine(Dispenser blockState, Window window) {
-        cachedMachines.put(blockState, window);
+    public void cacheMachine(TileState machineState, Window window) {
+        cachedMachines.put(machineState, window);
     }
 
     public void closeAllWindows() {

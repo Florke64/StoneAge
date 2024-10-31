@@ -18,6 +18,7 @@
 package pl.florke.stoneage.listener;
 
 import org.bukkit.block.Dispenser;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -53,7 +54,10 @@ public class StoneMachineInteractListener implements Listener {
         if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || player.isSneaking())
             return;
 
-        if (!plugin.getStoneMachine().isStoneMachine(event.getClickedBlock()))
+        if (event.getClickedBlock() == null || !(event.getClickedBlock().getState() instanceof TileState machineState))
+            return;
+
+        if (!plugin.getStoneMachine().isStoneMachine(machineState))
             return;
 
         final ItemStack tool = player.getInventory().getItemInMainHand();

@@ -35,7 +35,7 @@ public class StoneMachineWindow extends Window {
     private final Dispenser stoneMachine;
 
     public StoneMachineWindow(Player owner, Dispenser stoneMachine) {
-        super(Message.color(StoneAge.getPlugin(StoneAge.class)
+        super(Message.colors(StoneAge.getPlugin(StoneAge.class)
                 .getLanguage("stone-drop-actions-title")));
 
         this.stoneMachine = stoneMachine;

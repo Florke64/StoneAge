@@ -19,14 +19,16 @@ package pl.florke.stoneage.listener;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.Dispenser;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.Directional;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
-import pl.florke.stoneage.machine.StoneMachine;
 
 public class StoneMachinePlaceListener implements Listener {
 
@@ -41,17 +43,22 @@ public class StoneMachinePlaceListener implements Listener {
         if (event.isCancelled())
             return;
 
-        final Block placedBlock = event.getBlockPlaced();
-
-        if (!plugin.getStoneMachine().isStoneMachine(event.getBlock()))
+        final ItemStack itemInHand = event.getItemInHand();
+        if (!plugin.getStoneMachine().isStoneMachine(itemInHand))
             return;
 
-        final Directional machine = (Directional) placedBlock.getState().getBlockData();
-        final Location stoneGenerationLocation = placedBlock.getRelative(machine.getFacing(), 1).getLocation();
+        final Block placedBlock = event.getBlock();
 
-        final Dispenser stoneMachine = (Dispenser) placedBlock.getState();
-        stoneMachine.getInventory().setItem(StoneMachine.MACHINE_LABEL_SLOT, plugin.getStoneMachine().getMachineLabel());
-        stoneMachine.setCustomName(plugin.getStoneMachine().getMachineName());
+        if (!(placedBlock.getState() instanceof TileState machineState)
+                || !(placedBlock.getState().getBlockData() instanceof Directional directionalMachine)) {
+            return;
+        }
+
+        final Location stoneGenerationLocation = placedBlock.getRelative(directionalMachine.getFacing(), 1).getLocation();
+
+        final PersistentDataContainer machineData = machineState.getPersistentDataContainer();
+        machineData.set(plugin.getStoneMachine().getMachineIdentifierKey(), PersistentDataType.BOOLEAN, true);
+        machineState.update();
 
         plugin.getStoneMachine().generateStone(stoneGenerationLocation);
     }

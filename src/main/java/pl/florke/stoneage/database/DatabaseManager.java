@@ -17,7 +17,6 @@
 
 package pl.florke.stoneage.database;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -27,8 +26,8 @@ import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.config.DatabaseConfigReader;
 import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
-import pl.florke.stoneage.database.wrapper.MySQLWrapper;
 import pl.florke.stoneage.database.wrapper.DatabaseWrapper;
+import pl.florke.stoneage.database.wrapper.MySQLWrapper;
 import pl.florke.stoneage.database.wrapper.SQLiteWrapper;
 import pl.florke.stoneage.util.Message;
 

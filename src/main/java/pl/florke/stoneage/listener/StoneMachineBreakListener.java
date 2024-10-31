@@ -20,7 +20,7 @@ package pl.florke.stoneage.listener;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.Dispenser;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -45,45 +45,36 @@ public class StoneMachineBreakListener implements Listener {
         if (event.isCancelled())
             return;
 
-        if (event.getPlayer() == null)
-            return;
-
         final Player destroyer = event.getPlayer();
         final GameMode gameMode = destroyer.getGameMode();
 
-        if (!plugin.getStoneMachine().isStoneMachine(event.getBlock()))
+        if (!(event.getBlock().getState() instanceof TileState machineState))
             return;
 
-        final Block brokenBlock = event.getBlock();
-        final Dispenser stoneMachine = (Dispenser) brokenBlock.getState();
+        final Block brokenBlock = machineState.getBlock();
 
         event.setDropItems(false);
 
         final ItemStack tool = destroyer.getInventory().getItemInMainHand();
-        if (plugin.getApplicableTools().isMachineDestroyTool(tool) || gameMode == GameMode.CREATIVE) {
-            final Location brokenBlockLocation = brokenBlock.getLocation();
+        if (!plugin.getApplicableTools().isMachineDestroyTool(tool) || gameMode != GameMode.CREATIVE)
+            return;
 
-            stoneMachine.getInventory().clear();
+        final Location brokenBlockLocation = brokenBlock.getLocation();
 
-            //Closing all active windows
-            final WindowManager windowManager = plugin.getWindowManager();
-            final Window brokenMachinesWindow = windowManager.getWindow(stoneMachine);
-            if (brokenMachinesWindow != null) {
+        //Closing all active windows
+        final WindowManager windowManager = plugin.getWindowManager();
+        final Window brokenMachinesWindow = windowManager.getWindow(machineState);
+        if (brokenMachinesWindow != null) {
 
-                final Message machineDestroyedMsg = new Message(plugin.getLanguage("stone-machine-destroyed"));
-                for (Player user : brokenMachinesWindow.getUsers()) {
-                    if (user != null && user.isOnline()) {
-
-                        //TODO: To be tested in action
-                        if (user.getOpenInventory() == null)
-                            continue;
-
-                        if (windowManager.getWindow(user).getBukkitInventory().equals(user.getOpenInventory().getTopInventory())) {
-                            user.closeInventory();
-                            machineDestroyedMsg.send(destroyer);
-                        }
+            final Message machineDestroyedMsg = new Message(plugin.getLanguage("stone-machine-destroyed"));
+            for (Player user : brokenMachinesWindow.getUsers()) {
+                if (user != null && user.isOnline()) {
+                    if (windowManager.getWindow(user).getBukkitInventory().equals(user.getOpenInventory().getTopInventory())) {
+                        user.closeInventory();
+                        machineDestroyedMsg.send(destroyer);
                     }
                 }
+
             }
 
             if (gameMode != GameMode.CREATIVE) {

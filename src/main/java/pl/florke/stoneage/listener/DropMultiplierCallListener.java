@@ -25,6 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.event.DropMultiplierStartEvent;
+
 import java.util.UUID;
 
 public class DropMultiplierCallListener implements Listener {

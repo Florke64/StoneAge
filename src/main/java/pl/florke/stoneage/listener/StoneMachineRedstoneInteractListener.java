@@ -17,7 +17,7 @@
 
 package pl.florke.stoneage.listener;
 
-import org.bukkit.block.Block;
+import org.bukkit.block.TileState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseEvent;
@@ -38,8 +38,10 @@ public class StoneMachineRedstoneInteractListener implements Listener {
         if (event.isCancelled())
             return;
 
-        final Block interactedBlock = event.getBlock();
-        if (!plugin.getStoneMachine().isStoneMachine(interactedBlock))
+        if (!(event.getBlock().getState() instanceof TileState machineState))
+            return;
+
+        if (!plugin.getStoneMachine().isStoneMachine(machineState))
             return;
 
         event.setCancelled(true);

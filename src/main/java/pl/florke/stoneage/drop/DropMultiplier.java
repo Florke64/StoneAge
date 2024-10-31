@@ -30,7 +30,7 @@ import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.event.DropMultiplierStartEvent;
 import pl.florke.stoneage.util.Message;
 
-import java.sql.*;
+import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -171,7 +171,7 @@ public class DropMultiplier {
 
         final NamespacedKey bossBarKey = new NamespacedKey(plugin, "multiplier_bossbar");
         final String bossBarTitle = plugin.getLanguage("stone-multiplier-title-ticker");
-        multiplierBossBar = Bukkit.createBossBar(bossBarKey, Message.color(bossBarTitle), BarColor.BLUE, BarStyle.SEGMENTED_10);
+        multiplierBossBar = Bukkit.createBossBar(bossBarKey, Message.colors(bossBarTitle), BarColor.BLUE, BarStyle.SEGMENTED_10);
         multiplierBossBar.setVisible(false);
 
         final BukkitRunnable multiplierBossBarRunnable = new BukkitRunnable() {

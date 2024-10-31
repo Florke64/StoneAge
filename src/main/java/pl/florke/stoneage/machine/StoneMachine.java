@@ -41,12 +41,14 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dispenser;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.Directional;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,21 +65,22 @@ import java.util.logging.Level;
  */
 public class StoneMachine {
 
-    public static final Material STONE_MACHINE_MATERIAL = Material.DISPENSER;
-    public static final Material MACHINE_LABEL_MATERIAL = Material.PAPER;
-
-    public static final int MACHINE_LABEL_SLOT = 0;
+    public final String STONE_MACHINE_IDENTIFIER_NAME = "stone_machine";
 
     private final StoneAge plugin;
+    private final NamespacedKey machineIdentifierKey;
+
+    public static final Material STONE_MACHINE_MATERIAL = Material.DISPENSER;
 
     private final ItemAutoSmelter itemSmelter;
 
     private final String machineName;
     private final List<String> machineLore;
 
-    private final Map<Dispenser, Long> lastStoneMachineRepair = new HashMap<>();
+    // This item is cloned, it represents a machine
     private final ItemStack stoneMachineParent;
-    private final ItemStack machineLabel;
+
+    private final Map<Dispenser, Long> lastStoneMachineRepair = new HashMap<>();
     private long stoneRespawnFrequency = 40L;
     private int repairCooldown = 5;
     private boolean allowHopperOutput = false;
@@ -90,24 +93,17 @@ public class StoneMachine {
      */
     public StoneMachine(final String machineName, final List<String> machineLore) {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
+        this.machineIdentifierKey = new NamespacedKey(this.plugin, STONE_MACHINE_IDENTIFIER_NAME);
 
-        this.itemSmelter = new ItemAutoSmelter();
-
-        this.machineName = Message.color(machineName);
+        this.machineName = Message.color(machineName).content();
 
         final Message lore = new Message(machineLore);
         this.machineLore = lore.getCachedCompiledMessage();
 
         this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
 
-        this.machineLabel = new ItemStack(MACHINE_LABEL_MATERIAL, 1);
-        final ItemMeta im = this.machineLabel.getItemMeta();
-
-        assert im != null;
-        im.setLore(this.machineLore);
-        im.setDisplayName(this.machineName);
-
-        this.machineLabel.setItemMeta(im);
+        // machine extension
+        this.itemSmelter = new ItemAutoSmelter();
     }
 
     /**
@@ -130,14 +126,16 @@ public class StoneMachine {
      */
     public boolean repairStoneMachine(@NotNull final Dispenser machine) {
         boolean result = true;
+
         final long repairCooldownLimit = (System.currentTimeMillis() - (1000L * getRepairCooldown()));
         if (lastStoneMachineRepair.containsKey(machine) && lastStoneMachineRepair.get(machine) >= repairCooldownLimit) {
             //Player is trying to repair stone machine too frequently
             result = false;
         } else {
-            lastStoneMachineRepair.put(machine, System.currentTimeMillis());
             final Location stoneLocation = getGeneratedStoneLocation(machine);
             generateStone(stoneLocation);
+
+            lastStoneMachineRepair.put(machine, System.currentTimeMillis());
         }
 
         return result;
@@ -149,44 +147,30 @@ public class StoneMachine {
      * @param stoneMachine {@link Dispenser} instance of a stone machine.
      * @return where stone block should be generated for a stone machine given in a parameter.
      */
-    public Location getGeneratedStoneLocation(@NotNull final Dispenser stoneMachine) {
-        Location result = null;
-        if (isStoneMachine(stoneMachine.getInventory())) {
-            final Directional machine = (Directional) stoneMachine.getBlockData();
-            result = stoneMachine.getBlock().getRelative(machine.getFacing()).getLocation();
-        }
+    public Location getGeneratedStoneLocation(@NotNull final TileState stoneMachine) {
+        if (!isStoneMachine(stoneMachine))
+            return null;
 
-        return result;
+        final Directional machine = (Directional) stoneMachine.getBlockData();
+        return stoneMachine.getBlock().getRelative(machine.getFacing()).getLocation();
     }
 
-    public boolean isStoneMachine(@Nullable final Block block) {
-        if (block == null || !(block.getState() instanceof Dispenser machine)) {
-            return false;
-        }
+    public boolean isStoneMachine(@NotNull final TileState machineState) {
+        final PersistentDataContainer machineData = machineState.getPersistentDataContainer();
+        final Boolean isStoneMachine = machineData.get(machineIdentifierKey, PersistentDataType.BOOLEAN);
 
-        if (machine.getCustomName() == null) {
-            return false;
-        }
-
-        return machine.getCustomName().equalsIgnoreCase(this.machineName);
+        return Boolean.TRUE.equals(isStoneMachine);
     }
 
-    public boolean isStoneMachine(@Nullable final Inventory inventory) {
-        if (inventory == null || inventory.getLocation() == null) {
+    public boolean isStoneMachine(@NotNull final ItemStack machineItem) {
+        if (!machineItem.hasItemMeta())
             return false;
-        }
 
-        final Block block = inventory.getLocation().getBlock();
+        final ItemMeta meta = machineItem.getItemMeta();
+        final PersistentDataContainer machineData = meta.getPersistentDataContainer();
+        final Boolean isStoneMachine = machineData.get(machineIdentifierKey, PersistentDataType.BOOLEAN);
 
-        return isStoneMachine(block);
-    }
-
-    public boolean isStoneMachine(@NotNull final Dispenser machine) {
-        if (machine.getCustomName() == null) {
-            return false;
-        }
-
-        return machine.getCustomName().equalsIgnoreCase(this.machineName);
+        return Boolean.TRUE.equals(isStoneMachine);
     }
 
     @Nullable
@@ -194,7 +178,10 @@ public class StoneMachine {
         for (int i = 0; i < 6; i++) {
             final Block relativeBlock = block.getRelative(BlockFace.values()[i], 1);
 
-            if (isStoneMachine(relativeBlock)) {
+            if (!(relativeBlock.getState() instanceof TileState machineState))
+                continue;
+
+            if (isStoneMachine(machineState)) {
                 final Directional machine = (Directional) relativeBlock.getBlockData();
 
                 if (machine.getFacing().getOppositeFace().equals(BlockFace.values()[i])) {
@@ -280,14 +267,16 @@ public class StoneMachine {
      */
     @NotNull
     private ItemStack createStoneMachineItem(@NotNull final Material material) {
+        if (!material.equals(STONE_MACHINE_MATERIAL))
+            throw new IllegalArgumentException("Machine's Material must be DISPENSER");
+
         final ItemStack item = new ItemStack(material);
+
         final ItemMeta meta = item.getItemMeta();
+        final PersistentDataContainer persistentDataContainer = meta.getPersistentDataContainer();
+        persistentDataContainer.set(machineIdentifierKey, PersistentDataType.BOOLEAN, true);
 
-        //TODO: Add appropriate configuration sections (issue #18)
-        assert meta != null;
-        meta.setDisplayName(machineName);
-        meta.setLore(machineLore);
-
+        meta.displayName(Message.color(machineName));
         item.setItemMeta(meta);
 
         return item;
@@ -319,7 +308,7 @@ public class StoneMachine {
      * It won't register crafting recipe if {@link NamespacedKey} is already in use.
      */
     public void registerCraftingRecipe() {
-        final NamespacedKey namespacedKey = new NamespacedKey(this.plugin, "stone_machine");
+        final NamespacedKey namespacedKey = new NamespacedKey(this.plugin, STONE_MACHINE_IDENTIFIER_NAME);
 
         final Iterator<Recipe> registeredRecipes = Bukkit.recipeIterator();
         while (registeredRecipes.hasNext()) {
@@ -353,13 +342,13 @@ public class StoneMachine {
     }
 
     /**
-     * Machine Label is stored in Stone Machines.
-     * It is a dummy ItemStack, it represents that Dispenser which contains it is a Stone Machine.
+     * Retrieves the {@link NamespacedKey} used to identify Stone Machine in the PersistenceDataContainer.<br />
+     * This key is used to determine whether a certain block is a Stone Machine or not.
      *
-     * @return sample {@link ItemStack} of this kind.
+     * @return the unique NamespaceKey used to identify Stone Machine.
      */
-    public ItemStack getMachineLabel() {
-        return machineLabel;
+    public NamespacedKey getMachineIdentifierKey() {
+        return machineIdentifierKey;
     }
 
     /**

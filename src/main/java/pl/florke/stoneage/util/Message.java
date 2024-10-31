@@ -77,7 +77,7 @@ public class Message {
         // Inserting values in respective $_n variables
         getRawMessage().replaceAll(this::insertVariableValues);
 
-        color();
+        colors();
 
         return this;
     }
@@ -147,18 +147,39 @@ public class Message {
         return line;
     }
 
-    private void color() {
+    private void colors() {
         for (String s : this.rawMessage) {
-            final String coloredLine = color(s);
+            final String coloredLine = colors(s);
             this.cachedCompiledMessage.add(coloredLine);
         }
     }
 
-    public static String color(String text) {
+    @Deprecated
+    public static String colors(String text) {
         if (text == null || text.isEmpty()) return text;
 
         // O.G. method
         return text.replace('&', '\u00a7');
+    }
+
+    @NotNull
+    public static TextComponent color(String text) {
+        if (text == null || text.isEmpty()) return Component.text("");
+
+        // O.G. method
+        final String coloredLine = text.replace('&', '\u00a7');
+
+        return Component.text(coloredLine);
+    }
+
+    @NotNull
+    public static TextComponent color(TextComponent text) {
+        if (text == null) return Component.text("");
+
+        // O.G. method
+        final String coloredLine = text.toString().replace('&', '\u00a7');
+
+        return Component.text(coloredLine);
     }
 
     /**
@@ -179,13 +200,13 @@ public class Message {
 
     /**
      * Prettifies a constant name. Like "DIAMOND_PICKAXE" -> "Diamond Pickaxe"
-     * @see #color(String)
+     * @see #colors(String)
      * @see #recalculate()
      */
     public static String constNamePrettify(String text) {
         if (text == null || text.isEmpty()) return text;
 
-        String result = color(text);
+        String result = colors(text);
         result = replaceUnderlines(result);
         result = capitalize(result);
 

@@ -43,7 +43,7 @@ public class DropInfoWindow extends Window {
 
     //TODO: Support for pagination
     public DropInfoWindow(Player owner) {
-        super(Message.color(StoneAge.getPlugin(StoneAge.class)
+        super(Message.colors(StoneAge.getPlugin(StoneAge.class)
                 .getLanguage("stone-drop-info-title")));
 
         windowContentOwner = owner;
@@ -87,7 +87,7 @@ public class DropInfoWindow extends Window {
 
         final String dropEntryNameDetails;
         if (playerHasNeededLevelForDrop) {
-            dropEntryNameDetails = Message.color("&6 (" + df.format(dropChance) + "%)");
+            dropEntryNameDetails = Message.colors("&6 (" + df.format(dropChance) + "%)");
         } else {
             dropEntryNameDetails = "";
         }
