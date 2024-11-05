@@ -49,6 +49,9 @@ stone:
 
   stone-drop-gui-error: "&cError! &7Cannot open GUI."
 
+  stone-drop-level-up-bc: "&dCongrats! &c$_1 &dhas just reached &6$_2 &dmining level!"
+  stone-drop-level-up-player: "&dCongrats! You are now at &6$_2 &dmining level!"
+
   stone-smelting-use: "&7AutoSmelting fuel left: &6$_1"
   stone-smelting-hopper: "&6Input coal with a Hopper, then drop will be smelt automatically!"
   stone-multiplier-end: "  &cDrop multiplier ended."
