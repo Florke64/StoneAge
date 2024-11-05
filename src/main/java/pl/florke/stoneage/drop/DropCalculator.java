@@ -18,7 +18,7 @@
 package pl.florke.stoneage.drop;
 
 import org.bukkit.Material;
-import org.bukkit.block.Dispenser;
+import org.bukkit.block.TileState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -87,11 +87,11 @@ public class DropCalculator {
  *
  * @param player the player who is breaking the block
  * @param tool the tool used by the player to break the block
- * @param stoneMachine the stone machine involved, can be null
+ * @param machineState the stone machine involved, can be null
  * @return a DropLoot object containing the items and experience to be dropped
  *         or null if no applicable tool was used
  */
-    public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable Dispenser stoneMachine) {
+    public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable TileState machineState) {
         //No tool was used to break a block
         if (tool == null) return null;
 
@@ -129,8 +129,8 @@ public class DropCalculator {
             ItemStack primitiveItemStack = primitiveDrop.getDrop(hasSilkTouch, fortuneLevel);
 
             //TODO: Autosmelting primitive drop
-//            if(autoSmelter.getAutoSmeltingUsesLeft(stoneMachine) >= 1) {
-//                final ItemStack smelted = autoSmelter.getSmelted(stoneMachine, primitiveItemStack);
+//            if(autoSmelter.getAutoSmeltingUsesLeft(machineState) >= 1) {
+//                final ItemStack smelted = autoSmelter.getSmelted(machineState, primitiveItemStack);
 //                if(smelted != null) {
 //                    primitiveItemStack = smelted;
 //                }
@@ -140,40 +140,34 @@ public class DropCalculator {
         }
 
         for (DropEntry dropEntry : dropEntries.values()) {
-
-            //Check for requirements for this drop
-            if (playerStats.getMinerLvl() < dropEntry.getNeededMinerLevel()) {
+            // Verify requirements for this drop
+            if (playerStats.getMinerLvl() < dropEntry.getNeededMinerLevel())
                 continue;
-            }
 
-            if (usedToolLevel < dropEntry.getNeededToolLevel()) {
+            if (usedToolLevel < dropEntry.getNeededToolLevel())
                 continue;
-            }
 
             //Checks for player's personalised drop entry settings
-            if (!dropConfig.isDropping(dropEntry)) {
+            if (!dropConfig.isDropping(dropEntry))
                 continue;
-            }
 
             final float luck = randomizer.nextFloat() * totalWeight;
 
             final float itemChanceWeight = dropEntry.getChanceWeight();
             final float currentDropMultiplier;
-            if (dropMultiplier.isActive()) {
-                currentDropMultiplier = this.getDropMultiplier().getCurrentDropMultiplier();
-            } else {
+            if (dropMultiplier.isActive())
+                currentDropMultiplier = getDropMultiplier().getCurrentDropMultiplier();
+            else
                 currentDropMultiplier = getDropMultiplier().getDefaultDropMultiplier();
-            }
 
             if (luck < itemChanceWeight * currentDropMultiplier) {
                 ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
 
                 //Auto smelting feature
-                if (stoneMachine != null && autoSmelter.getAutoSmeltingUsesLeft(stoneMachine) >= itemDrop.getAmount()) {
-                    final ItemStack smelted = autoSmelter.getSmelted(stoneMachine, itemDrop);
-                    if (smelted != null) {
+                if (machineState != null && autoSmelter.getAutoSmeltingUsesLeft(machineState) >= itemDrop.getAmount()) {
+                    final ItemStack smelted = autoSmelter.getSmelted(machineState, itemDrop);
+                    if (smelted != null)
                         itemDrop = smelted;
-                    }
                 }
 
                 dropLoot.addLoot(dropEntry, itemDrop);

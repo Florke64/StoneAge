@@ -26,6 +26,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.util.Message;
@@ -68,7 +69,7 @@ public class ItemAutoSmelter {
         new Message("Cached " + index + " smelting recipes for auto smelting feature.").log(Level.INFO);
     }
 
-    public ItemStack getSmelted(@NotNull final Dispenser stoneMachine, @NotNull final ItemStack itemToSmelt) {
+    public synchronized ItemStack getSmelted(@NotNull final TileState machineState, @NotNull final ItemStack itemToSmelt) {
         for (final FurnaceRecipe recipe : this.smeltingRecipeList) {
             final RecipeChoice input = recipe.getInputChoice();
 
@@ -77,8 +78,18 @@ public class ItemAutoSmelter {
                 final ItemStack smeltedItemStack = recipe.getResult();
                 smeltedItemStack.setAmount(itemToSmelt.getAmount());
 
-                takeAutoSmeltingUse(stoneMachine, itemToSmelt.getAmount());
+                // #getSmelted is called on drop calculate which is async
+                //  It                      operates on block data so has to be run in tick
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        takeAutoSmeltingUse(machineState, itemToSmelt.getAmount());
+                    }
+                }.runTask(plugin);
 
+                // TODO: This may return ItemStack[] because smelting can sometimes produce more stacks
+                // For example if not enough fuel is available to smelt full stack.
+                // This may also mean that (usage of) #takeAutoSmeltingUse() is bugged, but I don't want to check it now.
                 return smeltedItemStack;
             }
         }
@@ -86,7 +97,7 @@ public class ItemAutoSmelter {
         return null;
     }
 
-    public int getAutoSmeltingUsesLeft(@NotNull final TileState machineState) {
+    public synchronized Integer getAutoSmeltingUsesLeft(@NotNull final TileState machineState) {
         if (!plugin.getStoneMachine().isStoneMachine(machineState))
             return -1;
 
@@ -95,6 +106,8 @@ public class ItemAutoSmelter {
 
         final PersistentDataContainer machineData = machineState.getPersistentDataContainer();
         final Integer availableSmeltingUses = machineData.get(AUTOSMELTER_KEY, PersistentDataType.INTEGER);
+        machineState.setBlockData(machineState.getBlockData());
+        machineState.update();
 
         if (availableSmeltingUses == null)
             return -1;
@@ -102,14 +115,29 @@ public class ItemAutoSmelter {
         return availableSmeltingUses;
     }
 
+    /**
+     * Checks if given Stone Machine has enabled auto-smelting feature.
+     * For actual auto-smelting uses left see {@link #getAutoSmeltingUsesLeft(TileState)}.
+     *
+     * @param machineState Stone Machine's {@link TileState} instance.
+     * @return {@code true} if given Stone Machine has enabled auto-smelting.
+     */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean hasAutoSmelting(@NotNull final TileState machineState) {
+    private synchronized boolean hasAutoSmelting(@NotNull final TileState machineState) {
         final PersistentDataContainer machineData = machineState.getPersistentDataContainer();
+        machineState.setBlockData(machineState.getBlockData());
+        machineState.update();
 
-        return Boolean.TRUE.equals(machineData.get(AUTOSMELTER_KEY, PersistentDataType.BOOLEAN));
+        if (!machineData.has(AUTOSMELTER_KEY))
+            return false;
+
+        if (machineData.get(AUTOSMELTER_KEY, PersistentDataType.INTEGER) instanceof Integer smelting)
+            return smelting >= 0;
+
+        return false;
     }
 
-    public void takeAutoSmeltingUse(@NotNull final TileState machineState, final int usesToTake) {
+    public synchronized void takeAutoSmeltingUse(@NotNull final TileState machineState, final int usesToTake) {
         final int availableSmeltingUses = getAutoSmeltingUsesLeft(machineState);
 
         if (availableSmeltingUses < usesToTake)
@@ -117,13 +145,18 @@ public class ItemAutoSmelter {
 
         final PersistentDataContainer machineData = machineState.getPersistentDataContainer();
 
-        final int newSmeltingUses = availableSmeltingUses - usesToTake;
-        machineData.set(AUTOSMELTER_KEY, PersistentDataType.INTEGER, newSmeltingUses);
+        final Integer newSmeltingUses = availableSmeltingUses - usesToTake;
 
+        if (machineData.has(AUTOSMELTER_KEY))
+            machineData.remove(AUTOSMELTER_KEY);
+
+        new Message("Auto-Smelting: newSmeltingUses: " + newSmeltingUses).log(Level.INFO);
+        machineData.set(AUTOSMELTER_KEY, PersistentDataType.INTEGER, newSmeltingUses);
+        machineState.setBlockData(machineState.getBlockData());
         machineState.update();
     }
 
-    public boolean addAutoSmeltingUse(@NotNull final TileState machineState, final int usesToAdd) {
+    public synchronized boolean addAutoSmeltingUse(@NotNull final TileState machineState, final int usesToAdd) {
         final int availableSmeltingUses = getAutoSmeltingUsesLeft(machineState);
 
         if (availableSmeltingUses >= MAX_FUEL_CAPACITY)
@@ -132,7 +165,12 @@ public class ItemAutoSmelter {
         final PersistentDataContainer machineData = machineState.getPersistentDataContainer();
         final int newSmeltingUses = availableSmeltingUses + usesToAdd;
 
+        if (machineData.has(AUTOSMELTER_KEY))
+            machineData.remove(AUTOSMELTER_KEY);
+
         machineData.set(AUTOSMELTER_KEY, PersistentDataType.INTEGER, newSmeltingUses);
+        machineState.setBlockData(machineState.getBlockData());
+        machineState.update();
 
         return true;
     }

@@ -220,7 +220,7 @@ public class DropMultiplier {
         int bossBarTitleId = leftTime == 0 ? 2 : textSwitch ? 0 : 1;
 
         multiplierBossBar.setTitle(
-            new Message(plugin.getLanguage("stone-multiplier-title", bossBarTitleId))
+            new Message(plugin.getLanguage("stone-multiplier-title-ticker", bossBarTitleId))
                     .placeholder(1, Float.toString(value))
                     .placeholder(2, Integer.toString(leftTime))
                     .getCachedCompiledMessage().getFirst()
