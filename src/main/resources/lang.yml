@@ -16,7 +16,7 @@ stone:
     - "&eonly with a Gold Axe."
   stone-multiplier-title: "&3Drop&aMultiplier&b!"
   stone-multiplier-title-ticker:
-    - "&eDrop multiplier active, don't miss out! &c$_2&7m&6)"
+    - "&eDrop multiplier active, don't miss out! &c$_2&7m&6"
     - "&eDrop multiplier from stone is active, don't miss the opportunity!"
     - "&cDrop multiplier will end soon!"
   stone-drop-info-title: "&7&lStoneMach &8&l> &5&lDROP INFO"
