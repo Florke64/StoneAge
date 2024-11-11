@@ -77,7 +77,7 @@ public class MySQLWrapper extends DatabaseWrapper {
         }
     }
 
-    protected @NotNull HikariConfig getHikariConfig(@NotNull DatabaseConfigReader databaseConfig) {
+    protected HikariConfig getHikariConfig(@NotNull DatabaseConfigReader databaseConfig) {
         /* This method shall be called before first call to setupConnectionPool.
          * Setup connection pool relies on an existing database. This is specific to MySQL. */
         if (getHikariDataSource() == null)

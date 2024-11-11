@@ -65,6 +65,7 @@ public final class StoneAge extends JavaPlugin {
         // Dependency check
         Message.initMessenger(this);
         language = new Language("lang");
+        language.reload();
 
         // Plugin startup logic
         windowManager = new WindowManager();
@@ -113,7 +114,7 @@ public final class StoneAge extends JavaPlugin {
     private void registerPluginCommandExecutor(@NotNull final String commandLabel, @NotNull final CommandExecutor commandExecutor) {
         final PluginCommand command = getCommand(commandLabel);
         if (command == null) {
-            final Message error = new Message("&4Couldn't set CommandExecutor for /$_1: Command is null!");
+            final Message error = new Message("Couldn't set CommandExecutor for $_1: Command is null!");
             error.placeholder(1, commandLabel);
             error.log(Level.SEVERE);
 
@@ -124,7 +125,7 @@ public final class StoneAge extends JavaPlugin {
     }
 
     private void initStoneMachines() {
-        final List<String> machineLore = StoneMachine.createDefaultMachineLore();
+        final List<String> machineLore = new Message().getCachedCompiledMessage();
 
         // TODO: Move to config.yml
         new Message(language.getText("stone-machine-item-name")).log(Level.INFO);

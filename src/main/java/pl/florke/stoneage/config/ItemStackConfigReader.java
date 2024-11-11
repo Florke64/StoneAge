@@ -39,6 +39,7 @@ import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.enchantments.Enchantment;
@@ -48,10 +49,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pl.florke.stoneage.util.Message;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 public class ItemStackConfigReader extends ConfigSectionReader {
@@ -63,13 +61,12 @@ public class ItemStackConfigReader extends ConfigSectionReader {
     }
 
     public ItemStack getItemStack() {
-        if (cachedItemStack == null) {
+        if (cachedItemStack == null)
             try {
                 cachedItemStack = compileItemStack();
             } catch (InvalidConfigurationException ex) {
                 new Message("Invalid Configuration of ItemStack");
             }
-        }
 
         return cachedItemStack;
     }
@@ -95,9 +92,8 @@ public class ItemStackConfigReader extends ConfigSectionReader {
 
         //Reading enchantments
         final Map<Enchantment, Integer> enchants = readEnchantments();
-        for (Enchantment enchantment : enchants.keySet()) {
-            itemMeta.addEnchant(enchantment, enchants.get(enchantment), true);
-        }
+        for (Map.Entry<Enchantment, Integer> enchantment : enchants.entrySet())
+            itemMeta.addEnchant(enchantment.getKey(), enchantment.getValue(), true);
 
         //Warping-ip the ItemStack
         itemStack.setItemMeta(itemMeta);
@@ -128,7 +124,6 @@ public class ItemStackConfigReader extends ConfigSectionReader {
         return new Message(rootSection.getStringList("lore"));
     }
 
-    @NotNull
     private Map<Enchantment, Integer> readEnchantments() {
         final RegistryAccess registryAccess = RegistryAccess.registryAccess();
 
@@ -140,17 +135,22 @@ public class ItemStackConfigReader extends ConfigSectionReader {
             final String[] enchantmentData = enchant.split(" ", 2);
 
             final NamespacedKey enchantmentNamespacedKey = NamespacedKey.minecraft(enchantmentData[0].toLowerCase());
-            final Enchantment enchantment;
-            final int enchantmentLevel;
 
-            enchantment = registryAccess.getRegistry(RegistryKey.ENCHANTMENT).get(enchantmentNamespacedKey);
-            enchantmentLevel = (enchantmentData.length < 2) ? 1 : Integer.parseInt(enchantmentData[1]);
+            Enchantment enchantment;
+            int enchantmentLevel;
 
-            if (enchantment != null)
+            final Registry<Enchantment> registry;
+            try {
+                registry = registryAccess.getRegistry(RegistryKey.ENCHANTMENT);
+
+                enchantment = registry.get(enchantmentNamespacedKey);
+                enchantmentLevel = (enchantmentData.length < 2) ? 1 : Integer.parseInt(enchantmentData[1]);
+
                 enchantments.put(enchantment, enchantmentLevel);
-            else
+            } catch (NoSuchElementException ex) {
                 new Message("Invalid Enchantment for the item found - please double check the config.yml file!")
                         .log(Level.WARNING);
+            }
         }
 
         return enchantments;

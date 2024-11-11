@@ -51,23 +51,33 @@ public class Message {
     private final List<String> cachedCompiledMessage = new ArrayList<>();
     private final Map<Integer, String> variables = new HashMap<>();
 
-    public Message(@NotNull String... message) {
-        this(Arrays.asList(message));
+    public Message(final String... message) {
+        this(new ArrayList<>());
+        addLines(message);
     }
 
-    public Message(@NotNull List<String> message) {
-        this.rawMessage.addAll(message);
-        recalculate();
+    public Message(List<String> message) {
+        addLines(message);
     }
 
     @SuppressWarnings("unused")
-    public Message addLines(@NotNull final String... lines) {
+    public Message addLines(final String... lines) {
+        if (lines == null) return this;
+
         return addLines(Arrays.asList(lines));
     }
 
     @SuppressWarnings("unused")
-    public Message addLines(@NotNull final List<String> lines) {
-        this.rawMessage.addAll(lines);
+    public Message addLines(final List<String> lines) {
+        if (lines == null)
+            return this;
+
+        try {
+            this.rawMessage.addAll(lines);
+        } catch (RuntimeException ex) {
+            return this;
+        }
+
         return recalculate();
     }
 
@@ -92,14 +102,14 @@ public class Message {
     }
 
     public void send(@NotNull Audience recipient) {
-        for (final String line : this.cachedCompiledMessage) {
+        for (final String line : getCachedCompiledMessage()) {
             TextComponent textMessage = Component.text(line);
             recipient.sendMessage(textMessage);
         }
     }
 
     public void sendActionMessage(@NotNull Player recipient) {
-        for (final String line : this.cachedCompiledMessage) {
+        for (final String line : getCachedCompiledMessage()) {
             final Component actionBarMessage = Component.text(line, NamedTextColor.WHITE);
 
             final Audience audience = adventure.player(recipient);
@@ -108,14 +118,17 @@ public class Message {
     }
 
     public void log(final Level level) {
-        for (final String line : this.cachedCompiledMessage) {
+        for (final String line : getCachedCompiledMessage()) {
             logger.log(level, line);
         }
     }
 
-    public Message placeholder(final String @NotNull ...values) {
+    public Message placeholder(final String ...values) {
+        if (values == null) return this;
+
         for (int i = 0; i < values.length; i++) {
-            placeholder(i, values[i], false);
+            if (values[i] != null)
+                placeholder(i, values[i], false);
         }
 
         return recalculate();
@@ -131,10 +144,14 @@ public class Message {
     }
 
     private String insertVariableValues(String line) {
-        for (int placeholderId : this.variables.keySet()) {
-            if (!line.contains(("$_" + placeholderId))) continue;
+        if (line == null) return "";
 
-            String placeholderValue = this.variables.get(placeholderId);
+        for (Map.Entry<Integer, String> placeholder : this.variables.entrySet()) {
+            final int placeholderId = placeholder.getKey();
+            if (!line.contains(("$_" + placeholderId)))
+                continue;
+
+            String placeholderValue = placeholder.getValue();
             if (placeholderValue == null) {
                 placeholderValue = "<?>";
             }
@@ -150,7 +167,7 @@ public class Message {
     private void colors() {
         for (String s : this.rawMessage) {
             final String coloredLine = colors(s);
-            this.cachedCompiledMessage.add(coloredLine);
+            cachedCompiledMessage.add(coloredLine);
         }
     }
 
@@ -177,7 +194,7 @@ public class Message {
         if (text == null) return Component.text("");
 
         // O.G. method
-        final String coloredLine = text.toString().replace('&', '\u00a7');
+        final String coloredLine = text.content().replace('&', '\u00a7');
 
         return Component.text(coloredLine);
     }
@@ -218,20 +235,20 @@ public class Message {
     }
 
     public List<String> getCachedCompiledMessage() {
-        return this.cachedCompiledMessage;
+        return new ArrayList<>(cachedCompiledMessage);
     }
 
     public Component[] asComponents() {
-        Component[] components = new Component[this.cachedCompiledMessage.size()];
-        for (String s : this.cachedCompiledMessage) {
-            components[this.cachedCompiledMessage.indexOf(s)] = Component.text(s);
+        Component[] components = new Component[getCachedCompiledMessage().size()];
+        for (String s : getCachedCompiledMessage()) {
+            components[getCachedCompiledMessage().indexOf(s)] = Component.text(s);
         }
 
         return components;
     }
 
     private void clearCache() {
-        this.cachedCompiledMessage.clear();
+        getCachedCompiledMessage().clear();
     }
 
 }

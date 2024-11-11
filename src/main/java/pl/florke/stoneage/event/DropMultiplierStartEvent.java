@@ -17,6 +17,7 @@
 
 package pl.florke.stoneage.event;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -26,7 +27,7 @@ import java.util.UUID;
 
 public class DropMultiplierStartEvent extends Event implements Cancellable {
 
-    public static final HandlerList handlers = new HandlerList();
+    private static final HandlerList handlers = new HandlerList();
 
     private final String callerName;
     private final UUID callerUniqueId;
@@ -66,8 +67,11 @@ public class DropMultiplierStartEvent extends Event implements Cancellable {
         return callerUniqueId;
     }
 
-    @Override
-    public @NotNull HandlerList getHandlers() {
+    // SpotBugs highlights that handlers might be null despite @NotNull annotation
+    // But Bukkit requires @NotNull annotation for overwritten getHandlers() method
+    @SuppressFBWarnings("NP_NONNULL_RETURN_VIOLATION")
+    @Override @NotNull
+    public HandlerList getHandlers() {
         return handlers;
     }
 

@@ -24,8 +24,10 @@ import pl.florke.stoneage.config.DatabaseConfigReader;
 import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.drop.DropMultiplier;
+import pl.florke.stoneage.util.Message;
 
 import java.util.UUID;
+import java.util.logging.Level;
 
 public abstract class DatabaseWrapper {
 
@@ -34,22 +36,22 @@ public abstract class DatabaseWrapper {
     private final HikariDataSource hikariDataSource;
 
     public DatabaseWrapper(@NotNull DatabaseConfigReader databaseConfig) {
-        this.hikariDataSource = setupConnectionPool(databaseConfig);
+        HikariDataSource _hikariDataSource = null;
+
+        try {
+            _hikariDataSource = setupConnectionPool(databaseConfig);
+        } catch (Exception ex) {
+            new Message("Failed to setup connection pool", ex.getMessage()).log(Level.SEVERE);
+        }
+
+        this.hikariDataSource = _hikariDataSource;
         this.databaseName = databaseConfig.getDatabaseName();
     }
 
     public HikariDataSource setupConnectionPool(final @NotNull DatabaseConfigReader databaseConfig) {
         final HikariConfig config = getHikariConfig(databaseConfig);
 
-        HikariDataSource dataSource = null;
-        try {
-            dataSource = new HikariDataSource(config);
-        } catch (Exception ex) {
-            //noinspection CallToPrintStackTrace
-            ex.printStackTrace();
-        }
-
-        return dataSource;
+        return new HikariDataSource(config);
     }
 
     abstract protected HikariConfig getHikariConfig(final @NotNull DatabaseConfigReader databaseConfig);

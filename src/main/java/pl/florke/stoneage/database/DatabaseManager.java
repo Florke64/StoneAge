@@ -124,10 +124,10 @@ public class DatabaseManager {
             }
 
             return response;
-        } catch (SQLException | NullPointerException ex) {
+        } catch (SQLException ex) {
             //Checks the error code and skipping exception's stack trace printing
-            if (!(ex instanceof SQLException) || ((SQLException) ex).getErrorCode() != 1060) {
-                ex.printStackTrace();
+            if (ex.getErrorCode() != 1060) {
+                new Message(ex.getMessage()).log(Level.WARNING);
             }
         }
 

@@ -56,7 +56,6 @@ public class SQLiteWrapper extends DatabaseWrapper {
         addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, "primitive_drop", "BOOLEAN", "true");
     }
 
-    @NotNull
     protected HikariConfig getHikariConfig(@NotNull DatabaseConfigReader databaseConfig) {
         final HikariConfig config = new HikariConfig();
         config.setPoolName("StoneAgeDatabasePool");

@@ -65,7 +65,7 @@ import java.util.logging.Level;
  */
 public class StoneMachine {
 
-    public final String STONE_MACHINE_IDENTIFIER_NAME = "stone_machine";
+    public static final String STONE_MACHINE_IDENTIFIER_NAME = "stone_machine";
 
     private final StoneAge plugin;
     private final NamespacedKey machineIdentifierKey;
@@ -100,20 +100,17 @@ public class StoneMachine {
         final Message lore = new Message(machineLore);
         this.machineLore = lore.getCachedCompiledMessage();
 
-        this.stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
+        ItemStack _stoneMachineParent;
+        try {
+            _stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
+        } catch (IllegalArgumentException ex) {
+            _stoneMachineParent = new ItemStack(Material.DISPENSER);
+        }
+
+        this.stoneMachineParent = _stoneMachineParent;
 
         // machine extension
         this.itemSmelter = new ItemAutoSmelter();
-    }
-
-    /**
-     * @return {@link ArrayList} of a colored Stone Machine's default lore lines.
-     */
-    @NotNull
-    public static List<String> createDefaultMachineLore() {
-        final Message defaultMachineLore = new Message();
-
-        return defaultMachineLore.getCachedCompiledMessage();
     }
 
     /**
@@ -265,21 +262,21 @@ public class StoneMachine {
      * @param material Currently, only {@link Material#DISPENSER} is acceptable.
      * @return {@link ItemStack} representing Stone Machine's item.
      */
-    @NotNull
-    private ItemStack createStoneMachineItem(@NotNull final Material material) {
-        if (!material.equals(STONE_MACHINE_MATERIAL))
-            throw new IllegalArgumentException("Machine's Material must be DISPENSER");
+    private ItemStack createStoneMachineItem(final Material material) {
+        final ItemStack machineItem;
 
-        final ItemStack item = new ItemStack(material);
+        machineItem = new ItemStack(
+            (material != null && material.equals(STONE_MACHINE_MATERIAL))?
+                material : Material.DISPENSER);
 
-        final ItemMeta meta = item.getItemMeta();
+        final ItemMeta meta = machineItem.getItemMeta();
         final PersistentDataContainer persistentDataContainer = meta.getPersistentDataContainer();
         persistentDataContainer.set(machineIdentifierKey, PersistentDataType.BOOLEAN, true);
 
         meta.displayName(Message.color(machineName));
-        item.setItemMeta(meta);
+        machineItem.setItemMeta(meta);
 
-        return item;
+        return machineItem;
     }
 
     /**
@@ -292,15 +289,13 @@ public class StoneMachine {
 
     /**
      * @return {@link ArrayList} of a current effective Stone Machine item's lore.
-     * @see StoneMachine#createDefaultMachineLore()
      */
     @SuppressWarnings("unused")
     public List<String> getMachineLore() {
-        if (machineLore == null || machineLore.isEmpty()) {
-            createDefaultMachineLore();
-        }
+        if (this.machineLore == null)
+            return new Message().getCachedCompiledMessage();
 
-        return machineLore;
+        return List.copyOf(machineLore);
     }
 
     /**

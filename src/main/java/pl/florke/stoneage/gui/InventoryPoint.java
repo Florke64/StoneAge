@@ -63,6 +63,8 @@ public class InventoryPoint {
                 this.point[0] = (this.slotNumber) % 9;
                 this.point[1] = (int) Math.floor((slotNumber / 9));
                 break;
+            default:
+                break;
         }
     }
 
@@ -72,6 +74,8 @@ public class InventoryPoint {
             case SHULKER_BOX:
             case ENDER_CHEST:
                 this.slotNumber = this.point[0] + (9 * this.point[1]);
+                break;
+            default:
                 break;
         }
     }

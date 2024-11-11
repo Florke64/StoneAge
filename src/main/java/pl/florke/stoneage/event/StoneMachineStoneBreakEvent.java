@@ -17,6 +17,7 @@
 
 package pl.florke.stoneage.event;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.bukkit.Location;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
@@ -27,7 +28,8 @@ import pl.florke.stoneage.drop.DropLoot;
 
 public class StoneMachineStoneBreakEvent extends Event {
 
-    public static final HandlerList handlers = new HandlerList();
+    private static final HandlerList handlers = new HandlerList();
+
     private final Player player;
     private final DropLoot loot;
     private final Dispenser stoneMachine;
@@ -57,6 +59,10 @@ public class StoneMachineStoneBreakEvent extends Event {
         return player;
     }
 
+
+    // SpotBugs highlights that handlers might be null despite @NotNull annotation
+    // But Bukkit requires @NotNull annotation for overwritten getHandlers() method
+    @SuppressFBWarnings("NP_NONNULL_RETURN_VIOLATION")
     @Override @NotNull
     public HandlerList getHandlers() {
         return handlers;

@@ -30,6 +30,7 @@ import java.util.logging.Level;
 
 public class Language {
 
+    private final StoneAge stoneAge = StoneAge.getPlugin(StoneAge.class);
     private final String languageKey;
 
     private final Map<String, List<String>> translationLists = new HashMap<>(); // <key, translation>
@@ -37,7 +38,6 @@ public class Language {
 
     public Language(final String langKey) {
         this.languageKey = langKey;
-        reload();
     }
 
     /**
@@ -62,14 +62,22 @@ public class Language {
     }
 
     public void reload() {
-        translationLists.clear();
-
-        final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
+        try {
+            translationLists.clear();
+        } catch (RuntimeException ex) {
+            new Message("Failed to clear translation lists", ex.getMessage()).log(Level.SEVERE);
+        }
 
         // Read language file
-        final File languageFile = new File(plugin.getDataFolder(),languageKey + ".yml");
-        if (!languageFile.exists()) {
-            plugin.saveResource(languageKey + ".yml", false);
+        File languageFile = null;
+        try {
+            languageFile = new File(stoneAge.getDataFolder(),languageKey + ".yml");
+        } catch (RuntimeException ex) {
+            new Message("Language file: " + languageKey + ".yml not found").log(Level.WARNING);
+        }
+
+        if (languageFile == null || !languageFile.exists()) {
+            stoneAge.saveResource(languageKey + ".yml", false);
         }
 
         // Load language file

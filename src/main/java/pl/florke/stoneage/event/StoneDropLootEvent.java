@@ -17,6 +17,7 @@
 
 package pl.florke.stoneage.event;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -26,7 +27,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class StoneDropLootEvent extends Event implements Cancellable {
 
-    public static final HandlerList handlers = new HandlerList();
+    private static final HandlerList handlers = new HandlerList();
+
     private final ItemStack itemDrop;
     private final Player player;
     private boolean isCancelled = false;
@@ -44,6 +46,10 @@ public class StoneDropLootEvent extends Event implements Cancellable {
         return player;
     }
 
+
+    // SpotBugs highlights that handlers might be null despite @NotNull annotation
+    // But Bukkit requires @NotNull annotation for overwritten getHandlers() method
+    @SuppressFBWarnings("NP_NONNULL_RETURN_VIOLATION")
     @Override @NotNull
     public HandlerList getHandlers() {
         return handlers;

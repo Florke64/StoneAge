@@ -56,7 +56,6 @@ public class ItemButtonFactory {
         }
     }
 
-    @NotNull
     private ItemStack getUpdatedDropMultiplier() {
         final ItemStack item = ItemButtonType.DROP_MULTIPLIER.getItemIcon();
         final ItemMeta meta = item.getItemMeta();
@@ -90,9 +89,9 @@ public class ItemButtonFactory {
         MACHINE_UPGRADE(new ItemStack(Material.EMERALD)),
         SMELTING_STATUS(new ItemStack(Material.BLAST_FURNACE));
 
-        final ItemStack itemIcon;
+        ItemStack itemIcon = new ItemStack(Material.COBBLESTONE);
 
-        ItemButtonType(@NotNull final ItemStack icon) {
+        ItemButtonType(final ItemStack icon) {
             final Language language = StoneAge.getPlugin(StoneAge.class).getLanguage();
             final List<Component> lore = new ArrayList<>();
 
@@ -118,12 +117,13 @@ public class ItemButtonFactory {
             this.itemIcon = icon;
         }
 
-        @NotNull
         public ItemStack getItemIcon() {
-            return itemIcon.clone();
+            if (itemIcon == null)
+                return new ItemStack(Material.COBBLESTONE);
+
+            return itemIcon;
         }
 
-        @NotNull
         public String configLineSuffix() {
             return name().replace('_', '-').toLowerCase();
         }

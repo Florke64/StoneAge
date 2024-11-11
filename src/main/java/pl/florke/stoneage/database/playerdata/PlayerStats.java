@@ -19,6 +19,7 @@ package pl.florke.stoneage.database.playerdata;
 
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.drop.DropEntry;
+import pl.florke.stoneage.drop.ExperienceCalculator;
 import pl.florke.stoneage.event.MinerLevelUpEvent;
 
 import java.util.HashMap;
@@ -43,7 +44,7 @@ public class PlayerStats {
         this.uuid = uuid;
         this.playerName = playerName;
 
-        this.minerExp = plugin.getExpCalculator().INITIAL_XP;
+        this.minerExp = ExperienceCalculator.INITIAL_XP;
         this.minerLvl = 1;
 
         statistics.put(plugin.getDropCalculator().getPrimitiveDropEntry().getEntryName(), 0);
