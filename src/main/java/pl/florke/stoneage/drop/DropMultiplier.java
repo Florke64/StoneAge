@@ -223,7 +223,7 @@ public class DropMultiplier {
             new Message(plugin.getLanguage("stone-multiplier-title-ticker", bossBarTitleId))
                     .placeholder(1, Float.toString(value))
                     .placeholder(2, Integer.toString(leftTime))
-                    .getCachedCompiledMessage().getFirst()
+                    .asComponents().getFirst().content()
         );
 
         multiplierBossBar.setProgress(percentage);

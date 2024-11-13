@@ -34,13 +34,13 @@
 
 package pl.florke.stoneage.machine;
 
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Dispenser;
 import org.bukkit.block.TileState;
 import org.bukkit.block.data.Directional;
 import org.bukkit.inventory.ItemStack;
@@ -53,6 +53,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pl.florke.stoneage.StoneAge;
+import pl.florke.stoneage.config.GeneralConfigReader;
 import pl.florke.stoneage.util.Message;
 
 import java.util.*;
@@ -74,13 +75,12 @@ public class StoneMachine {
 
     private final ItemAutoSmelter itemSmelter;
 
-    private final String machineName;
-    private final List<String> machineLore;
+    private final TextComponent machineName;
+    private final List<TextComponent> machineLore;
 
     // This item is cloned, it represents a machine
     private final ItemStack stoneMachineParent;
 
-    private final Map<Dispenser, Long> lastStoneMachineRepair = new HashMap<>();
     private long stoneRespawnFrequency = 40L;
     private int repairCooldown = 5;
     private boolean allowHopperOutput = false;
@@ -95,10 +95,9 @@ public class StoneMachine {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
         this.machineIdentifierKey = new NamespacedKey(this.plugin, STONE_MACHINE_IDENTIFIER_NAME);
 
-        this.machineName = Message.color(machineName).content();
+        this.machineName = Message.color(plugin.getLanguage("stone-machine-item-name"));
 
-        final Message lore = new Message(machineLore);
-        this.machineLore = lore.getCachedCompiledMessage();
+        this.machineLore = new Message().asComponents();
 
         ItemStack _stoneMachineParent;
         try {
@@ -117,11 +116,11 @@ public class StoneMachine {
      * Places stone block in location relative to given machine parameter.<br />
      * Method used by the manual stone machine repair option in a stone machine's GUI.
      *
-     * @param machine {@link Dispenser} instance of Stone Machine which should be repaired.
+     * @param machine {@link TileState} instance of Stone Machine which should be repaired.
      * @return {@code true} if successfully added given machine to the async repair queue.
      * @see StoneMachine#generateStone(Location)
      */
-    public boolean repairStoneMachine(@NotNull final Dispenser machine) {
+    public boolean repairStoneMachine(@NotNull final TileState machine) {
         boolean result = true;
 
         final long repairCooldownLimit = (System.currentTimeMillis() - (1000L * getRepairCooldown()));
@@ -141,7 +140,7 @@ public class StoneMachine {
     /**
      * Gets {@link Location} where stone block should be generated for given parameter.
      *
-     * @param stoneMachine {@link Dispenser} instance of a stone machine.
+     * @param stoneMachine {@link TileState} instance of a stone machine.
      * @return where stone block should be generated for a stone machine given in a parameter.
      */
     public Location getGeneratedStoneLocation(@NotNull final TileState stoneMachine) {
@@ -283,7 +282,7 @@ public class StoneMachine {
      * @return {@link String} of a current effective Stone Machine item's display name.
      */
     @SuppressWarnings("unused")
-    public String getMachineName() {
+    public TextComponent getMachineName() {
         return machineName;
     }
 
@@ -291,9 +290,9 @@ public class StoneMachine {
      * @return {@link ArrayList} of a current effective Stone Machine item's lore.
      */
     @SuppressWarnings("unused")
-    public List<String> getMachineLore() {
+    public List<TextComponent> getMachineLore() {
         if (this.machineLore == null)
-            return new Message().getCachedCompiledMessage();
+            return new Message().asComponents();
 
         return List.copyOf(machineLore);
     }

@@ -234,15 +234,14 @@ public class Message {
         return this.rawMessage;
     }
 
-    public List<String> getCachedCompiledMessage() {
-        return new ArrayList<>(cachedCompiledMessage);
+    private List<String> getCachedCompiledMessage() {
+        return cachedCompiledMessage;
     }
 
-    public Component[] asComponents() {
-        Component[] components = new Component[getCachedCompiledMessage().size()];
-        for (String s : getCachedCompiledMessage()) {
-            components[getCachedCompiledMessage().indexOf(s)] = Component.text(s);
-        }
+    public List<TextComponent> asComponents() {
+        List<TextComponent> components = new ArrayList<>();
+        for (String s : getCachedCompiledMessage())
+            components.add(Component.text(s));
 
         return components;
     }
