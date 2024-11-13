@@ -81,6 +81,8 @@ public class StoneMachine {
     // This item is cloned, it represents a machine
     private final ItemStack stoneMachineParent;
 
+    private final Map<TileState, Long> lastStoneMachineRepair = new HashMap<>();
+    private ItemStack machineDestroyTool = new ItemStack(Material.GOLDEN_PICKAXE);
     private long stoneRespawnFrequency = 40L;
     private int repairCooldown = 5;
     private boolean allowHopperOutput = false;
