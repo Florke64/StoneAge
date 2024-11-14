@@ -17,7 +17,7 @@
 
 package pl.florke.stoneage.gui;
 
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -27,8 +27,6 @@ import pl.florke.stoneage.drop.DropMultiplier;
 import pl.florke.stoneage.util.Language;
 import pl.florke.stoneage.util.Message;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ItemButtonFactory {
@@ -73,7 +71,7 @@ public class ItemButtonFactory {
         lore.placeholder(2, String.valueOf(multiplier.getCurrentDropMultiplier()));
         lore.placeholder(3, String.valueOf(multiplier.getMinutesLeft()));
 
-        meta.lore(Arrays.asList(lore.asComponents()));
+        meta.lore(lore.asComponents());
         item.setItemMeta(meta);
 
         return item;
@@ -93,28 +91,29 @@ public class ItemButtonFactory {
 
         ItemButtonType(final ItemStack icon) {
             final Language language = StoneAge.getPlugin(StoneAge.class).getLanguage();
-            final List<Component> lore = new ArrayList<>();
+
+            final List<TextComponent> itemDescription = new Message(language.getText(
+                    "stone-drop-gui-icon-" + this.configLineSuffix()
+            )).asComponents();
 
             final ItemMeta meta = icon.getItemMeta();
+            meta.itemName(itemDescription.removeFirst()); // getting first and removing it
+            icon.setItemMeta(meta);
 
-            final Component[] itemDescription = new Message(language.getText(
-                "stone-drop-gui-icon-" + this.configLineSuffix())
-            ).asComponents();
+            // Drop Multiplier's lore is calculated on fly to reflect current events
+            if (!this.name().equals("DROP_MULTIPLIER"))
+                addLore(icon, itemDescription);
 
-            // Set first line as display name
-            // and other lines as lore for item
-            for (int i = 0; i < itemDescription.length; i++)
-                if (i == 0)
-                    meta.displayName(itemDescription[i]);
-                else
-                    lore.add(itemDescription[i]);
+            this.itemIcon = icon.clone();
+        }
+
+        private void addLore(@NotNull ItemStack icon, @NotNull List<TextComponent> lore) {
+            final ItemMeta meta = icon.getItemMeta();
 
             if (!lore.isEmpty())
                 meta.lore(lore);
 
             icon.setItemMeta(meta);
-
-            this.itemIcon = icon;
         }
 
         public ItemStack getItemIcon() {

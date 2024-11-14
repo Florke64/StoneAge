@@ -40,6 +40,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+import pl.florke.stoneage.PluginCommandsController;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.gui.window.DropInfoWindow;
 import pl.florke.stoneage.util.Message;
@@ -47,7 +48,7 @@ import pl.florke.stoneage.util.Message;
 public class DropCommand implements CommandExecutor {
 
     private final StoneAge plugin;
-    private final CommandExecutionController executionController;
+    private final PluginCommandsController executionController;
 
     public DropCommand() {
         plugin = StoneAge.getPlugin(StoneAge.class);

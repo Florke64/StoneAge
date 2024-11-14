@@ -17,6 +17,7 @@
 
 package pl.florke.stoneage.gui.window;
 
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -33,7 +34,6 @@ import pl.florke.stoneage.gui.Window;
 import pl.florke.stoneage.util.Message;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
 
 public class DropInfoWindow extends Window {
 
@@ -92,9 +92,11 @@ public class DropInfoWindow extends Window {
             dropEntryNameDetails = "";
         }
 
-        meta.displayName(new Message(
-                "&6" + Message.constNamePrettify(drop.getCustomName()) + dropEntryNameDetails
-        ).asComponents()[0]);
+        if (drop.getCustomName() == null || drop.getCustomName().isEmpty()) {
+            String iconRawName = ((TextComponent) drop.getDropEntryIcon().displayName()).content();
+            final Message dropTitle = new Message("&6" + Message.constNamePrettify(iconRawName) + dropEntryNameDetails);
+            meta.displayName(dropTitle.asComponents().getFirst());
+        }
 
         final Message lore = new Message();
         if (!playerHasNeededLevelForDrop) {
@@ -123,8 +125,7 @@ public class DropInfoWindow extends Window {
                     .placeholder(3, String.valueOf(realDropChance));
         }
 
-        meta.lore(Arrays.asList(lore.asComponents()));
-
+        meta.lore(lore.asComponents());
         icon.setItemMeta(meta);
 
         return icon;

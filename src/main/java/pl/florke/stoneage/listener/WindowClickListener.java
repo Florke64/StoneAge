@@ -61,7 +61,6 @@ public class WindowClickListener implements Listener {
         ClickType clickType = event.getClick();
         InventoryPoint clickedPoint = new InventoryPoint(event.getInventory().getType(), event.getRawSlot());
 
-
         ItemStack current = event.getCurrentItem();
         if (current != null && !current.getType().equals(Material.AIR))
             window.onClick(clickType, player, clickedPoint);

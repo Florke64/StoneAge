@@ -21,10 +21,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Dispenser;
-import org.bukkit.block.Hopper;
+import org.bukkit.block.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
@@ -83,34 +80,36 @@ public class StoneBreakListener implements Listener {
         customizeStoneDrop(player, stoneMachine, brokenBlock);
     }
 
-    private void customizeStoneDrop(@NotNull Player player, Dispenser stoneMachine, Block brokenBlock) {
+    private void customizeStoneDrop(@NotNull Player player, TileState machineState, Block brokenBlock) {
         if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR)
             return;
 
-        if (stoneMachine == null)
+        if (machineState == null)
             return;
 
-        stoneMachine.getBlock();
+        machineState.getBlock();
 
         final ItemStack usedTool = player.getInventory().getItemInMainHand();
+//        TODO: Remove ApplicableTools and use loot tables
+//        brokenBlock.getDrops(usedTool, player);
 
         //Not applicable tool was used, means no drops
-        if (!plugin.getApplicableTools().isApplicableTool(usedTool.getType()))
+        if (brokenBlock.getDrops(usedTool, player).isEmpty())
             new Message(plugin.getLanguage("stone-machine-drop-fail-tool")).send(player);
 
         new BukkitRunnable() {
             @Override
             public void run() {
                 final DropLoot finalDrop;
-                finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, stoneMachine);
+                finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, machineState);
 
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        final StoneMachineStoneBreakEvent stoneBreakEvent = new StoneMachineStoneBreakEvent(player, stoneMachine, finalDrop);
+                        final StoneMachineStoneBreakEvent stoneBreakEvent = new StoneMachineStoneBreakEvent(player, machineState, finalDrop);
                         Bukkit.getServer().getPluginManager().callEvent(stoneBreakEvent);
 
-                        dropLoot(player, brokenBlock.getLocation(), stoneMachine, finalDrop);
+                        dropLoot(player, brokenBlock.getLocation(), machineState, finalDrop);
                     }
                 }.runTask(plugin);
             }
@@ -125,15 +124,15 @@ public class StoneBreakListener implements Listener {
         }.runTaskLater(plugin, 1L);
     }
 
-    private void dropLoot(Player player, Location stoneLoc, @Nullable Dispenser stoneMachine, DropLoot dropLoot) {
+    private void dropLoot(Player player, Location stoneLoc, TileState machineState, DropLoot dropLoot) {
         if (dropLoot == null)
             return;
 
         boolean hasHopper = false;
         Block blockUnderStoneMachine = null;
         //Verifying plugin's config and using hopper output if allowed
-        if (stoneMachine != null && plugin.getStoneMachine().isHopperOutputAllowed()) {
-            blockUnderStoneMachine = stoneMachine.getBlock().getRelative(BlockFace.DOWN);
+        if (machineState != null && plugin.getStoneMachine().isHopperOutputAllowed()) {
+            blockUnderStoneMachine = machineState.getBlock().getRelative(BlockFace.DOWN);
             if (blockUnderStoneMachine.getState() instanceof Hopper) {
                 hasHopper = true;
             }

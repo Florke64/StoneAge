@@ -17,39 +17,56 @@
 
 package pl.florke.stoneage;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.command.*;
 import pl.florke.stoneage.config.DatabaseConfigReader;
-import pl.florke.stoneage.config.DropEntryConfigReader;
 import pl.florke.stoneage.config.GeneralConfigReader;
-import pl.florke.stoneage.config.ToolsConfigReader;
+import pl.florke.stoneage.config.MachinesConfigReader;
 import pl.florke.stoneage.database.DatabaseManager;
 import pl.florke.stoneage.database.playerdata.PlayersData;
 import pl.florke.stoneage.database.wrapper.DatabaseWrapper;
 import pl.florke.stoneage.drop.DropCalculator;
+import pl.florke.stoneage.drop.DropEntry;
 import pl.florke.stoneage.drop.DropMultiplier;
 import pl.florke.stoneage.drop.ExperienceCalculator;
 import pl.florke.stoneage.gui.WindowManager;
 import pl.florke.stoneage.listener.*;
-import pl.florke.stoneage.machine.ApplicableTools;
 import pl.florke.stoneage.machine.StoneMachine;
 import pl.florke.stoneage.util.Language;
 import pl.florke.stoneage.util.Message;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 public final class StoneAge extends JavaPlugin {
 
+    private PluginListenerRegistry pluginListenerRegistry = new PluginListenerRegistry(this);
+    private final List<Class<? extends Listener>> listeners = new ArrayList<>(List.of(
+            // Stone Machines
+            StoneMachinePlaceListener.class, StoneMachineBreakListener.class,
+            StoneMachineInteractListener.class, StoneMachineHopperInteractListener.class,
+            StoneMachineRedstoneInteractListener.class, StoneBreakListener.class,
+            // Windows, Stats, Player Data
+            WindowClickListener.class, DropMultiplierCallListener.class,
+            StatisticsIncreaseListener.class, MinerLevelUpListener.class
+    ));
+
+    private PluginCommandsController commandExecutionController = new PluginCommandsController(this);
+    private final Map<String, Class<? extends CommandExecutor>> commandExecutors = new HashMap<>(Map.of(
+        "drop", DropCommand.class,
+        "drophelp", DropHelpCommand.class,
+        "dropstat", DropStatCommand.class,
+        "multiplier", DropMultiplierCommand.class,
+        "dropspamdb", DropSpamDBCommand.class
+    ));
+
     private StoneMachine stoneMachine;
-    private ApplicableTools applicableTools;
-    private CommandExecutionController commandExecutionController;
     private PlayersData playersData;
 
     private WindowManager windowManager;
@@ -58,7 +75,7 @@ public final class StoneAge extends JavaPlugin {
 
     private Language language;
     private DatabaseManager dbManager;
-
+    private MachinesConfigReader machinesConfigManager = new MachinesConfigReader(this);
 
     @Override
     public void onEnable() {
@@ -68,40 +85,23 @@ public final class StoneAge extends JavaPlugin {
         language.reload();
 
         // Plugin startup logic
+        stoneMachine = new StoneMachine();
         windowManager = new WindowManager();
         dropCalculator = new DropCalculator();
         expCalculator = new ExperienceCalculator();
         playersData = new PlayersData();
-
-        initStoneMachines();
-        stoneMachine.registerCraftingRecipe();
 
         //Saving and reloading config
         saveDefaultConfig();
         reloadConfig();
 
         //Registering Event Listeners for the Plugin
-        getServer().getPluginManager().registerEvents(new StoneMachinePlaceListener(), this);
-        getServer().getPluginManager().registerEvents(new StoneMachineBreakListener(), this);
-        getServer().getPluginManager().registerEvents(new StoneMachineInteractListener(), this);
-        getServer().getPluginManager().registerEvents(new StoneMachineHopperInteractListener(), this);
-        getServer().getPluginManager().registerEvents(new StoneMachineRedstoneInteractListener(), this);
-        getServer().getPluginManager().registerEvents(new StoneBreakListener(), this);
-
-        getServer().getPluginManager().registerEvents(new PlayerSaveDataOnLeaveListener(), this);
-        getServer().getPluginManager().registerEvents(new WindowClickListener(), this);
-
-        getServer().getPluginManager().registerEvents(new StatisticsIncreaseListener(), this);
-        getServer().getPluginManager().registerEvents(new MinerLevelUpListener(), this);
-
-        getServer().getPluginManager().registerEvents(new DropMultiplierCallListener(), this);
+        for (final Class<? extends Listener> listener : listeners)
+            pluginListenerRegistry.registerListener(listener);
 
         //Registering Plugin Commands
-        registerPluginCommandExecutor("drop", new DropCommand());
-        registerPluginCommandExecutor("drophelp", new DropHelpCommand());
-        registerPluginCommandExecutor("dropstat", new DropStatCommand());
-        registerPluginCommandExecutor("multiplier", new DropMultiplierCommand());
-        registerPluginCommandExecutor("dropspamdb", new DropSpamDBCommand());
+        for (final Map.Entry<String, Class<? extends CommandExecutor>> cmdExec : commandExecutors.entrySet())
+            commandExecutionController.registerExecutor(cmdExec.getKey(), cmdExec.getValue());
 
         //TODO: Add this setting to the config.yml (open issue #17)
         final long period = 15; // autosave period in minutes
@@ -111,28 +111,14 @@ public final class StoneAge extends JavaPlugin {
         getDropCalculator().getDropMultiplier().initMultiplierBossBar();
     }
 
-    private void registerPluginCommandExecutor(@NotNull final String commandLabel, @NotNull final CommandExecutor commandExecutor) {
-        final PluginCommand command = getCommand(commandLabel);
-        if (command == null) {
-            final Message error = new Message("Couldn't set CommandExecutor for $_1: Command is null!");
-            error.placeholder(1, commandLabel);
-            error.log(Level.SEVERE);
+    @Override
+    public void saveDefaultConfig() {
+        //saving config.yml
+        super.saveDefaultConfig();
 
-            return;
-        }
-
-        command.setExecutor(commandExecutor);
-    }
-
-    private void initStoneMachines() {
-        final List<String> machineLore = new Message().getCachedCompiledMessage();
-
-        // TODO: Move to config.yml
-        new Message(language.getText("stone-machine-item-name")).log(Level.INFO);
-        final String machineName = new Message(language.getText("stone-machine-item-name"))
-                .getCachedCompiledMessage().getFirst();
-
-        stoneMachine = new StoneMachine(machineName, machineLore);
+        //saving resources from directories
+        // "drops/" and "drops/primitives/"
+        machinesConfigManager.saveDefaultDrops();
     }
 
     @Override
@@ -141,113 +127,48 @@ public final class StoneAge extends JavaPlugin {
         super.reloadConfig();
 
         //Reading 'General' configuration for Stone Machines
-        if (!getConfig().isConfigurationSection("machines")) {
-            new Message("Invalid Configuration file (missing the \"machines\" section)!")
-                .addLines("$_1 plugin will now be disabled.")
-                .placeholder(1, this.getName())
-                    .log(Level.SEVERE);
+        final ConfigurationSection machinesSection = getConfig().getConfigurationSection("machines");
+        if (machinesSection == null || !getConfig().isConfigurationSection("machines")) {
+            new Message("Invalid Configuration file (missing the \"machines\" section)!", "$_1 plugin will now be disabled.")
+                .placeholder(1, this.getName()).log(Level.SEVERE);
 
-            Bukkit.getServer().getPluginManager().disablePlugin(this);
+            getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        final GeneralConfigReader generalConfig = new GeneralConfigReader(getConfig().getConfigurationSection("machines"));
-        generalConfig.compile();
+        final GeneralConfigReader generalConfig = new GeneralConfigReader(machinesSection);
 
-        getStoneMachine().setStoneRespawnFrequency(generalConfig.getStoneFrequency());
-        getStoneMachine().setRepairCooldown(generalConfig.getRepairCoolDown());
-        getStoneMachine().setDropItemsToFeet(generalConfig.isDropItemsToFeet());
-        getStoneMachine().setDropExpToFeet(generalConfig.isDropExpToFeet());
-        getStoneMachine().setAllowHopperOutput(generalConfig.isAllowHopperDropOutput());
-        getStoneMachine().setAllowHopperInput(generalConfig.isAllowCoalUpgradesByHopper());
-        this.commandExecutionController = new CommandExecutionController(generalConfig.getCommandsCoolDown());
+        stoneMachine.registerCraftingRecipe();
+        stoneMachine.applyMachineConfiguration(generalConfig);
+
+        this.commandExecutionController.setCommandCooldownSeconds(generalConfig.getCommandsCoolDown());
         this.expCalculator.setMaximumMinerLevel(generalConfig.getMaxMinerLevel());
 
         getDropCalculator().setDropMultiplier(new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier()));
 
-        //Reading applicable tools (pickaxes and their levels)
-        final ToolsConfigReader toolsConfig = new ToolsConfigReader(getConfig().getConfigurationSection("tools"));
-        toolsConfig.compile();
+        //Reading 'DropEntry' configuration
+        //TODO: Support for multiple primitive drops, like generating cobble, deepslate etc
+        final DropEntry primitiveDropEntry = machinesConfigManager.getPrimitiveDropEntries().getFirst();
+        dropCalculator.setPrimitiveDrop(primitiveDropEntry);
 
-        applicableTools = new ApplicableTools(toolsConfig.getMachineDestroyTool());
-        for (final Material tool : toolsConfig.getMiningTools()) {
-            this.applicableTools.addApplicableTool(tool, toolsConfig.getToolLevel(tool));
-        }
-
-        //Reading Primitive Stone drop
-        if (!getConfig().isConfigurationSection("primitive_drop")) {
-            final Message error = new Message();
-            error.addLines("Invalid Configuration file (missing the \"primitive_drop\" section)!");
-            error.addLines("$_1 plugin will now be disabled.");
-            error.placeholder(1, this.getName());
-            error.log(Level.SEVERE);
-
-            Bukkit.getServer().getPluginManager().disablePlugin(this);
-
-            return;
-        }
-
-        final DropEntryConfigReader primitiveDropEntry = new DropEntryConfigReader(getConfig().getConfigurationSection("primitive_drop"));
-        dropCalculator.setPrimitiveDrop(primitiveDropEntry.compileDropEntry());
-
-        //Reading Custom Stone drop
-        if (!getConfig().isConfigurationSection("custom_drops")) {
-            final Message error = new Message();
-            error.addLines("Invalid Configuration file (missing the \"custom_drops\" section)!");
-            error.addLines("Skipping, stone will drop server-default items.");
-            error.log(Level.SEVERE);
-
-            return;
-        }
-
-        int customDropsLoaded = 0, customDropsFound = 0;
-        final ConfigurationSection customDropsSection = getConfig().getConfigurationSection("custom_drops");
-
-        if (customDropsSection == null) {
-            final Message error = new Message();
-            error.addLines("Invalid Configuration file (missing the \"custom_drops\" section)!");
-            error.addLines("Skipping, Stone will drop server-default values.");
-            error.log(Level.SEVERE);
-        } else {
-            for (String entryName : customDropsSection.getKeys(false)) {
-                customDropsFound++;
-
-                final Message loadingMessage = new Message("Attempting to load drop entry: $_1");
-                loadingMessage.placeholder(1, entryName);
-                loadingMessage.log(Level.INFO);
-
-                final DropEntryConfigReader customDropEntry = new DropEntryConfigReader(customDropsSection.getConfigurationSection(entryName));
-
-                dropCalculator.addDrop(customDropEntry.compileDropEntry());
-
-                final Message success = new Message("Loaded a custom drop: $_1");
-                success.placeholder(1, entryName);
-                success.log(Level.INFO);
-
-                customDropsLoaded++;
-            }
-        }
-
-        final Message customDropsInfo = new Message("Loaded $_1 of $_2 custom drop entries.");
-        customDropsInfo.placeholder(1, Integer.toString(customDropsLoaded));
-        customDropsInfo.placeholder(2, Integer.toString(customDropsFound));
-        customDropsInfo.log(Level.INFO);
+        final List<DropEntry> dropEntries = machinesConfigManager.getDropEntries();
+        for (final DropEntry dropEntry : dropEntries)
+            dropCalculator.addDrop(dropEntry);
 
         //Reading 'database' configuration
         if (!getConfig().isConfigurationSection("database")) {
-            final Message error = new Message();
-            error.addLines("Invalid Configuration file (missing the \"database\" section)!");
-            error.addLines("Skipping, database won't work.");
-            error.log(Level.SEVERE);
-        } else {
-            final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(getConfig().getConfigurationSection("database"));
-            databaseConfig.readDatabaseConnectionDetails();
-
-            dbManager = new DatabaseManager(databaseConfig);
-            dbManager.loadAllPlayers();
-
-            dbManager.getSQLWrapper().readPreviousMultiplierFromDatabase(dropCalculator.getDropMultiplier());
+            new Message("Invalid Configuration file (missing the \"database\" section)!",
+                "Skipping, database won't work.").log(Level.SEVERE);
+            getServer().getPluginManager().disablePlugin(this);
         }
+
+        final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(getConfig().getConfigurationSection("database"));
+        databaseConfig.readDatabaseConnectionDetails();
+
+        dbManager = new DatabaseManager(databaseConfig);
+        dbManager.loadAllPlayers();
+
+        dbManager.getSQLWrapper().readPreviousMultiplierFromDatabase(dropCalculator.getDropMultiplier());
 
         new Message("Config reloaded!").log(Level.INFO);
     }
@@ -263,12 +184,8 @@ public final class StoneAge extends JavaPlugin {
         return this.stoneMachine;
     }
 
-    public CommandExecutionController getCommandExecutionController() {
+    public PluginCommandsController getCommandExecutionController() {
         return commandExecutionController;
-    }
-
-    public ApplicableTools getApplicableTools() {
-        return applicableTools;
     }
 
     public WindowManager getWindowManager() {
@@ -315,10 +232,20 @@ public final class StoneAge extends JavaPlugin {
         getWindowManager().closeAllWindows();
 
         new Message("Syncing all unsaved data with the database...").log(Level.INFO);
-        playersData.onDisable();
+        if (playersData != null)
+            playersData.onDisable();
+        else
+            new Message("PlayersData not even initialized!").log(Level.WARNING);
 
         new Message("Disconnecting database, closing connection pool...").log(Level.INFO);
-        dbManager.onDisable();
+        if (dbManager != null)
+            dbManager.onDisable();
+        else
+            new Message("Database not even initialized!").log(Level.WARNING);
+    }
+
+    public List<Class<? extends Listener>> getRegisteredListeners() {
+        return new ArrayList<>(listeners);
     }
 
 }

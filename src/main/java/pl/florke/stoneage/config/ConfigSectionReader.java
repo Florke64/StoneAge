@@ -22,13 +22,11 @@ import pl.florke.stoneage.StoneAge;
 
 public abstract class ConfigSectionReader {
 
-    protected final StoneAge plugin;
+    protected final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
 
     protected final ConfigurationSection rootSection;
 
     public ConfigSectionReader(ConfigurationSection configurationSection) {
-        plugin = StoneAge.getPlugin(StoneAge.class);
-
         rootSection = configurationSection;
     }
 

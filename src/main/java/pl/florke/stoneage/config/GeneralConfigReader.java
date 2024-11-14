@@ -40,9 +40,10 @@ public class GeneralConfigReader extends ConfigSectionReader {
 
     public GeneralConfigReader(ConfigurationSection section) {
         super(section);
+        compile();
     }
 
-    public void compile() {
+    private void compile() {
         defaultDropMultiplier = Float.parseFloat(rootSection.getString("default_drop_multiplier", "1.0"));
         maxDropMultiplier = Float.parseFloat(rootSection.getString("max_drop_multiplier", "2.0"));
 

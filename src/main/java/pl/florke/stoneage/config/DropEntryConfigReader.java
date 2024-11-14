@@ -17,6 +17,7 @@
 
 package pl.florke.stoneage.config;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import pl.florke.stoneage.drop.DropEntry;
@@ -30,69 +31,80 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         super(section);
     }
 
-    public DropEntry compileDropEntry() {
+    public DropEntry readDropEntry(final String dropEntryId) {
+        //Block that represents this drop (not dropping actually)
+        final Material blockMaterial = readBlockMaterial();
+
         //Getting drop's chance weight
         final float weight = readDropChanceWeight();
 
         //Reading actual drops
-        ItemStack defaultToolItem = null;
-        ItemStack silkToolItem = null;
-
-        final String canonicalEntryName = rootSection.getName();
+        ItemStack defaultDrop = null;
+        ItemStack silkDrop = null;
 
         //Reading drops for default tool
-        final ConfigurationSection defaultToolSection = rootSection.getConfigurationSection("default_tool");
-        if (defaultToolSection != null) {
-            final ItemStackConfigReader defaultToolConfig = new ItemStackConfigReader(defaultToolSection);
+        final ConfigurationSection defaultDropSection = rootSection.getConfigurationSection("drop");
+        if (defaultDropSection != null) {
+            final ItemStackConfigReader defaultToolConfig = new ItemStackConfigReader(defaultDropSection);
 
-            defaultToolItem = defaultToolConfig.getItemStack();
+            defaultDrop = defaultToolConfig.getItemStack();
         }
 
         //Reading drops for tools with Silk Touch enchantment
-        final ConfigurationSection silkToolSection = rootSection.getConfigurationSection("silk_touch_tool");
-        if (silkToolSection != null) {
-            final ItemStackConfigReader silkToolConfig = new ItemStackConfigReader(silkToolSection);
+        final ConfigurationSection silkDropSection = rootSection.getConfigurationSection("silk");
+        if (silkDropSection != null) {
+            final ItemStackConfigReader silkToolConfig = new ItemStackConfigReader(silkDropSection);
 
-            silkToolItem = silkToolConfig.getItemStack();
+            silkDrop = silkToolConfig.getItemStack();
+        }
+
+        if (rootSection.getConfigurationSection("silk") == null) {
+            for (String s : rootSection.getKeys(false)) {
+                new Message(s).log(Level.WARNING);
+            }
         }
 
         //If there was an error while reading those sections
-        if (defaultToolItem == null && silkToolItem == null) {
-            new Message("Error while reading DropEntry: $_1.")
-                    .placeholder(1, rootSection.getName())
+        if (defaultDrop == null && silkDrop == null) {
+            new Message("Error while reading DropEntry: $_1")
+                .placeholder(1, rootSection.getString("material", "<?>"))
                     .log(Level.SEVERE);
 
             return null;
         }
 
-        defaultToolItem = (defaultToolItem != null) ? defaultToolItem : silkToolItem;
-        final DropEntry dropEntry = new DropEntry(canonicalEntryName, defaultToolItem, weight);
+        defaultDrop = (defaultDrop != null) ? defaultDrop : silkDrop;
+
+        final DropEntry dropEntry = new DropEntry(dropEntryId, defaultDrop, weight);
+
+        dropEntry.setBlockMaterial(blockMaterial == null? Material.STONE : blockMaterial);
 
         //Setting Silk Touch enchantment drop
-        if (silkToolItem != null)
-            dropEntry.setSilkTouchItemStack(silkToolItem);
+        if (silkDrop != null)
+            dropEntry.setSilkDrop(silkDrop);
 
-        //Fortune Enchant ignoring
-        final String customEntryName = rootSection.getString("custom_name", canonicalEntryName);
+        // TODO: Only use set... methods if section exists
+        //Getting DropEntry custom name for its display in menus
+        final String customEntryName = rootSection.getString("custom_name", dropEntryId);
         dropEntry.setCustomName(customEntryName);
 
         //Fortune Enchant ignoring
         final boolean ignoreFortune = rootSection.getBoolean("ignore_fortune", true);
-        dropEntry.setIgnoreFortuneEnchant(ignoreFortune);
+        dropEntry.setIgnoreFortune(ignoreFortune);
 
         //Accepts drop multiplication set by server admin
-        boolean multipliable = rootSection.getBoolean("multipliable", true);
+        final boolean multipliable = rootSection.getBoolean("multipliable", true);
         dropEntry.setMultipliable(multipliable);
 
         //Minimal and Maximal drop count
-        final int minAmount = defaultToolSection.getInt("minimal_amount", -1);
-        final int maxAmount = defaultToolSection.getInt("maximal_amount", -1);
+        final int minAmount = defaultDropSection.getInt("minimal_amount", 1);
+        final int maxAmount = defaultDropSection.getInt("maximal_amount", 1);
         dropEntry.setMinAmount(minAmount);
         dropEntry.setMaxAmount(maxAmount);
 
         //Experience Drops
-        final int minExp = rootSection.getInt("minimal_exp", -1);
-        final int maxExp = rootSection.getInt("maximal_exp", -1);
+        final int minExp = rootSection.getInt("minimal_exp", 1);
+        final int maxExp = rootSection.getInt("maximal_exp", 5);
         dropEntry.setMinimalExp(minExp);
         dropEntry.setMaximalExp(maxExp);
 
@@ -104,19 +116,13 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         final int neededMinerLevel = rootSection.getInt("minimal_miner_lvl", 1);
         dropEntry.setNeededMinerLevel(neededMinerLevel);
 
-        //Needed level to drop
-        final int neededToolLevel = rootSection.getInt("minimal_tool_lvl", 1);
-        dropEntry.setNeededToolLevel(neededToolLevel);
-
         return dropEntry;
     }
 
     private float readDropChanceWeight() {
         final String weightString = rootSection.getString("weight");
-        if (weightString == null) {
-            new Message("Error while reading DropEntry: null").log(Level.SEVERE);
+        if (weightString == null)
             return 0.0f;
-        }
 
         float weight;
         try {
@@ -127,6 +133,14 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         }
 
         return weight;
+    }
+
+    private Material readBlockMaterial() {
+        final String materialName = rootSection.getString("block.material");
+        if (materialName == null)
+            return null;
+
+        return Material.getMaterial(materialName);
     }
 
 }

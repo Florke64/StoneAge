@@ -18,7 +18,6 @@
 package pl.florke.stoneage.machine;
 
 import org.bukkit.NamespacedKey;
-import org.bukkit.block.Dispenser;
 import org.bukkit.block.TileState;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
@@ -66,7 +65,8 @@ public class ItemAutoSmelter {
             index++;
         }
 
-        new Message("Cached " + index + " smelting recipes for auto smelting feature.").log(Level.INFO);
+        new Message("Cached $_1 smelting recipes for auto smelting feature.")
+                .placeholder(1, Integer.toString(index)).log(Level.INFO);
     }
 
     public synchronized ItemStack getSmelted(@NotNull final TileState machineState, @NotNull final ItemStack itemToSmelt) {

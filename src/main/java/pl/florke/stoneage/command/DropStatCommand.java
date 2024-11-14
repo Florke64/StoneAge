@@ -40,6 +40,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import pl.florke.stoneage.PluginCommandsController;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.database.playerdata.PlayersData;
@@ -52,7 +53,7 @@ import pl.florke.stoneage.util.Message;
 public class DropStatCommand implements CommandExecutor {
 
     private final Language lang;
-    private final CommandExecutionController executionController;
+    private final PluginCommandsController executionController;
 
     private final PlayersData playerSetupManager;
     private final DropCalculator dropCalculator;

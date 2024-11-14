@@ -56,7 +56,7 @@ public class StoneMachineBreakListener implements Listener {
         event.setDropItems(false);
 
         final ItemStack tool = destroyer.getInventory().getItemInMainHand();
-        if (!plugin.getApplicableTools().isMachineDestroyTool(tool) || gameMode != GameMode.CREATIVE)
+        if (!plugin.getStoneMachine().isMachineDestroyTool(tool) || gameMode != GameMode.CREATIVE)
             return;
 
         final Location brokenBlockLocation = brokenBlock.getLocation();

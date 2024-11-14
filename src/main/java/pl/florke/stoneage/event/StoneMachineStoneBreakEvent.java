@@ -19,7 +19,7 @@ package pl.florke.stoneage.event;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.bukkit.Location;
-import org.bukkit.block.Dispenser;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -32,17 +32,17 @@ public class StoneMachineStoneBreakEvent extends Event {
 
     private final Player player;
     private final DropLoot loot;
-    private final Dispenser stoneMachine;
+    private final TileState stoneMachine;
     private final Location location;
 
-    public StoneMachineStoneBreakEvent(Player player, @NotNull Dispenser stoneMachine, DropLoot loot) {
+    public StoneMachineStoneBreakEvent(Player player, @NotNull TileState stoneMachine, DropLoot loot) {
         this.player = player;
         this.loot = loot;
         this.stoneMachine = stoneMachine;
         this.location = stoneMachine.getLocation();
     }
 
-    public Dispenser getStoneMachine() {
+    public TileState getStoneMachine() {
         return stoneMachine;
     }
 

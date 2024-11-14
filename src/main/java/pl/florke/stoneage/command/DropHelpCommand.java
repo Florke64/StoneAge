@@ -38,13 +38,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import pl.florke.stoneage.PluginCommandsController;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.util.Language;
 import pl.florke.stoneage.util.Message;
 
 public class DropHelpCommand implements CommandExecutor {
 
-    private final CommandExecutionController executionController;
+    private final PluginCommandsController executionController;
     private final Language lang;
 
     public DropHelpCommand() {

@@ -93,11 +93,8 @@ public class DropCalculator {
  */
     public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable TileState machineState) {
         //No tool was used to break a block
-        if (tool == null) return null;
-
-        final int usedToolLevel = plugin.getApplicableTools().getToolLevel(tool);
-
-        if (usedToolLevel == 0) return null;
+        if (tool == null)
+            return null;
 
         //Checking tool properties
         boolean hasSilkTouch = false;
@@ -115,7 +112,6 @@ public class DropCalculator {
 
         //Calculating final drop
         final Random randomizer = new Random();
-
         final DropLoot dropLoot = new DropLoot();
 
         final PlayersData playerSetup = plugin.getPlayersData();
@@ -139,21 +135,21 @@ public class DropCalculator {
             dropLoot.addLoot(primitiveDrop, primitiveItemStack);
         }
 
-        for (DropEntry dropEntry : dropEntries.values()) {
+        for (Map.Entry<String, DropEntry> dropEntry : dropEntries.entrySet()) {
             // Verify requirements for this drop
-            if (playerStats.getMinerLvl() < dropEntry.getNeededMinerLevel())
+            if (playerStats.getMinerLvl() < dropEntry.getValue().getNeededMinerLevel())
                 continue;
 
-            if (usedToolLevel < dropEntry.getNeededToolLevel())
+            if (!dropEntry.getValue().getBlockMaterial().createBlockData().isPreferredTool(tool))
                 continue;
 
             //Checks for player's personalised drop entry settings
-            if (!dropConfig.isDropping(dropEntry))
+            if (!dropConfig.isDropping(dropEntry.getValue()))
                 continue;
 
             final float luck = randomizer.nextFloat() * totalWeight;
 
-            final float itemChanceWeight = dropEntry.getChanceWeight();
+            final float itemChanceWeight = dropEntry.getValue().getChanceWeight();
             final float currentDropMultiplier;
             if (dropMultiplier.isActive())
                 currentDropMultiplier = getDropMultiplier().getCurrentDropMultiplier();
@@ -161,7 +157,7 @@ public class DropCalculator {
                 currentDropMultiplier = getDropMultiplier().getDefaultDropMultiplier();
 
             if (luck < itemChanceWeight * currentDropMultiplier) {
-                ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
+                ItemStack itemDrop = dropEntry.getValue().getDrop(hasSilkTouch, fortuneLevel);
 
                 //Auto smelting feature
                 if (machineState != null && autoSmelter.getAutoSmeltingUsesLeft(machineState) >= itemDrop.getAmount()) {
@@ -170,7 +166,7 @@ public class DropCalculator {
                         itemDrop = smelted;
                 }
 
-                dropLoot.addLoot(dropEntry, itemDrop);
+                dropLoot.addLoot(dropEntry.getValue(), itemDrop.clone());
             }
         }
 

@@ -17,23 +17,32 @@
 
 package pl.florke.stoneage.drop;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
+/* Objects of this class represent possible drop's properties
+ * like the ItemStack min/max amount, min/max exp, chance etc. */
 public class DropEntry {
 
-    final Random random = new Random();
+    private final Random random = new Random();
 
-    private final ItemStack defaultItemStack;
-    private final float chanceWeight;
+    private Material blockMaterial;
+
+    private final ItemStack defaultDrop;
+    private ItemStack silkDrop;
+    //TODO: Store type of item to reduce ItemStack#getType() calls count
+
     private final String entryName;
+    private final float chanceWeight;
+
+    private boolean ignoreFortune = false;
+    private boolean multipliable = true;
+
     private String customName;
     private int minAmount;
     private int maxAmount;
-    private boolean ignoreFortuneEnchant = false;
-
-    private boolean multipliable = true;
 
     private int minExp;
     private int maxExp;
@@ -41,16 +50,15 @@ public class DropEntry {
     private int minerExp;
 
     private int neededMinerLevel;
-    private int neededToolLevel;
 
-    private ItemStack silkTouchItemStack;
-    //TODO: Store type of item to reduce ItemStack#getType() calls count
+    public DropEntry(String entry, ItemStack itemStack, float weight) {
+        blockMaterial = Material.STONE;
 
-    public DropEntry(String entryName, ItemStack itemStack, float weight) {
-        this.entryName = entryName;
+        defaultDrop = itemStack;
+        silkDrop = itemStack;
 
+        entryName = entry;
         chanceWeight = weight;
-        defaultItemStack = itemStack;
 
         minAmount = 1;
         maxAmount = minAmount; // Initially the same; can be set with #setMaxAmount() - only values greater than 0!
@@ -61,21 +69,18 @@ public class DropEntry {
         minerExp = 0;
 
         neededMinerLevel = 0;
-        neededToolLevel = 1;
-
-        silkTouchItemStack = itemStack;
     }
 
     public ItemStack getDrop(boolean silkTouch, int fortuneLevel) {
         final ItemStack itemStack;
         if (silkTouch) {
-            itemStack = silkTouchItemStack.clone();
+            itemStack = silkDrop.clone();
             itemStack.setAmount(1);
 
             return itemStack;
         }
 
-        itemStack = defaultItemStack.clone();
+        itemStack = defaultDrop.clone();
         itemStack.setAmount(calculateFinalAmount(fortuneLevel));
 
         return itemStack;
@@ -94,15 +99,15 @@ public class DropEntry {
     }
 
     public ItemStack getDropEntryIcon() {
-        return defaultItemStack.clone();
+        return defaultDrop.clone();
     }
 
-    public boolean isIgnoreFortuneEnchant() {
-        return ignoreFortuneEnchant;
+    public boolean isIgnoreFortune() {
+        return ignoreFortune;
     }
 
-    public void setIgnoreFortuneEnchant(boolean ignoreFortuneEnchant) {
-        this.ignoreFortuneEnchant = ignoreFortuneEnchant;
+    public void setIgnoreFortune(boolean ignoreFortune) {
+        this.ignoreFortune = ignoreFortune;
     }
 
     public int getMinAmount() {
@@ -110,7 +115,7 @@ public class DropEntry {
     }
 
     public void setMinAmount(int amount) {
-        this.minAmount = Math.max(amount, 1);
+        this.minAmount = amount;
     }
 
     public int getMaxAmount() {
@@ -121,8 +126,8 @@ public class DropEntry {
         this.maxAmount = Math.max(amount, this.minAmount);
     }
 
-    public void setSilkTouchItemStack(ItemStack itemStack) {
-        silkTouchItemStack = itemStack;
+    public void setSilkDrop(ItemStack itemStack) {
+        silkDrop = itemStack;
     }
 
     public float getChanceWeight() {
@@ -132,7 +137,7 @@ public class DropEntry {
     public int calculateFinalAmount(int fortuneLevel) {
         int amount = minAmount == maxAmount ? minAmount : random.nextInt(maxAmount - minAmount) + minAmount;
 
-        if (isIgnoreFortuneEnchant())
+        if (isIgnoreFortune())
             return amount;
 
         for (int i = 0; i < fortuneLevel; i++)
@@ -147,7 +152,7 @@ public class DropEntry {
     }
 
     public void setMinimalExp(int exp) {
-        minExp = Math.max(exp, 0);
+        minExp = exp;
     }
 
     public int getMaximalExp() {
@@ -155,11 +160,14 @@ public class DropEntry {
     }
 
     public void setMaximalExp(int exp) {
-        maxExp = Math.max(exp, minExp);
+        maxExp = exp;
     }
 
     public int calculateFinalExpValue() {
-        return random.nextInt(maxExp - minExp) + (minAmount);
+        if (maxExp - minExp <= 0)
+            return 1;
+
+        return random.nextInt(maxExp - minExp) + (minExp);
     }
 
     public int getNeededMinerLevel() {
@@ -168,14 +176,6 @@ public class DropEntry {
 
     public void setNeededMinerLevel(int neededMinerLevel) {
         this.neededMinerLevel = neededMinerLevel;
-    }
-
-    public int getNeededToolLevel() {
-        return neededToolLevel;
-    }
-
-    public void setNeededToolLevel(int neededToolLevel) {
-        this.neededToolLevel = neededToolLevel;
     }
 
     public boolean isMultipliable() {
@@ -192,5 +192,13 @@ public class DropEntry {
 
     public void setMinerExp(int minerExp) {
         this.minerExp = minerExp;
+    }
+
+    public void setBlockMaterial(Material blockMaterial) {
+        this.blockMaterial = blockMaterial;
+    }
+
+    public Material getBlockMaterial() {
+        return blockMaterial;
     }
 }

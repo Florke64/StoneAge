@@ -93,7 +93,7 @@ public class StoneMachine {
     /**
      * @see StoneMachine
      */
-    public StoneMachine(final String machineName, final List<String> machineLore) {
+    public StoneMachine() {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
         this.machineIdentifierKey = new NamespacedKey(this.plugin, STONE_MACHINE_IDENTIFIER_NAME);
 
@@ -105,7 +105,7 @@ public class StoneMachine {
         try {
             _stoneMachineParent = createStoneMachineItem(STONE_MACHINE_MATERIAL);
         } catch (IllegalArgumentException ex) {
-            _stoneMachineParent = new ItemStack(Material.DISPENSER);
+            _stoneMachineParent = new ItemStack(STONE_MACHINE_MATERIAL);
         }
 
         this.stoneMachineParent = _stoneMachineParent;
@@ -347,6 +347,15 @@ public class StoneMachine {
         return machineIdentifierKey;
     }
 
+    public void applyMachineConfiguration(GeneralConfigReader generalConfig) {
+        setStoneRespawnFrequency(generalConfig.getStoneFrequency());
+        setRepairCooldown(generalConfig.getRepairCoolDown());
+        setDropItemsToFeet(generalConfig.isDropItemsToFeet());
+        setDropExpToFeet(generalConfig.isDropExpToFeet());
+        setAllowHopperOutput(generalConfig.isAllowHopperDropOutput());
+        setAllowHopperInput(generalConfig.isAllowCoalUpgradesByHopper());
+    }
+
     /**
      * 'machines.stone_frequency' in the config.yml file.
      *
@@ -444,6 +453,16 @@ public class StoneMachine {
      */
     public void setDropExpToFeet(boolean dropExpToFeet) {
         this.dropExpToFeet = dropExpToFeet;
+    }
+
+    public boolean isMachineDestroyTool(final ItemStack tool) {
+        return machineDestroyTool.isSimilar(tool.clone());
+    }
+
+    public void setMachineDestroyTool(final ItemStack tool) {
+        if (tool == null)
+            throw new IllegalArgumentException("Wrong machine destroy tool provided");
+        machineDestroyTool = tool.clone();
     }
 
 }

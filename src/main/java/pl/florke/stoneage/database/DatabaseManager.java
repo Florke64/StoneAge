@@ -92,13 +92,11 @@ public class DatabaseManager {
 
                 final long dbLoadFinishTime = System.currentTimeMillis();
 
-                final Message success = new Message();
-                success.addLines("Loaded PlayerStats ($_1) and PlayerConfigs ($_2) from the database");
-                success.addLines("Loading took $_3ms");
-                success.placeholder(1, Integer.toString(statsCount));
-                success.placeholder(2, Integer.toString(configsCount));
-                success.placeholder(3, Long.toString(dbLoadFinishTime - dbLoadStartTime));
-                success.log(Level.INFO);
+                new Message("Loaded PlayerStats ($_1) and PlayerConfigs ($_2) from the database", "Loading took $_3ms")
+                    .placeholder(1, Integer.toString(statsCount))
+                    .placeholder(2, Integer.toString(configsCount))
+                    .placeholder(3, Long.toString(dbLoadFinishTime - dbLoadStartTime))
+                        .log(Level.INFO);
 
             }
         }.runTaskAsynchronously(StoneAge.getPlugin(StoneAge.class));

@@ -15,28 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * @Florke64 <Daniel Chojnacki>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package pl.florke.stoneage.config;
 
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -49,7 +33,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pl.florke.stoneage.util.Message;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 
 public class ItemStackConfigReader extends ConfigSectionReader {
@@ -68,27 +55,26 @@ public class ItemStackConfigReader extends ConfigSectionReader {
                 new Message("Invalid Configuration of ItemStack");
             }
 
-        return cachedItemStack;
+        return cachedItemStack.clone();
     }
 
-    public ItemStack compileItemStack() throws InvalidConfigurationException {
+    private ItemStack compileItemStack() throws InvalidConfigurationException {
         //Getting material type from config section
         final Material itemMaterial = readMaterial();
         if (itemMaterial == null)
             throw new InvalidConfigurationException("Invalid Material name. Please refer to Bukkit's Material enum class.");
 
         final ItemStack itemStack = new ItemStack(itemMaterial);
-
         final ItemMeta itemMeta = itemStack.getItemMeta();
 
         //Getting item's custom name
-        final Component customName = readCustomName();
-        if (customName != null)
+        final TextComponent customName = readCustomName();
+        if (customName != null && !customName.content().isEmpty())
             itemMeta.displayName(customName);
 
         //Reading item's lore
         final Message lore = readLore();
-        itemMeta.lore(Arrays.asList(lore.asComponents()));
+        itemMeta.lore(lore.asComponents());
 
         //Reading enchantments
         final Map<Enchantment, Integer> enchants = readEnchantments();
@@ -111,9 +97,9 @@ public class ItemStackConfigReader extends ConfigSectionReader {
     }
 
     @Nullable
-    private Component readCustomName() {
-        final String customName = rootSection.getString("custom_name");
-        if (customName == null)
+    private TextComponent readCustomName() {
+        final String customName = rootSection.getString("display_name");
+        if (customName == null || customName.isEmpty())
             return null;
 
         return Component.text(customName);

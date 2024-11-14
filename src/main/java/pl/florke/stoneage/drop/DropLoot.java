@@ -24,6 +24,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/* Objects of this class are the "loot boxes" that drop, when machine used.
+ * They may contain multiple different ItemStacks as well as experience.
+ * Contents are calculated by DropCalculator and ExperienceCalculator respectively. */
 public class DropLoot {
 
     private final Map<DropEntry, ItemStack> loots = new HashMap<>();

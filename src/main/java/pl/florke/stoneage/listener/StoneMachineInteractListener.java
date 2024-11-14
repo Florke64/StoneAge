@@ -61,7 +61,7 @@ public class StoneMachineInteractListener implements Listener {
             return;
 
         final ItemStack tool = player.getInventory().getItemInMainHand();
-        if (plugin.getApplicableTools().isMachineDestroyTool(tool) && player.isOp()) {
+        if (plugin.getStoneMachine().isMachineDestroyTool(tool) && player.isOp()) {
             return;
         }
 

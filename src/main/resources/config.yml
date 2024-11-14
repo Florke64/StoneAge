@@ -1,4 +1,4 @@
-config_version: 1
+config_version: 2
 
 database:
   connector: 'sqlite'
@@ -10,8 +10,10 @@ database:
   db_ssl: true
 
 machines:
+  destroy_tool: GOLDEN_PICKAXE
+  
   default_drop_multiplier: 1.0
-  max_drop_multiplier: 5.0
+  max_drop_multiplier: 5.0 # admin exploit security
 
   max_miner_level: 99
 
@@ -24,129 +26,3 @@ machines:
 
   allow_hopper_output: true # pass stone machine drops to hopper under it
   allow_hopper_input: true # allow upgrading stone machines with hopper input (Coal)
-
-tools:
-  machine_destroy: GOLDEN_PICKAXE
-  levels:
-    WOODEN_PICKAXE: 1
-    STONE_PICKAXE: 2
-    IRON_PICKAXE: 3
-    GOLDEN_PICKAXE: 2
-    DIAMOND_PICKAXE: 4
-    NETHERITE_PICKAXE: 4
-
-primitive_drop:
-  custom_name: 'Stone'
-  miner_exp: 1 # Integer exp value for mining level
-  weight: 63.9
-  minimal_exp: 0
-  maximal_exp: 0
-  ignore_fortune: true
-  multipliable: false
-  default_tool:
-    material: 'COBBLESTONE'
-    lore:
-      - '&7Default Drop'
-  silk_touch_tool:
-    material: 'STONE'
-    lore:
-      - '&7Drop Silktouch'
-
-custom_drops:
-  coal:
-    miner_exp: 2
-    weight: 11.6 # float value
-    minimal_exp: 1
-    maximal_exp: 5
-    multipliable: true #If set to 'true' then accepts current drop multiplication set by server admin
-    default_tool:
-      material: 'COAL' # Bukkit Material
-      custom_name: '' # for default item name leave empty: '' or don't include in config section
-      lore: # for no lore don't include this config section
-        - '&7Default Drop'
-      minimal_amount: 1
-    silk_touch_tool:
-      material: 'COAL_ORE'
-      custom_name: ''
-      lore:
-        - '&7Drop Silktouch'
-
-  iron:
-    miner_exp: 2
-    weight: 5.1
-    ignore_fortune: true
-    multipliable: true
-    default_tool:
-      material: 'IRON_ORE'
-      custom_name: ''
-      lore:
-        - '&7Default drop only'
-
-  gold:
-    miner_exp: 1
-    weight: 1.2
-    ignore_fortune: true
-    multipliable: true
-    default_tool:
-      material: 'GOLD_ORE'
-      custom_name: ''
-      lore:
-        - '&7Default drop only'
-
-  diamond:
-    minimal_miner_lvl: 5 # minimal mining level needed to drop this item from stone
-    minimal_tool_lvl: 1 # minimal tool's material needed to drop this item from stone {0: hand, 1: wooden+, 2: stone+/gold+, 3: iron+, 4: diamond+|
-    miner_exp: 4
-    weight: 1.0 # float value
-    minimal_exp: 1
-    maximal_exp: 5
-    multipliable: true #If set to 'true' then accepts current drop multiplication set by server admin
-    default_tool:
-      material: 'DIAMOND' # Bukkit Material
-      custom_name: '' # for default item name leave empty: '' or don't include in config section
-      lore: # for no lore don't include this config section
-        - '&7Default Drop'
-      minimal_amount: 1
-    silk_touch_tool:
-      material: 'DIAMOND_ORE'
-      custom_name: ''
-      lore:
-        - '&7Drop Silktouch'
-
-  redstone:
-    miner_exp: 3
-    weight: 5.5 # float value
-    minimal_exp: 1
-    maximal_exp: 5
-    multipliable: true
-    default_tool:
-      material: 'REDSTONE' # Bukkit Material
-      custom_name: '' # for default item name leave empty: '' or don't include in config section
-      lore: # for no lore don't include this config section
-        - '&7Default Drop'
-      minimal_amount: 4
-      maximal_amount: 5
-    silk_touch_tool:
-      material: 'REDSTONE_ORE'
-      custom_name: ''
-      lore:
-        - '&7Drop Silktouch'
-
-  lapis:
-    miner_exp: 3
-    weight: 0.1 # float value
-    minimal_exp: 1
-    maximal_exp: 5
-    multipliable: true
-    default_tool:
-      material: 'LAPIS_LAZULI' # Bukkit Material enum name
-      custom_name: '' # for default item name leave empty: '' or don't include in config section
-      lore: # for no lore don't include this config section
-        - '&7Default Drop'
-      minimal_amount: 4
-      maximal_amount: 8
-    silk_touch_tool:
-      material: 'LAPIS_ORE'
-      custom_name: ''
-      lore:
-        - '&7Drop Silktouch'

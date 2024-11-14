@@ -17,7 +17,7 @@
 
 package pl.florke.stoneage.gui.window;
 
-import org.bukkit.block.Dispenser;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
@@ -32,17 +32,17 @@ import pl.florke.stoneage.util.Message;
 
 public class StoneMachineWindow extends Window {
 
-    private final Dispenser stoneMachine;
+    private final TileState machineState;
 
-    public StoneMachineWindow(Player owner, Dispenser stoneMachine) {
+    public StoneMachineWindow(Player owner, TileState machineState) {
         super(Message.colors(StoneAge.getPlugin(StoneAge.class)
                 .getLanguage("stone-drop-actions-title")));
 
-        this.stoneMachine = stoneMachine;
+        this.machineState = machineState;
     }
 
-    public Dispenser getStoneMachine() {
-        return stoneMachine;
+    public TileState getMachineState() {
+        return machineState;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class StoneMachineWindow extends Window {
             return false;
         }
 
-        plugin.getWindowManager().cacheMachine(stoneMachine, this);
+        plugin.getWindowManager().cacheMachine(machineState, this);
         player.openInventory(inventory);
 
         return true;
@@ -92,7 +92,7 @@ public class StoneMachineWindow extends Window {
             player.closeInventory();
 
             final ItemAutoSmelter autoSmelter = plugin.getStoneMachine().getItemSmelter();
-            final int usesLeft = autoSmelter.getAutoSmeltingUsesLeft(stoneMachine);
+            final int usesLeft = autoSmelter.getAutoSmeltingUsesLeft(machineState);
 
             final Message msg = new Message();
             if (usesLeft > 0) {
@@ -109,7 +109,7 @@ public class StoneMachineWindow extends Window {
         else if (clickedPoint.getSlotNumber() == 22) {
             player.closeInventory();
 
-            if (plugin.getStoneMachine().repairStoneMachine(stoneMachine)) {
+            if (plugin.getStoneMachine().repairStoneMachine(machineState)) {
                 new Message(plugin.getLanguage("stone-machine-repaired")).send(player);
             } else {
                 new Message(plugin.getLanguage("stone-machine-repaired-deny")).send(player);
