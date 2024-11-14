@@ -1,0 +1,18 @@
+version: 1
+miner_exp: 1
+weight: 1.2
+ignore_fortune: false
+multipliable: true
+
+block:
+  material: 'GOLD_ORE'
+drop:
+  material: 'RAW_GOLD'
+  display_name: ''
+  lore:
+    - '&7Default drop'
+silk:
+  material: 'GOLD_ORE'
+  display_name: ''
+  lore:
+    - '&7Drop Silktouch'

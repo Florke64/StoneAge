@@ -1,0 +1,19 @@
+version: 1
+custom_name: 'Stone'
+miner_exp: 1
+weight: 63.9
+minimal_exp: 0
+maximal_exp: 0
+ignore_fortune: true
+multipliable: false
+
+block:
+  material: 'STONE'
+drop:
+  material: 'COBBLESTONE'
+  lore:
+    - '&7Default Drop'
+silk:
+  material: 'STONE'
+  lore:
+    - '&7Drop Silktouch'

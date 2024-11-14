@@ -1,0 +1,21 @@
+version: 2
+miner_exp: 3
+weight: 0.1 # float value
+minimal_exp: 1
+maximal_exp: 5
+multipliable: true
+
+block:
+  material: 'LAPIS_ORE'
+drop:
+  material: 'LAPIS_LAZULI'
+  display_name: ''
+  lore:
+    - '&7Default Drop'
+  minimal_amount: 4
+  maximal_amount: 8
+silk:
+  material: 'LAPIS_ORE'
+  display_name: ''
+  lore:
+    - '&7Drop Silktouch'

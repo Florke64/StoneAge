@@ -1,0 +1,21 @@
+version: 2
+miner_exp: 3
+weight: 5.5
+minimal_exp: 1
+maximal_exp: 5
+multipliable: true
+
+block:
+  material: 'REDSTONE_ORE'
+drop:
+  material: 'REDSTONE'
+  display_name: ''
+  lore:
+    - '&7Default Drop'
+  minimal_amount: 4
+  maximal_amount: 5
+silk:
+  material: 'REDSTONE_ORE'
+  custom_name: ''
+  lore:
+    - '&7Drop Silktouch'

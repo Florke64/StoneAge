@@ -1,0 +1,20 @@
+version: 1
+miner_exp: 1
+weight: 0.2
+ignore_fortune: false
+multipliable: true
+
+block:
+  material: 'STONE'
+drop:
+  material: 'ENCHANTED_BOOK'
+#  display_name: ''
+  lore:
+    - '&7Default drop'
+  enchantments:
+    - 'MENDING 1'
+silk:
+  material: 'GOLD_ORE'
+  display_name: ''
+  lore:
+    - '&7Drop Silktouch'

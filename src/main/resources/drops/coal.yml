@@ -1,0 +1,20 @@
+version: 1
+miner_exp: 2
+weight: 11.6
+minimal_exp: 1
+maximal_exp: 5
+multipliable: true
+
+block:
+  material: 'COAL_ORE'
+drop:
+  material: 'COAL'
+  custom_name: ''
+  lore:
+    - '&7Default Drop'
+  minimal_amount: 1
+silk:
+  material: 'COAL_ORE'
+  custom_name: ''
+  lore:
+    - '&7Drop Silktouch'

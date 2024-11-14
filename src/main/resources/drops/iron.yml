@@ -1,0 +1,18 @@
+version: 1
+miner_exp: 2
+weight: 5.1
+ignore_fortune: false
+multipliable: true
+
+block:
+    material: 'IRON_ORE'
+drop:
+  material: 'RAW_IRON'
+  display_name: ''
+  lore:
+    - '&7Default drop'
+silk:
+  material: 'IRON_ORE'
+  display_name: ''
+  lore:
+    - '&7Drop Silktouch'
