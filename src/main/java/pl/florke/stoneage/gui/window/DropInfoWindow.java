@@ -34,17 +34,22 @@ import pl.florke.stoneage.gui.Window;
 import pl.florke.stoneage.util.Message;
 
 import java.text.DecimalFormat;
+import java.util.List;
+import java.util.logging.Level;
 
 public class DropInfoWindow extends Window {
 
     final DecimalFormat df = new DecimalFormat("0.00");
+
     private final Player windowContentOwner;
     private final PlayerConfig personalDropConfig;
 
     //TODO: Support for pagination
     public DropInfoWindow(Player owner) {
-        super(Message.colors(StoneAge.getPlugin(StoneAge.class)
-                .getLanguage("stone-drop-info-title")));
+        super (
+            new Message(StoneAge.getPlugin(StoneAge.class)
+                .getLanguage("stone-drop-info-title")).asComponents().getFirst()
+        );
 
         windowContentOwner = owner;
         personalDropConfig = plugin.getPlayersData().getPersonalDropConfig(windowContentOwner.getUniqueId());
@@ -52,24 +57,29 @@ public class DropInfoWindow extends Window {
 
     @Override
     public void updateInventoryContent() {
-
-        final DropCalculator calculator = plugin.getDropCalculator();
         final PlayerStats stats = plugin.getPlayersData().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
 
-        for (int i = 0; i <= calculator.getDropEntries().size(); i++) {
-            if (i >= inventory.getSize()) {
+        final DropCalculator calculator = plugin.getDropCalculator();
+        int i = drawDropEntries(calculator.getDropEntries(), stats, 0);
+
+        final List<DropEntry> dropEntries = calculator.getPrimitiveDropEntries().values().stream().toList();
+        drawDropEntries(dropEntries, stats, i);
+    }
+
+    private int drawDropEntries(@NotNull List<DropEntry> dropEntries, @NotNull PlayerStats stats, int startIndex) {
+        int i = startIndex;
+        for (DropEntry drop : dropEntries) {
+            if (i >= inventory.getSize())
                 break;
-            }
-
-            final DropEntry drop;
-
-            if (i == calculator.getDropEntries().size()) drop = calculator.getPrimitiveDropEntry();
-            else drop = calculator.getDropEntries().get(i);
 
             final ItemStack icon = createIconItem(drop, stats);
 
             inventory.setItem(i, icon);
+
+            i++;
         }
+
+        return i;
     }
 
     @NotNull
@@ -114,7 +124,7 @@ public class DropInfoWindow extends Window {
             lore.addLines(" ");
             // command-feedback-drop-print-summary is used multiple times and its placeholder handler is $_4
             lore.addLines(plugin.getLanguage("command-feedback-drop-print-summary"))
-                    .placeholder(4, String.valueOf(stats.getStatistic(drop.getEntryName())));
+                    .placeholder(4, String.valueOf(stats.getStatistic(drop.getKey())));
         }
 
         if (calculator.getDropMultiplier().isActive()) {
@@ -163,14 +173,18 @@ public class DropInfoWindow extends Window {
         final DropCalculator calculator = plugin.getDropCalculator();
         final DropEntry dropEntry;
 
-        if (clickedSlot < calculator.getDropEntries().size())
+        final int customDropsAmount = calculator.getDropEntries().size();
+        final int primitivesAmount = calculator.getPrimitiveDropEntries().size();
+
+        if (clickedSlot < customDropsAmount)
             dropEntry = calculator.getDropEntries().get(clickedSlot);
-        else if (clickedSlot == calculator.getDropEntries().size())
-            dropEntry = calculator.getPrimitiveDropEntry();
-        else {
-            // Clicked on empty slot perhaps
+
+        else if (clickedSlot >= calculator.getDropEntries().size())
+            dropEntry = List.of(calculator.getPrimitiveDropEntries().sequencedValues())
+                    .get(clickedSlot - customDropsAmount).getFirst();
+
+        else // Clicked on an empty slot, perhaps
             return;
-        }
 
         //Closing to reduce inventory update lag
         player.closeInventory();

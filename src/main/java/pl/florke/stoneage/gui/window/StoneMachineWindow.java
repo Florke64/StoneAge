@@ -35,8 +35,10 @@ public class StoneMachineWindow extends Window {
     private final TileState machineState;
 
     public StoneMachineWindow(Player owner, TileState machineState) {
-        super(Message.colors(StoneAge.getPlugin(StoneAge.class)
-                .getLanguage("stone-drop-actions-title")));
+        super (
+            new Message(StoneAge.getPlugin(StoneAge.class)
+                .getLanguage("stone-drop-actions-title")).asComponents().getFirst()
+        );
 
         this.machineState = machineState;
     }

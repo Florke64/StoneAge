@@ -18,6 +18,7 @@
 package pl.florke.stoneage.gui;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -31,17 +32,16 @@ import java.util.List;
 
 public abstract class Window {
 
-    protected final StoneAge plugin;
-    protected final String windowTitle;
-    private final List<Player> users;
+    protected final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
+
+    private final List<Player> users = new ArrayList<>();
+
+    protected final TextComponent windowTitle;
     protected final Inventory inventory;
 
-    public Window(final String windowName) {
-        plugin = StoneAge.getPlugin(StoneAge.class);
-        users = new ArrayList<>();
-
+    public Window(final TextComponent windowName) {
         windowTitle = windowName;
-        inventory = Bukkit.createInventory(null, 3*9, Component.text(windowName));
+        inventory = Bukkit.createInventory(null, 3*9, windowName);
     }
 
     public boolean open(@NotNull Player player) {
