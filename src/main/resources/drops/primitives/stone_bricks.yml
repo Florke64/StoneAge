@@ -1,0 +1,15 @@
+version: 1
+custom_name: 'Stone Bricks'
+miner_exp: 1
+weight: 20
+minimal_exp: 0
+maximal_exp: 5
+ignore_fortune: true
+multipliable: false
+
+block:
+  material: 'STONE_BRICKS'
+drop:
+  material: 'STONE_BRICKS'
+silk:
+  material: 'STONE_BRICKS'

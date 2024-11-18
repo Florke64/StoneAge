@@ -49,7 +49,6 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pl.florke.stoneage.StoneAge;
@@ -74,6 +73,7 @@ public class StoneMachine {
     public static final Material STONE_MACHINE_MATERIAL = Material.DISPENSER;
 
     private final ItemAutoSmelter itemSmelter;
+    private final ResourceSpawner resourceSpawner;
 
     private final TextComponent machineName;
     private final List<TextComponent> machineLore;
@@ -83,7 +83,6 @@ public class StoneMachine {
 
     private final Map<TileState, Long> lastStoneMachineRepair = new HashMap<>();
     private ItemStack machineDestroyTool = new ItemStack(Material.GOLDEN_PICKAXE);
-    private long stoneRespawnFrequency = 40L;
     private int repairCooldown = 5;
     private boolean allowHopperOutput = false;
     private boolean allowHopperInput = false;
@@ -95,6 +94,7 @@ public class StoneMachine {
      */
     public StoneMachine() {
         this.plugin = StoneAge.getPlugin(StoneAge.class);
+        this.resourceSpawner = new ResourceSpawner();
         this.machineIdentifierKey = new NamespacedKey(this.plugin, STONE_MACHINE_IDENTIFIER_NAME);
 
         this.machineName = Message.color(plugin.getLanguage("stone-machine-item-name"));
@@ -120,7 +120,7 @@ public class StoneMachine {
      *
      * @param machine {@link TileState} instance of Stone Machine which should be repaired.
      * @return {@code true} if successfully added given machine to the async repair queue.
-     * @see StoneMachine#generateStone(Location)
+     * @see ResourceSpawner#spawnResource(Location)
      */
     public boolean repairStoneMachine(@NotNull final TileState machine) {
         boolean result = true;
@@ -130,27 +130,13 @@ public class StoneMachine {
             //Player is trying to repair stone machine too frequently
             result = false;
         } else {
-            final Location stoneLocation = getGeneratedStoneLocation(machine);
-            generateStone(stoneLocation);
+            final Location stoneLocation = resourceSpawner.getGeneratedResourceLocation(machine);
+            resourceSpawner.spawnResource(stoneLocation);
 
             lastStoneMachineRepair.put(machine, System.currentTimeMillis());
         }
 
         return result;
-    }
-
-    /**
-     * Gets {@link Location} where stone block should be generated for given parameter.
-     *
-     * @param stoneMachine {@link TileState} instance of a stone machine.
-     * @return where stone block should be generated for a stone machine given in a parameter.
-     */
-    public Location getGeneratedStoneLocation(@NotNull final TileState stoneMachine) {
-        if (!isStoneMachine(stoneMachine))
-            return null;
-
-        final Directional machine = (Directional) stoneMachine.getBlockData();
-        return stoneMachine.getBlock().getRelative(machine.getFacing()).getLocation();
     }
 
     public boolean isStoneMachine(@NotNull final TileState machineState) {
@@ -201,50 +187,6 @@ public class StoneMachine {
     public boolean isConnectedToStoneMachine(@NotNull final Block block) {
         //TODO: Check block type and return false if it is not a Material.STONE
         return getConnectedStoneMachine(block) != null;
-    }
-
-    /**
-     * Generates stone block at given position with current stone respawn delay.
-     *
-     * @param location where stone block will be placed.
-     * @see StoneMachine#generateStone(Location, long)
-     * @see StoneMachine#setStoneRespawnFrequency(long)
-     */
-    public void generateStone(@NotNull final Location location) {
-        generateStone(location, stoneRespawnFrequency);
-    }
-
-    /**
-     * This method will wait given delay in async task, switch to the sync task
-     * and then check if given location is connected to any Stone Machine block.
-     * Will also verify if given location is "empty" (meaning, no blocks were placed in mean time).<br />
-     * If everything is fine, then block type at given position is set to {@link Material#STONE}.
-     *
-     * @param location where stone block will be placed.
-     * @param delay    value in server ticks to wait and place block.
-     */
-    public void generateStone(@NotNull final Location location, final long delay) {
-        final Block block = Objects.requireNonNull(location.getWorld()).getBlockAt(location);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-
-                //Returning to the Main thread
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (!isConnectedToStoneMachine(block))
-                            return;
-
-                        if (!block.getType().equals(Material.AIR))
-                            return;
-
-                        block.setType(Material.STONE);
-                    }
-                }.runTask(plugin);
-            }
-        }.runTaskLaterAsynchronously(plugin, delay);
     }
 
     /**
@@ -337,6 +279,10 @@ public class StoneMachine {
         return itemSmelter;
     }
 
+    public ResourceSpawner getResourceSpawner() {
+        return resourceSpawner;
+    }
+
     /**
      * Retrieves the {@link NamespacedKey} used to identify Stone Machine in the PersistenceDataContainer.<br />
      * This key is used to determine whether a certain block is a Stone Machine or not.
@@ -348,21 +294,13 @@ public class StoneMachine {
     }
 
     public void applyMachineConfiguration(GeneralConfigReader generalConfig) {
-        setStoneRespawnFrequency(generalConfig.getStoneFrequency());
+        resourceSpawner.setSpawnFrequency(generalConfig.getStoneFrequency());
+
         setRepairCooldown(generalConfig.getRepairCoolDown());
         setDropItemsToFeet(generalConfig.isDropItemsToFeet());
         setDropExpToFeet(generalConfig.isDropExpToFeet());
         setAllowHopperOutput(generalConfig.isAllowHopperDropOutput());
         setAllowHopperInput(generalConfig.isAllowCoalUpgradesByHopper());
-    }
-
-    /**
-     * 'machines.stone_frequency' in the config.yml file.
-     *
-     * @param stoneRespawnFrequency time in which stone blocks will regenerate after breaking (in server ticks).
-     */
-    public void setStoneRespawnFrequency(final long stoneRespawnFrequency) {
-        this.stoneRespawnFrequency = stoneRespawnFrequency;
     }
 
     /**

@@ -17,6 +17,7 @@
 
 package pl.florke.stoneage.database.playerdata;
 
+import org.bukkit.NamespacedKey;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.drop.DropEntry;
 import pl.florke.stoneage.drop.ExperienceCalculator;
@@ -33,7 +34,7 @@ public class PlayerStats {
 
     private final UUID uuid;
     private final String playerName;
-    private final Map<String, Integer> statistics = new HashMap<>();
+    private final Map<NamespacedKey, Integer> statistics = new HashMap<>();
     private boolean unsavedEdits = false;
     private long minerExp;
     private int minerLvl;
@@ -47,22 +48,23 @@ public class PlayerStats {
         this.minerExp = ExperienceCalculator.INITIAL_XP;
         this.minerLvl = 1;
 
-        statistics.put(plugin.getDropCalculator().getPrimitiveDropEntry().getEntryName(), 0);
-        for (DropEntry entry : plugin.getDropCalculator().getDropEntries()) {
-            statistics.put(entry.getEntryName(), 0);
-        }
+        for (DropEntry entry : plugin.getDropCalculator().getDropEntries())
+            statistics.put(entry.getKey(), 0);
+
+        for (DropEntry entry : plugin.getDropCalculator().getPrimitiveDropEntries().values())
+            statistics.put(entry.getKey(), 0);
     }
 
-    public void setStatistic(String key, int value) {
+    public void setStatistic(NamespacedKey key, int value) {
         statistics.put(key, value);
     }
 
     @SuppressWarnings("unused")
-    public int increaseStatistic(String key) {
+    public int increaseStatistic(NamespacedKey key) {
         return increaseStatistic(key, 1);
     }
 
-    public int increaseStatistic(String key, int amount) {
+    public int increaseStatistic(NamespacedKey key, int amount) {
         final int value = getStatistic(key) + amount;
         statistics.put(key, value);
         markUnsaved(true);
@@ -70,11 +72,11 @@ public class PlayerStats {
         return value;
     }
 
-    public int getStatistic(String key) {
+    public int getStatistic(NamespacedKey key) {
         return statistics.getOrDefault(key, 0);
     }
 
-    public Set<String> getStatisticKeys() {
+    public Set<NamespacedKey> getStatisticKeys() {
         return statistics.keySet();
     }
 

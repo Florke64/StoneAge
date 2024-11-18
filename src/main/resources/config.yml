@@ -1,7 +1,10 @@
 config_version: 2
 
 database:
+  # available connectors: sqlite, mysql
   connector: 'sqlite'
+
+  # settings for MySQL connector
   server_address: 'localhost'
   server_port: 3306
   db_name: 'stoneage'
@@ -26,3 +29,22 @@ machines:
 
   allow_hopper_output: true # pass stone machine drops to hopper under it
   allow_hopper_input: true # allow upgrading stone machines with hopper input (Coal)
+
+# resource relations
+resources:
+  STONE:
+    - coal
+    - diamond
+    - gold
+    - iron
+    - lapis
+    - mending
+    - redstone
+
+  STONE_BRICKS:
+    - coal
+    - mending
+
+# resources:
+#   drops/primitives/*
+#     - drops/*

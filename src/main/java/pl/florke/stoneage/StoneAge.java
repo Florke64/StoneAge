@@ -17,6 +17,7 @@
 
 package pl.florke.stoneage;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -34,6 +35,7 @@ import pl.florke.stoneage.drop.DropMultiplier;
 import pl.florke.stoneage.drop.ExperienceCalculator;
 import pl.florke.stoneage.gui.WindowManager;
 import pl.florke.stoneage.listener.*;
+import pl.florke.stoneage.machine.ResourceSpawner;
 import pl.florke.stoneage.machine.StoneMachine;
 import pl.florke.stoneage.util.Language;
 import pl.florke.stoneage.util.Message;
@@ -144,21 +146,50 @@ public final class StoneAge extends JavaPlugin {
         this.commandExecutionController.setCommandCooldownSeconds(generalConfig.getCommandsCoolDown());
         this.expCalculator.setMaximumMinerLevel(generalConfig.getMaxMinerLevel());
 
-        getDropCalculator().setDropMultiplier(new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier()));
+        final DropMultiplier defaultMultiplier = new DropMultiplier(generalConfig.getDefaultDropMultiplier(), generalConfig.getMaxDropMultiplier());
+        getDropCalculator().setDropMultiplier(defaultMultiplier);
 
         //Reading 'DropEntry' configuration
-        //TODO: Support for multiple primitive drops, like generating cobble, deepslate etc
-        final DropEntry primitiveDropEntry = machinesConfigManager.getPrimitiveDropEntries().getFirst();
-        dropCalculator.setPrimitiveDrop(primitiveDropEntry);
+        for (final DropEntry primitiveDropEntry : machinesConfigManager.getPrimitiveDropEntries())
+            dropCalculator.addPrimitiveDrop(primitiveDropEntry);
 
-        final List<DropEntry> dropEntries = machinesConfigManager.getDropEntries();
-        for (final DropEntry dropEntry : dropEntries)
-            dropCalculator.addDrop(dropEntry);
+        for (final DropEntry dropEntry : machinesConfigManager.getDropEntries())
+            dropCalculator.addCustomDrop(dropEntry);
 
-        //Reading 'database' configuration
+        reloadResourceRelations(generalConfig);
+        reloadDatabaseConfig(generalConfig);
+
+        new Message("Config reloaded!").log(Level.INFO);
+    }
+
+    private void reloadResourceRelations(GeneralConfigReader generalConfig) {
+        final ResourceSpawner resourceSpawner = stoneMachine.getResourceSpawner();
+
+        for (final Map.Entry<String, ArrayList<String>> entry : generalConfig.getResourceRelations().entrySet()) {
+            final String primitiveName = entry.getKey();
+            final ArrayList<String> dropNames = entry.getValue();
+
+            // Getting KEY <String, ...>
+            final String rawPrimitiveKeyName = DropEntry.EntryType.PRIMITIVE.getPrefix() + primitiveName;
+            final NamespacedKey primitiveKey = new NamespacedKey(this, rawPrimitiveKeyName.toLowerCase());
+            final DropEntry primitive = dropCalculator.getDropEntry(primitiveKey);
+
+            // Getting VALUES <..., List<String>>
+            for (final String dropName : dropNames) {
+                final String rawCustomDropKeyName = DropEntry.EntryType.CUSTOM_DROP.getPrefix() + dropName;
+                final NamespacedKey dropKey = new NamespacedKey(this, rawCustomDropKeyName.toLowerCase());
+                final DropEntry drop = dropCalculator.getDropEntry(dropKey);
+
+                //apply relation
+                resourceSpawner.addResourceChild(primitive, drop);
+            }
+        }
+    }
+
+    private void reloadDatabaseConfig(GeneralConfigReader generalConfig) {
         if (!getConfig().isConfigurationSection("database")) {
             new Message("Invalid Configuration file (missing the \"database\" section)!",
-                "Skipping, database won't work.").log(Level.SEVERE);
+                    "Skipping, database won't work.").log(Level.SEVERE);
             getServer().getPluginManager().disablePlugin(this);
         }
 
@@ -169,8 +200,6 @@ public final class StoneAge extends JavaPlugin {
         dbManager.loadAllPlayers();
 
         dbManager.getSQLWrapper().readPreviousMultiplierFromDatabase(dropCalculator.getDropMultiplier());
-
-        new Message("Config reloaded!").log(Level.INFO);
     }
 
     public PlayersData getPlayersData() {

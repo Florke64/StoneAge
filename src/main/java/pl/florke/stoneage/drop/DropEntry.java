@@ -18,6 +18,7 @@
 package pl.florke.stoneage.drop;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
@@ -28,13 +29,14 @@ public class DropEntry {
 
     private final Random random = new Random();
 
+    private final EntryType entryType;
     private Material blockMaterial;
 
     private final ItemStack defaultDrop;
     private ItemStack silkDrop;
     //TODO: Store type of item to reduce ItemStack#getType() calls count
 
-    private final String entryName;
+    private final NamespacedKey entryKey;
     private final float chanceWeight;
 
     private boolean ignoreFortune = false;
@@ -51,13 +53,14 @@ public class DropEntry {
 
     private int neededMinerLevel;
 
-    public DropEntry(String entry, ItemStack itemStack, float weight) {
+    public DropEntry(EntryType category, NamespacedKey key, ItemStack itemStack, float weight) {
+        entryType = category;
         blockMaterial = Material.STONE;
 
         defaultDrop = itemStack;
         silkDrop = itemStack;
 
-        entryName = entry;
+        entryKey = key;
         chanceWeight = weight;
 
         minAmount = 1;
@@ -86,8 +89,22 @@ public class DropEntry {
         return itemStack;
     }
 
-    public String getEntryName() {
-        return entryName;
+    /**
+     * Returns the id name of the entry.
+     *
+     * @deprecated Use {@link #getKey()} instead
+     */
+    @Deprecated
+    public String getEntryId() {
+        return entryKey.getKey();
+    }
+
+    public EntryType getEntryType() {
+        return entryType;
+    }
+
+    public NamespacedKey getKey() {
+        return entryKey;
     }
 
     public String getCustomName() {
@@ -200,5 +217,26 @@ public class DropEntry {
 
     public Material getBlockMaterial() {
         return blockMaterial;
+    }
+
+    public enum EntryType {
+        CUSTOM_DROP("drops", "drop_"),
+        PRIMITIVE("drops/primitives", "primitive_");
+
+        private final String path;
+        private final String prefix;
+
+        EntryType(final String path, final String namespacePrefix) {
+            this.path = path;
+            this.prefix = namespacePrefix;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
     }
 }

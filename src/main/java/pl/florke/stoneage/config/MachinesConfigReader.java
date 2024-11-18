@@ -17,8 +17,10 @@
 
 package pl.florke.stoneage.config;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.drop.DropEntry;
 import pl.florke.stoneage.util.Message;
 
@@ -37,17 +39,20 @@ public class MachinesConfigReader {
     }
 
     public List<DropEntry> getDropEntries() {
-        return readDropEntriesDirectory(new File(plugin.getDataFolder(), "drops"), true);
+        final DropEntry.EntryType type = DropEntry.EntryType.CUSTOM_DROP;
+        return readDropEntriesDirectory(type);
     }
 
     public List<DropEntry> getPrimitiveDropEntries() {
-        return readDropEntriesDirectory(new File(plugin.getDataFolder(), "drops/primitives"), true);
+        final DropEntry.EntryType type = DropEntry.EntryType.PRIMITIVE;
+        return readDropEntriesDirectory(type);
     }
 
-    private List<DropEntry> readDropEntriesDirectory(File dropEntryDirectory, boolean saveDefault) {
+    private List<DropEntry> readDropEntriesDirectory(DropEntry.EntryType types) {
+        final File dropEntryDirectory = new File(plugin.getDataFolder(), types.getPath());
         final List<DropEntry> drops = new ArrayList<>();
 
-        if (saveDefault && !dropEntryDirectory.exists())
+        if (!dropEntryDirectory.exists())
             saveDefaultDrops();
 
         final File[] dropEntryFiles = dropEntryDirectory.listFiles();
@@ -57,10 +62,10 @@ public class MachinesConfigReader {
             return drops;
         }
 
-        return readDropEntriesDirectory(dropEntryFiles);
+        return readDropEntriesDirectory(types, dropEntryFiles);
     }
 
-    private List<DropEntry> readDropEntriesDirectory(File[] dropEntryFiles) {
+    private List<DropEntry> readDropEntriesDirectory(DropEntry.EntryType types, File[] dropEntryFiles) {
         final List<DropEntry> drops = new ArrayList<>();
         if (dropEntryFiles == null)
             return drops;
@@ -77,7 +82,7 @@ public class MachinesConfigReader {
             new Message("Attempting to load drop entry: $_1")
                     .placeholder(1, dropEntryFile.getName().split("\\.yml", 2)[0]).log(Level.INFO);
 
-            final DropEntry dropEntry = readDrop(dropEntryFile);
+            final DropEntry dropEntry = readDrop(types, dropEntryFile);
             if (dropEntry == null)
                 continue;
 
@@ -94,14 +99,16 @@ public class MachinesConfigReader {
         return drops;
     }
 
-    private DropEntry readDrop(File file) {
+    private DropEntry readDrop(DropEntry.EntryType type, File file) {
         if (file == null || !file.exists() || !file.isFile())
             return null;
 
         final YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
 
         final DropEntryConfigReader customDropEntry = new DropEntryConfigReader(yaml);
-        final DropEntry dropEntry = customDropEntry.readDropEntry(file.getName().split("\\.yml", 2)[0]);
+        final String rawKey = file.getName().split("\\.yml", 2)[0];
+        final NamespacedKey key = new NamespacedKey(StoneAge.getPlugin(StoneAge.class), type.getPrefix() + rawKey.toLowerCase());
+        final DropEntry dropEntry = customDropEntry.readDropEntry(type, key);
 
         new Message(dropEntry == null ? "Failed to load a custom drop: $_1" : "Loaded a custom drop: $_1")
             .placeholder(1, file.getAbsolutePath()).log(Level.INFO);
@@ -110,20 +117,20 @@ public class MachinesConfigReader {
     }
 
     public void saveDefaultDrops() {
-        final File customDropsDirectory = new File(plugin.getDataFolder(), "drops");
-        if (!customDropsDirectory.exists()) {
-            plugin.saveResource("drops/coal.yml", false);
-            plugin.saveResource("drops/iron.yml", false);
-            plugin.saveResource("drops/gold.yml", false);
-            plugin.saveResource("drops/lapis.yml", false);
-            plugin.saveResource("drops/redstone.yml", false);
-            plugin.saveResource("drops/diamond.yml", false);
-            plugin.saveResource("drops/mending.yml", false);
-        }
+        final File customDropsDirectory = new File(plugin.getDataFolder(), DropEntry.EntryType.CUSTOM_DROP.getPath());
+        final File primitivesDirectory = new File(plugin.getDataFolder(), DropEntry.EntryType.PRIMITIVE.getPath());
 
-        final File primitivesDirectory = new File(customDropsDirectory, "primitives");
-        if (!primitivesDirectory.exists())
-            plugin.saveResource("drops/primitives/stone.yml", false);
+        if (customDropsDirectory.exists() || primitivesDirectory.exists())
+            return;
 
+        plugin.saveResource("drops/coal.yml", false);
+        plugin.saveResource("drops/iron.yml", false);
+        plugin.saveResource("drops/gold.yml", false);
+        plugin.saveResource("drops/lapis.yml", false);
+        plugin.saveResource("drops/redstone.yml", false);
+        plugin.saveResource("drops/diamond.yml", false);
+        plugin.saveResource("drops/mending.yml", false);
+
+        plugin.saveResource("drops/primitives/stone.yml", false);
     }
 }

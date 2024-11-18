@@ -18,6 +18,7 @@
 package pl.florke.stoneage.database.wrapper;
 
 import com.zaxxer.hikari.HikariConfig;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.config.DatabaseConfigReader;
@@ -49,7 +50,7 @@ public class MySQLWrapper extends DatabaseWrapper {
         makeDropMultiplierTable();
 
         for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getDropEntries()) {
-            final String dropEntryName = entry.getEntryName();
+            final String dropEntryName = entry.getEntryId();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
@@ -125,15 +126,15 @@ public class MySQLWrapper extends DatabaseWrapper {
             if (entry == null) continue;
 
             // appends EntryName field to target columns list
-            fields.append("`").append(entry.getEntryName()).append("`");
+            fields.append("`").append(entry.getEntryId()).append("`");
 
             // appends personal PlayerConfig values
             int dropSwitchStatus = config.isDropping(entry) ? 1 : 0;
             values.append("'").append(dropSwitchStatus).append("'"); // "'1'"
 
             // defaults
-            keyDuplicate.append("`").append(entry.getEntryName()).append("`=VALUES")
-                    .append("(`").append(entry.getEntryName()).append("`)");
+            keyDuplicate.append("`").append(entry.getEntryId()).append("`=VALUES")
+                    .append("(`").append(entry.getEntryId()).append("`)");
 
             // appends "," if it's not the last target column
             if (it.hasNext()) {
@@ -175,16 +176,16 @@ public class MySQLWrapper extends DatabaseWrapper {
         fields.append("`MinerExp`, ");
         fields.append("`MinerLvl`, ");
 
-        for (final Iterator<String> it = stats.getStatisticKeys().iterator(); it.hasNext(); ) {
-            final String entry = it.next();
+        for (final Iterator<NamespacedKey> it = stats.getStatisticKeys().iterator(); it.hasNext(); ) {
+            final NamespacedKey entry = it.next();
             if (entry == null) continue;
 
-            fields.append("`").append(entry).append("`"); // "`stone`"
+            fields.append("`").append(entry.getKey()).append("`"); // "`stone`"
 
             int dropStatistic = stats.getStatistic(entry);
             values.append("'").append(dropStatistic).append("'"); // "'1'"
 
-            keyDuplicate.append("`").append(entry).append("`=VALUES(`").append(entry).append("`)");
+            keyDuplicate.append("`").append(entry.getKey()).append("`=VALUES(`").append(entry.getKey()).append("`)");
 
             if (it.hasNext()) {
                 fields.append(", ");
@@ -246,7 +247,9 @@ public class MySQLWrapper extends DatabaseWrapper {
                     else if (columnName.contentEquals("MinerExp") || columnName.contentEquals("MinerLvl"))
                         continue;
 
-                    stats.setStatistic(columnName, result.getInt(columnName));
+                    //expected column name is fully qualified, like: drop_diamond, drop_gold, primitive_stone
+                    final NamespacedKey key = new NamespacedKey(StoneAge.getPlugin(StoneAge.class), columnName);
+                    stats.setStatistic(key, result.getInt(columnName));
                 }
 
                 stats.markUnsaved(false);
@@ -292,8 +295,9 @@ public class MySQLWrapper extends DatabaseWrapper {
                     if (columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
                         continue;
 
-                    config.setDropEntry(columnName, result.getBoolean(columnName));
-
+                    //expected column name is fully qualified, like: drop_diamond, drop_gold, primitive_stone
+                    final NamespacedKey key = new NamespacedKey(StoneAge.getPlugin(StoneAge.class), columnName);
+                    config.setDropEntry(key, result.getBoolean(columnName));
                 }
 
                 config.markUnsaved(false);

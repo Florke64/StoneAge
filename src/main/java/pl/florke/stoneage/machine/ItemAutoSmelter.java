@@ -69,6 +69,7 @@ public class ItemAutoSmelter {
                 .placeholder(1, Integer.toString(index)).log(Level.INFO);
     }
 
+    // TODO: config to exclude certain drops from auto smelting
     public synchronized ItemStack getSmelted(@NotNull final TileState machineState, @NotNull final ItemStack itemToSmelt) {
         for (final FurnaceRecipe recipe : this.smeltingRecipeList) {
             final RecipeChoice input = recipe.getInputChoice();
@@ -79,7 +80,7 @@ public class ItemAutoSmelter {
                 smeltedItemStack.setAmount(itemToSmelt.getAmount());
 
                 // #getSmelted is called on drop calculate which is async
-                //  It                      operates on block data so has to be run in tick
+                //  It operates on block data so has to be run in tick
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -150,7 +151,6 @@ public class ItemAutoSmelter {
         if (machineData.has(AUTOSMELTER_KEY))
             machineData.remove(AUTOSMELTER_KEY);
 
-        new Message("Auto-Smelting: newSmeltingUses: " + newSmeltingUses).log(Level.INFO);
         machineData.set(AUTOSMELTER_KEY, PersistentDataType.INTEGER, newSmeltingUses);
         machineState.setBlockData(machineState.getBlockData());
         machineState.update();

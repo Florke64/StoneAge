@@ -1,6 +1,7 @@
 version: 1
+custom_name: 'Mending Book'
 miner_exp: 1
-weight: 0.2
+weight: 0.015
 ignore_fortune: false
 multipliable: true
 
@@ -8,7 +9,6 @@ block:
   material: 'STONE'
 drop:
   material: 'ENCHANTED_BOOK'
-#  display_name: ''
   lore:
     - '&7Default drop'
   enchantments:

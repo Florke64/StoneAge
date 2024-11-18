@@ -52,8 +52,7 @@ public class Message {
     private final Map<Integer, String> variables = new HashMap<>();
 
     public Message(final String... message) {
-        this(new ArrayList<>());
-        addLines(message);
+        this(new ArrayList<>(List.of(message)));
     }
 
     public Message(List<String> message) {

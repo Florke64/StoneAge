@@ -18,6 +18,7 @@
 package pl.florke.stoneage.drop;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.TileState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -28,58 +29,71 @@ import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.database.playerdata.PlayersData;
-import pl.florke.stoneage.machine.ItemAutoSmelter;
+import pl.florke.stoneage.machine.ResourceSpawner;
+import pl.florke.stoneage.util.Message;
 
 import java.util.*;
+import java.util.logging.Level;
 
-@SuppressWarnings("CommentedOutCode")
 public class DropCalculator {
 
-    private final StoneAge plugin;
+    private final Random random = new Random();
 
-    private final Map<String, DropEntry> dropEntries = new LinkedHashMap<>();
+    private final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
 
-    private DropEntry primitiveDrop;
+    private final LinkedHashMap<NamespacedKey, DropEntry> dropEntries = new LinkedHashMap<>();
+    private final LinkedHashMap<Material, DropEntry> primitiveEntries = new LinkedHashMap<>();
+
     private DropMultiplier dropMultiplier;
 
-    private float totalWeight = 0;
+    private float totalDropsWeight = 0;
+    private float totalResourcesWeight = 0;
 
     public DropCalculator() {
-        plugin = StoneAge.getPlugin(StoneAge.class);
-
-        this.primitiveDrop = new DropEntry("primitive_drop", new ItemStack(Material.COBBLESTONE), 1.0f);
-
         calculateTotalWeight();
     }
 
     public DropMultiplier getDropMultiplier() {
-        return dropMultiplier == null ? new DropMultiplier(1.0f, 2.0f) : dropMultiplier;
+        return dropMultiplier != null?
+                this.dropMultiplier : new DropMultiplier(1.0f, 2.0f);
     }
 
     public void setDropMultiplier(DropMultiplier dropMultiplier) {
         this.dropMultiplier = dropMultiplier;
     }
 
-    public void setPrimitiveDrop(DropEntry dropEntry) {
-        primitiveDrop = dropEntry;
+    public void addPrimitiveDrop(DropEntry dropEntry) {
+        primitiveEntries.put(dropEntry.getBlockMaterial(), dropEntry);
         calculateTotalWeight();
     }
 
-    public void addDrop(DropEntry dropEntry) {
-        dropEntries.put(dropEntry.getEntryName(), dropEntry);
+    public void addCustomDrop(DropEntry dropEntry) {
+        dropEntries.put(dropEntry.getKey(), dropEntry);
         calculateTotalWeight();
     }
 
     private void calculateTotalWeight() {
-        float weight = 0.0f;
-        for (DropEntry drop : dropEntries.values())
-            weight += drop.getChanceWeight();
+        float dropWeight = 0.0f;
+        float resourcesWeight = 0.0f;
 
-        totalWeight = weight + primitiveDrop.getChanceWeight();
+        for (DropEntry drop : dropEntries.values())
+            dropWeight += drop.getChanceWeight();
+
+        new Message("Drop weight: " + dropWeight).log(Level.INFO);
+
+        for (DropEntry drop : primitiveEntries.values())
+            resourcesWeight += drop.getChanceWeight();
+
+        totalDropsWeight = dropWeight;
+        totalResourcesWeight = resourcesWeight;
     }
 
-    public float getTotalWeight() {
-        return totalWeight;
+    public float getTotalDropsWeight() {
+        return totalDropsWeight;
+    }
+
+    public float getTotalResourcesWeight() {
+        return totalResourcesWeight;
     }
 
 /**
@@ -91,7 +105,7 @@ public class DropCalculator {
  * @return a DropLoot object containing the items and experience to be dropped
  *         or null if no applicable tool was used
  */
-    public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable TileState machineState) {
+    public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable TileState machineState, Material brokenBlock) {
         //No tool was used to break a block
         if (tool == null)
             return null;
@@ -101,89 +115,109 @@ public class DropCalculator {
         int fortuneLevel = 0;
 
         if (tool.hasItemMeta()) {
-            for (Enchantment enchant : tool.getEnchantments().keySet()) {
-                if (enchant.equals(Enchantment.SILK_TOUCH))
-                    hasSilkTouch = true;
-
-                else if (enchant.equals(Enchantment.FORTUNE))
-                    fortuneLevel = tool.getEnchantments().get(enchant);
-            }
+            if (tool.getEnchantments().containsKey(Enchantment.SILK_TOUCH))
+                hasSilkTouch = true;
+            else if (tool.getEnchantments().containsKey(Enchantment.FORTUNE))
+                fortuneLevel = tool.getEnchantments().get(Enchantment.FORTUNE);
         }
 
         //Calculating final drop
-        final Random randomizer = new Random();
         final DropLoot dropLoot = new DropLoot();
+
+        final DropEntry primitiveDrop = getPrimitiveDropEntries().get(brokenBlock);
 
         final PlayersData playerSetup = plugin.getPlayersData();
         final PlayerConfig dropConfig = playerSetup.getPersonalDropConfig(player.getUniqueId());
         final PlayerStats playerStats = playerSetup.getPlayerStoneMachineStats(player.getUniqueId());
 
-        final ItemAutoSmelter autoSmelter = plugin.getStoneMachine().getItemSmelter();
-
         //Checks if cobble wasn't disabled by the player
         if (dropConfig.isDropping(primitiveDrop)) {
             ItemStack primitiveItemStack = primitiveDrop.getDrop(hasSilkTouch, fortuneLevel);
-
-            //TODO: Autosmelting primitive drop
-//            if(autoSmelter.getAutoSmeltingUsesLeft(machineState) >= 1) {
-//                final ItemStack smelted = autoSmelter.getSmelted(machineState, primitiveItemStack);
-//                if(smelted != null) {
-//                    primitiveItemStack = smelted;
-//                }
-//            }
-
             dropLoot.addLoot(primitiveDrop, primitiveItemStack);
         }
 
-        for (Map.Entry<String, DropEntry> dropEntry : dropEntries.entrySet()) {
+        final ResourceSpawner resourceSpawner = plugin.getStoneMachine().getResourceSpawner();
+        for (DropEntry dropEntry : resourceSpawner.getResourceChildren(primitiveDrop)) {
             // Verify requirements for this drop
-            if (playerStats.getMinerLvl() < dropEntry.getValue().getNeededMinerLevel())
+            if (playerStats.getMinerLvl() < dropEntry.getNeededMinerLevel())
                 continue;
 
-            if (!dropEntry.getValue().getBlockMaterial().createBlockData().isPreferredTool(tool))
+            if (!dropEntry.getBlockMaterial().createBlockData().isPreferredTool(tool))
                 continue;
 
             //Checks for player's personalised drop entry settings
-            if (!dropConfig.isDropping(dropEntry.getValue()))
+            if (!dropConfig.isDropping(dropEntry))
                 continue;
 
-            final float luck = randomizer.nextFloat() * totalWeight;
+            final float luck = random.nextFloat() * getTotalDropsWeight();
 
-            final float itemChanceWeight = dropEntry.getValue().getChanceWeight();
-            final float currentDropMultiplier;
-            if (dropMultiplier.isActive())
-                currentDropMultiplier = getDropMultiplier().getCurrentDropMultiplier();
-            else
-                currentDropMultiplier = getDropMultiplier().getDefaultDropMultiplier();
+            final float itemChanceWeight = dropEntry.getChanceWeight() / getTotalDropsWeight();
+            final float currentDropMultiplier = dropEntry.isMultipliable() && getDropMultiplier().isActive()?
+                    getDropMultiplier().getCurrentDropMultiplier() : getDropMultiplier().getDefaultDropMultiplier();
 
             if (luck < itemChanceWeight * currentDropMultiplier) {
-                ItemStack itemDrop = dropEntry.getValue().getDrop(hasSilkTouch, fortuneLevel);
-
-                //Auto smelting feature
-                if (machineState != null && autoSmelter.getAutoSmeltingUsesLeft(machineState) >= itemDrop.getAmount()) {
-                    final ItemStack smelted = autoSmelter.getSmelted(machineState, itemDrop);
-                    if (smelted != null)
-                        itemDrop = smelted;
-                }
-
-                dropLoot.addLoot(dropEntry.getValue(), itemDrop.clone());
+                ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
+                dropLoot.addLoot(dropEntry, itemDrop.clone());
             }
         }
+
+        //this means that auto-smelting is allowed in the config
+        if (plugin.getStoneMachine().isHopperInputAllowed())
+            dropLoot.applyAutoSmeltingFeature(machineState);
 
         return dropLoot;
     }
 
-    public DropEntry getPrimitiveDropEntry() {
-        return primitiveDrop;
+    public DropEntry calculatePrimitive() {
+        DropEntry defaultPrimitiveEntry = primitiveEntries.values().stream().findFirst().orElse(null);
+
+        for (DropEntry entry : getPrimitiveDropEntries().values()) {
+            if (!plugin.getStoneMachine().getResourceSpawner().isRegisteredResource(entry))
+                continue;
+
+            final float luck = random.nextFloat() * getTotalResourcesWeight();
+            final float itemChanceWeight = entry.getChanceWeight() / getTotalResourcesWeight();
+
+            final float dropMultiplierValue = entry.isMultipliable() && getDropMultiplier().isActive()?
+                    getDropMultiplier().getCurrentDropMultiplier() : getDropMultiplier().getDefaultDropMultiplier();
+
+            if (luck < itemChanceWeight * dropMultiplierValue)
+                return entry;
+        }
+
+        return defaultPrimitiveEntry;
     }
 
-    public DropEntry getDropEntry(@NotNull String key) {
-        if (key.contentEquals(primitiveDrop.getEntryName()))
-            return getPrimitiveDropEntry();
-        return dropEntries.get(key);
+    public LinkedHashMap<Material, DropEntry> getPrimitiveDropEntries() {
+        return new LinkedHashMap<>(primitiveEntries);
+    }
+
+    @Nullable
+    public DropEntry getDropEntry(@NotNull NamespacedKey key) {
+        Optional<DropEntry> dropEntry = Optional.empty();
+
+        if (isPrimitiveDrop(key))
+            dropEntry = primitiveEntries.values().stream().filter(entry -> entry.getKey().equals(key)).findFirst();
+
+        if (!isPrimitiveDrop(key) || dropEntry.isEmpty())
+            return dropEntries.get(key);
+
+        return dropEntry.get();
     }
 
     public List<DropEntry> getDropEntries() {
         return new ArrayList<>(dropEntries.values());
+    }
+
+    public boolean isPrimitiveDrop(final NamespacedKey key) {
+        return primitiveEntries.values().stream().anyMatch(primitiveEntry -> primitiveEntry.getKey().equals(key));
+    }
+
+    public boolean isPrimitiveDrop(final DropEntry entry) {
+        return primitiveEntries.values().stream().anyMatch(primitiveEntry -> primitiveEntry.equals(entry));
+    }
+
+    public boolean isPrimitiveDrop(final Material material) {
+        return primitiveEntries.containsKey(material);
     }
 }

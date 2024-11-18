@@ -60,7 +60,7 @@ public class StoneMachinePlaceListener implements Listener {
         machineData.set(plugin.getStoneMachine().getMachineIdentifierKey(), PersistentDataType.BOOLEAN, true);
         machineState.update();
 
-        plugin.getStoneMachine().generateStone(stoneGenerationLocation);
+        plugin.getStoneMachine().getResourceSpawner().spawnResource(stoneGenerationLocation);
     }
 
 }

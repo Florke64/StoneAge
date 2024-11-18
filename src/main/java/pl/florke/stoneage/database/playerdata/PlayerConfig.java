@@ -17,6 +17,7 @@
 
 package pl.florke.stoneage.database.playerdata;
 
+import org.bukkit.NamespacedKey;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.drop.DropEntry;
 
@@ -39,11 +40,11 @@ public class PlayerConfig {
 
         this.uuid = uuid;
         this.playerName = playerName;
-
-        customDropEntries.put(plugin.getDropCalculator().getPrimitiveDropEntry(), true);
-        for (DropEntry drop : plugin.getDropCalculator().getDropEntries()) {
+        for (DropEntry drop : plugin.getDropCalculator().getDropEntries())
             customDropEntries.put(drop, true);
-        }
+
+        for (DropEntry drop : plugin.getDropCalculator().getPrimitiveDropEntries().values())
+            customDropEntries.put(drop, true);
 
     }
 
@@ -51,8 +52,8 @@ public class PlayerConfig {
         return customDropEntries.containsKey(dropEntry) && customDropEntries.get(dropEntry);
     }
 
-    public void setDropEntry(String entryKey, boolean shouldDrop) {
-        DropEntry dropEntry = plugin.getDropCalculator().getDropEntry(entryKey);
+    public void setDropEntry(NamespacedKey key, boolean shouldDrop) {
+        DropEntry dropEntry = plugin.getDropCalculator().getDropEntry(key);
         setDropEntry(dropEntry, shouldDrop);
     }
 

@@ -17,8 +17,11 @@
 
 package pl.florke.stoneage.drop;
 
+import org.bukkit.block.TileState;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import pl.florke.stoneage.StoneAge;
+import pl.florke.stoneage.machine.ItemAutoSmelter;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,6 +32,8 @@ import java.util.Map;
  * Contents are calculated by DropCalculator and ExperienceCalculator respectively. */
 public class DropLoot {
 
+    private final ItemAutoSmelter itemSmelter = StoneAge.getPlugin(StoneAge.class).getStoneMachine().getItemSmelter();
+
     private final Map<DropEntry, ItemStack> loots = new HashMap<>();
 
     private int totalExp = 0;
@@ -37,11 +42,11 @@ public class DropLoot {
         if (dropEntry.getMaximalExp() > 0)
             totalExp += dropEntry.calculateFinalExpValue();
 
-        loots.put(dropEntry, itemStack);
+        loots.put(dropEntry, itemStack.clone());
     }
 
     public ItemStack getItemLoot(DropEntry entry) {
-        return loots.get(entry);
+        return loots.get(entry).clone();
     }
 
     public int getExp() {
@@ -54,6 +59,19 @@ public class DropLoot {
 
     public int getAmountLooted(DropEntry key) {
         return loots.get(key).getAmount();
+    }
+
+    public void applyAutoSmeltingFeature(TileState machineState) {
+        for (Map.Entry<DropEntry, ItemStack> entry : loots.entrySet()) {
+            final ItemStack itemDrop = entry.getValue();
+
+            //AUTO-SMELTING FEATURE
+            if (machineState != null && itemSmelter.getAutoSmeltingUsesLeft(machineState) >= itemDrop.getAmount()) {
+                final ItemStack smelted = itemSmelter.getSmelted(machineState, itemDrop);
+                if (smelted != null)
+                    loots.put(entry.getKey(), smelted);
+            }
+        }
     }
 
 }

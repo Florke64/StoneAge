@@ -18,6 +18,7 @@
 package pl.florke.stoneage.config;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import pl.florke.stoneage.drop.DropEntry;
@@ -31,7 +32,7 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         super(section);
     }
 
-    public DropEntry readDropEntry(final String dropEntryId) {
+    public DropEntry readDropEntry(final DropEntry.EntryType type, final NamespacedKey key) {
         //Block that represents this drop (not dropping actually)
         final Material blockMaterial = readBlockMaterial();
 
@@ -75,7 +76,7 @@ public class DropEntryConfigReader extends ConfigSectionReader {
 
         defaultDrop = (defaultDrop != null) ? defaultDrop : silkDrop;
 
-        final DropEntry dropEntry = new DropEntry(dropEntryId, defaultDrop, weight);
+        final DropEntry dropEntry = new DropEntry(type, key, defaultDrop, weight);
 
         dropEntry.setBlockMaterial(blockMaterial == null? Material.STONE : blockMaterial);
 
@@ -83,9 +84,9 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         if (silkDrop != null)
             dropEntry.setSilkDrop(silkDrop);
 
-        // TODO: Only use set... methods if section exists
+        // TODO: Only use "set[...something...]();" methods if section exists
         //Getting DropEntry custom name for its display in menus
-        final String customEntryName = rootSection.getString("custom_name", dropEntryId);
+        final String customEntryName = rootSection.getString("custom_name", dropEntry.getBlockMaterial().name());
         dropEntry.setCustomName(customEntryName);
 
         //Fortune Enchant ignoring

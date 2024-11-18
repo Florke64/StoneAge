@@ -18,6 +18,7 @@
 package pl.florke.stoneage.database.wrapper;
 
 import com.zaxxer.hikari.HikariConfig;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.config.DatabaseConfigReader;
@@ -47,7 +48,7 @@ public class SQLiteWrapper extends DatabaseWrapper {
         makeDropMultiplierTable();
 
         for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getDropEntries()) {
-            final String dropEntryName = entry.getEntryName();
+            final String dropEntryName = entry.getKey().getKey();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
@@ -96,7 +97,7 @@ public class SQLiteWrapper extends DatabaseWrapper {
             if (entry == null) continue;
 
             // Append entry name to target columns
-            fields.append(", `").append(entry.getEntryName()).append("`");
+            fields.append(", `").append(entry.getKey().getKey()).append("`");
 
             // Append PlayerConfig value for each entry
             int dropSwitchStatus = config.isDropping(entry) ? 1 : 0;
@@ -130,7 +131,7 @@ public class SQLiteWrapper extends DatabaseWrapper {
                 .append("'").append(stats.getMinerLvl()).append("'");
 
         // Optional statistic fields
-        for (final String entry : stats.getStatisticKeys()) {
+        for (final NamespacedKey entry : stats.getStatisticKeys()) {
             if (entry == null) continue;
 
             fields.append(", `").append(entry).append("`");
@@ -178,7 +179,9 @@ public class SQLiteWrapper extends DatabaseWrapper {
                     else if (columnName.contentEquals("MinerExp") || columnName.contentEquals("MinerLvl"))
                         continue;
 
-                    stats.setStatistic(columnName, result.getInt(columnName));
+                    //column name is expected to be fully qualified (with drop_ or primitive_ prefix)
+                    final NamespacedKey key = NamespacedKey.fromString(columnName);
+                    stats.setStatistic(key, result.getInt(columnName));
                 }
 
                 stats.markUnsaved(false);
@@ -224,8 +227,9 @@ public class SQLiteWrapper extends DatabaseWrapper {
                     if (columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
                         continue;
 
-                    config.setDropEntry(columnName, result.getBoolean(columnName));
-
+                    //expected column name is fully qualified, like: drop_diamond, drop_gold, primitive_stone
+                    final NamespacedKey key = new NamespacedKey(StoneAge.getPlugin(StoneAge.class), columnName);
+                    config.setDropEntry(key, result.getBoolean(columnName));
                 }
 
                 config.markUnsaved(false);

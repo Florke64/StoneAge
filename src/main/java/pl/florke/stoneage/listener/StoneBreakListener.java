@@ -18,10 +18,12 @@
 package pl.florke.stoneage.listener;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Hopper;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
@@ -43,8 +45,6 @@ import pl.florke.stoneage.event.StoneDropLootEvent;
 import pl.florke.stoneage.event.StoneMachineStoneBreakEvent;
 import pl.florke.stoneage.util.Message;
 
-import java.util.logging.Level;
-
 public class StoneBreakListener implements Listener {
 
     private final StoneAge plugin;
@@ -55,12 +55,14 @@ public class StoneBreakListener implements Listener {
 
     @EventHandler
     public void onStoneBreak(@NotNull BlockBreakEvent event) {
-        if (event.isCancelled()) return;
+        if (event.isCancelled())
+            return;
 
         final Player player = event.getPlayer();
 
         final Block brokenBlock = event.getBlock();
-        if (!brokenBlock.getType().equals(Material.STONE)) return;
+        if (!plugin.getDropCalculator().isPrimitiveDrop(brokenBlock.getType()))
+            return;
 
         final DropMultiplier dropMultiplier = plugin.getDropCalculator().getDropMultiplier();
         if (dropMultiplier.isActive() && !dropMultiplier.getMultiplierBossBar().getPlayers().contains(player)) {
@@ -69,39 +71,52 @@ public class StoneBreakListener implements Listener {
         }
 
         final Block machineBlock = plugin.getStoneMachine().getConnectedStoneMachine(brokenBlock);
-        final Dispenser stoneMachine = machineBlock != null ? (Dispenser) machineBlock.getState() : null;
+        final Block resourceBlock = event.getBlock();
+        final TileState stoneMachine = machineBlock != null ? (TileState) machineBlock.getState() : null;
 
         if (stoneMachine == null)
             return;
 
-        //Cancelling default drops
-        event.setDropItems(false);
-
         customizeStoneDrop(player, stoneMachine, brokenBlock);
-    }
 
-    private void customizeStoneDrop(@NotNull Player player, TileState machineState, Block brokenBlock) {
-        if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR)
-            return;
-
-        if (machineState == null)
-            return;
-
-        machineState.getBlock();
-
-        final ItemStack usedTool = player.getInventory().getItemInMainHand();
-//        TODO: Remove ApplicableTools and use loot tables
-//        brokenBlock.getDrops(usedTool, player);
-
-        //Not applicable tool was used, means no drops
-        if (brokenBlock.getDrops(usedTool, player).isEmpty())
-            new Message(plugin.getLanguage("stone-machine-drop-fail-tool")).send(player);
+        //Cancelling default drops
+        event.setExpToDrop(0);
+        event.setDropItems(false);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                final DropLoot finalDrop;
-                finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, machineState);
+
+                resourceBlock.setType(Material.AIR);
+            }
+        }.runTaskLater(plugin, 1L);
+    }
+
+    private void customizeStoneDrop(@NotNull Player player, TileState machineState, Block brokenBlock) {
+        if (machineState == null)
+            return;
+
+        player.sendBlockChange(brokenBlock.getLocation(), Material.AIR.createBlockData());
+
+        // Respawn resource
+        plugin.getStoneMachine().getResourceSpawner().spawnResource(brokenBlock.getLocation());
+
+        final ItemStack usedTool = player.getInventory().getItemInMainHand();
+        //Not applicable tool was used, means no drops
+        if (!player.getGameMode().isInvulnerable() && brokenBlock.getDrops(usedTool, player).isEmpty()) {
+            new Message(plugin.getLanguage("stone-machine-drop-fail-tool")).send(player);
+            return;
+        }
+
+        final Material brokenMaterial = brokenBlock.getType();
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (player.getGameMode().isInvulnerable())
+                    return;
+
+                final DropLoot finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, machineState, brokenMaterial);
 
                 new BukkitRunnable() {
                     @Override
@@ -114,33 +129,14 @@ public class StoneBreakListener implements Listener {
                 }.runTask(plugin);
             }
         }.runTaskAsynchronously(plugin);
-
-        //Replacing broken stone with new one
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                plugin.getStoneMachine().generateStone(brokenBlock.getLocation());
-            }
-        }.runTaskLater(plugin, 1L);
     }
 
-    private void dropLoot(Player player, Location stoneLoc, TileState machineState, DropLoot dropLoot) {
+    private void dropLoot(Player player, Location stoneLocation, TileState machineState, DropLoot dropLoot) {
         if (dropLoot == null)
             return;
 
-        boolean hasHopper = false;
-        Block blockUnderStoneMachine = null;
-        //Verifying plugin's config and using hopper output if allowed
-        if (machineState != null && plugin.getStoneMachine().isHopperOutputAllowed()) {
-            blockUnderStoneMachine = machineState.getBlock().getRelative(BlockFace.DOWN);
-            if (blockUnderStoneMachine.getState() instanceof Hopper) {
-                hasHopper = true;
-            }
-        }
-
         //Checking drop location and verifying plugin configuration
-        final Location expDropLocation = (plugin.getStoneMachine().isDropExpToFeet()) ? player.getLocation() : stoneLoc;
-        final Location itemDropLocation = (plugin.getStoneMachine().isDropItemsToFeet()) ? player.getLocation() : stoneLoc;
+        final Location expDropLocation = (plugin.getStoneMachine().isDropExpToFeet()) ? player.getLocation() : stoneLocation;
 
         if (dropLoot.getExp() > 0) {
             final Entity orb = expDropLocation.getWorld().spawnEntity(expDropLocation, EntityType.EXPERIENCE_ORB);
@@ -159,36 +155,53 @@ public class StoneBreakListener implements Listener {
             final StoneDropLootEvent lootEvent = new StoneDropLootEvent(player, itemLoot);
             Bukkit.getServer().getPluginManager().callEvent(lootEvent);
 
-            if (lootEvent.isCancelled()) {
+            if (lootEvent.isCancelled())
                 continue;
-            }
+
+            //Drop to player
+            dropLootToPlayer(machineState, itemLoot, player, stoneLocation);
 
             final PlayerStats stats = this.plugin.getPlayersData().getPlayerStoneMachineStats(player.getUniqueId());
             stats.addMinerExp(drop.getMinerExp());
 
-            //Drop to hopper under the Stone Machine
-            ItemStack hopperLeftItem = null;
-            if (blockUnderStoneMachine != null && hasHopper) {
-                final Inventory hopperInventory = ((Hopper) blockUnderStoneMachine.getState()).getInventory();
-                hopperLeftItem = addItemToInventory(itemLoot, hopperInventory);
-            }
-
-            //Drop under player's feet if there is no hopper under Stone Machine
-            if (!hasHopper)
-                itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, itemLoot);
-
-            //Drop under player's feet in case if hopper cannot handle them all
-            else if (hopperLeftItem != null)
-                itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, hopperLeftItem);
-
-
-            if (drop != plugin.getDropCalculator().getPrimitiveDropEntry()) {
-                final Message dropMessage = new Message(plugin.getLanguage("stone-machine-drop-alert"));
-                dropMessage.placeholder(1, drop.getCustomName());
-                dropMessage.placeholder(2, Integer.toString(totalAmount));
-                dropMessage.sendActionMessage(player);
+            if (!plugin.getDropCalculator().isPrimitiveDrop(drop)) {
+                new Message(plugin.getLanguage("stone-machine-drop-alert"))
+                    .placeholder(1, Message.constNamePrettify(drop.getCustomName()))
+                    .placeholder(2, Integer.toString(totalAmount))
+                        .sendActionMessage(player);
             }
         }
+    }
+
+    private void dropLootToPlayer(TileState machineState, ItemStack itemLoot, Player player, Location naturalDropLocation) {
+        final Location itemDropLocation = plugin.getStoneMachine().isDropItemsToFeet()?
+                player.getLocation() : naturalDropLocation;
+
+        boolean hasHopper = false;
+        Block blockUnderStoneMachine = null;
+        //Verifying plugin's config and using hopper output if allowed
+        if (machineState != null && plugin.getStoneMachine().isHopperOutputAllowed()) {
+            blockUnderStoneMachine = machineState.getBlock().getRelative(BlockFace.DOWN);
+            if (blockUnderStoneMachine.getState() instanceof Hopper) {
+                hasHopper = true;
+            }
+        }
+
+        //Drop to hopper under the Stone Machine
+        ItemStack hopperLeftItem = null;
+        if (blockUnderStoneMachine != null && hasHopper) {
+            final Inventory hopperInventory = ((Hopper) blockUnderStoneMachine.getState()).getInventory();
+            hopperLeftItem = addItemToInventory(itemLoot, hopperInventory);
+        }
+
+        //Drop under player's feet if there is no hopper under Stone Machine
+        if (!hasHopper)
+            itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, itemLoot);
+
+            //Drop under player's feet in case if hopper cannot handle them all
+        else if (hopperLeftItem != null)
+            itemDropLocation.getWorld().dropItemNaturally(itemDropLocation, hopperLeftItem);
+
     }
 
     @Nullable
@@ -203,10 +216,8 @@ public class StoneBreakListener implements Listener {
                     inventory.setItem(firstFreeSlot, itemStack);
                     return null;
                 }
+                return itemStack.getAmount() > 0 ? itemStack : null;
             }
-
-            if (itemInInv == null)
-                new Message("StoneBreakListener: Hej! Null item in inventory! This is probably an error.").log(Level.SEVERE);
 
             //Adding as much as possible to the Inventory
             final int maxStackSize = itemInInv.getMaxStackSize();

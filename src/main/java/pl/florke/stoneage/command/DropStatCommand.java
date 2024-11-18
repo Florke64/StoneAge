@@ -106,10 +106,10 @@ public class DropStatCommand implements CommandExecutor {
 
         int summary = 0;
         for (DropEntry dropEntry : dropCalculator.getDropEntries()) {
-            if (dropEntry == dropCalculator.getPrimitiveDropEntry())
+            if (dropEntry.getEntryType().equals(DropEntry.EntryType.PRIMITIVE))
                 continue;
 
-            summary += playerStats.getStatistic(dropEntry.getEntryName());
+            summary += playerStats.getStatistic(dropEntry.getKey());
         }
 
         message.addLines(lang.getText("command-feedback-drop-print-summary"));

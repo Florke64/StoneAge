@@ -35,7 +35,6 @@ import pl.florke.stoneage.util.Message;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.logging.Level;
 
 public class DropInfoWindow extends Window {
 
@@ -142,7 +141,7 @@ public class DropInfoWindow extends Window {
     }
 
     private float getChancePercentage(DropEntry drop) {
-        return (100 * drop.getChanceWeight() / plugin.getDropCalculator().getTotalWeight());
+        return (100 * drop.getChanceWeight() / plugin.getDropCalculator().getTotalDropsWeight());
     }
 
     private float getRealChancePercentage(DropEntry drop) {
@@ -151,7 +150,7 @@ public class DropInfoWindow extends Window {
 
         final float multiplier = (drop.isMultipliable() ? dropMultiplier.getCurrentDropMultiplier() : 1.0f);
 
-        return (((drop.getChanceWeight() * multiplier) / plugin.getDropCalculator().getTotalWeight()) * 100);
+        return (((drop.getChanceWeight() * multiplier) / plugin.getDropCalculator().getTotalDropsWeight()) * 100);
     }
 
     @Override
@@ -191,12 +190,12 @@ public class DropInfoWindow extends Window {
 
         boolean isDropping = plugin.getPlayersData().getPersonalDropConfig(player.getUniqueId()).switchDropEntry(dropEntry);
 
-        final Message infoMessage = new Message(plugin.getLanguage("stone-machine-drop-switch"));
-        infoMessage.placeholder(1, dropEntry.getCustomName());
-        infoMessage.placeholder(2, (isDropping ?
+        new Message(plugin.getLanguage("stone-machine-drop-switch"))
+            .placeholder(1, dropEntry.getCustomName())
+            .placeholder(2, (isDropping ?
                 plugin.getLanguage("system-enabled") :
-                plugin.getLanguage("system-disabled")));
-        infoMessage.send(player);
+                plugin.getLanguage("system-disabled")
+            )).send(player);
     }
 
 }

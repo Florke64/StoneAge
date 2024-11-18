@@ -11,9 +11,5 @@ block:
   material: 'STONE'
 drop:
   material: 'COBBLESTONE'
-  lore:
-    - '&7Default Drop'
 silk:
   material: 'STONE'
-  lore:
-    - '&7Drop Silktouch'

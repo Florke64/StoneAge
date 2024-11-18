@@ -51,41 +51,42 @@ public class StoneMachineBreakListener implements Listener {
         if (!(event.getBlock().getState() instanceof TileState machineState))
             return;
 
+        if (!plugin.getStoneMachine().isStoneMachine(machineState))
+            return;
+
         final Block brokenBlock = machineState.getBlock();
 
         event.setDropItems(false);
 
         final ItemStack tool = destroyer.getInventory().getItemInMainHand();
-        if (!plugin.getStoneMachine().isMachineDestroyTool(tool) || gameMode != GameMode.CREATIVE)
+        if (!plugin.getStoneMachine().isMachineDestroyTool(tool) && gameMode != GameMode.CREATIVE) {
+            event.setCancelled(true);
+
+            new Message(plugin.getLanguage("stone-machine-destroyed-deny")).send(destroyer);
             return;
+        }
 
         final Location brokenBlockLocation = brokenBlock.getLocation();
 
         //Closing all active windows
         final WindowManager windowManager = plugin.getWindowManager();
         final Window brokenMachinesWindow = windowManager.getWindow(machineState);
-        if (brokenMachinesWindow != null) {
+        if (brokenMachinesWindow == null)
+            return;
 
-            final Message machineDestroyedMsg = new Message(plugin.getLanguage("stone-machine-destroyed"));
-            for (Player user : brokenMachinesWindow.getUsers()) {
-                if (user != null && user.isOnline()) {
-                    if (windowManager.getWindow(user).getBukkitInventory().equals(user.getOpenInventory().getTopInventory())) {
-                        user.closeInventory();
-                        machineDestroyedMsg.send(destroyer);
-                    }
+        final Message machineDestroyedMsg = new Message(plugin.getLanguage("stone-machine-destroyed"));
+        for (Player user : brokenMachinesWindow.getUsers()) {
+            if (user != null && user.isOnline()) {
+                if (windowManager.getWindow(user).getBukkitInventory().equals(user.getOpenInventory().getTopInventory())) {
+                    user.closeInventory();
+                    machineDestroyedMsg.send(destroyer);
                 }
-
             }
 
-            if (gameMode != GameMode.CREATIVE) {
-                brokenBlockLocation.getWorld().dropItemNaturally(brokenBlockLocation, plugin.getStoneMachine().createStoneMachineItem());
-            }
+        }
 
-        } else {
-            event.setCancelled(true);
-
-            final Message wrongToolMsg = new Message(plugin.getLanguage("stone-machine-destroyed-deny"));
-            wrongToolMsg.send(destroyer);
+        if (gameMode != GameMode.CREATIVE) {
+            brokenBlockLocation.getWorld().dropItemNaturally(brokenBlockLocation, plugin.getStoneMachine().createStoneMachineItem());
         }
     }
 

@@ -10,11 +10,7 @@ block:
 drop:
   material: 'COAL'
   custom_name: ''
-  lore:
-    - '&7Default Drop'
   minimal_amount: 1
 silk:
   material: 'COAL_ORE'
   custom_name: ''
-  lore:
-    - '&7Drop Silktouch'

@@ -18,8 +18,17 @@
 package pl.florke.stoneage.config;
 
 import org.bukkit.configuration.ConfigurationSection;
+import pl.florke.stoneage.StoneAge;
+import pl.florke.stoneage.util.Message;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 public class GeneralConfigReader extends ConfigSectionReader {
+
+    private HashMap<String, ArrayList<String>> resourceRelations = new HashMap<>();
 
     //Drop multiplier settings
     private float defaultDropMultiplier, maxDropMultiplier;
@@ -60,6 +69,25 @@ public class GeneralConfigReader extends ConfigSectionReader {
         allowHopperDropOutput = rootSection.getBoolean("allow_hopper_output", true);
         allowCoalUpgradesByHopper = rootSection.getBoolean("allow_hopper_input", true);
 
+        readResourceRelations();
+    }
+
+    private void readResourceRelations() {
+        final ConfigurationSection resourcesSection = StoneAge.getPlugin(StoneAge.class)
+                .getConfig().getConfigurationSection("resources");
+        if (resourcesSection == null) {
+            new Message("Invalid configuration, missing `resources` section!").log(Level.SEVERE);
+            return;
+        }
+
+        for (String key : resourcesSection.getKeys(false)) {
+            ArrayList<String> resources = new ArrayList<>(resourcesSection.getStringList(key));
+            resourceRelations.put(key, resources);
+        }
+    }
+
+    public Map<String, ArrayList<String>> getResourceRelations() {
+        return new HashMap<>(resourceRelations);
     }
 
     public int getCommandsCoolDown() {
