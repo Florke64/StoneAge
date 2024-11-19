@@ -150,7 +150,10 @@ public class DropInfoWindow extends Window {
 
         final float multiplier = (drop.isMultipliable() ? dropMultiplier.getCurrentDropMultiplier() : 1.0f);
 
-        return (((drop.getChanceWeight() * multiplier) / plugin.getDropCalculator().getTotalDropsWeight()) * 100);
+        return (((drop.getChanceWeight() * multiplier) / (
+                drop.getEntryType().equals(DropEntry.EntryType.RESOURCE_DROP)?
+                        plugin.getDropCalculator().getTotalResourcesWeight() : plugin.getDropCalculator().getTotalDropsWeight()
+        )) * 100);
     }
 
     @Override
