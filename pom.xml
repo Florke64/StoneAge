@@ -4,13 +4,13 @@
 
     <groupId>pl.florke.stoneage</groupId>
     <artifactId>StoneAge</artifactId>
-    <version>1.21-SNAPSHOT</version>
+    <version>RC-5</version>
     <packaging>jar</packaging>
 
     <name>StoneAge</name>
     <url>https://github.com/Florke64/StoneAge</url>
 
-    <description>Spigot Plugin adding stone generator machines.</description>
+    <description>Paper-MC Plugin adding stone generator machines.</description>
     <properties>
         <java.version>21</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
