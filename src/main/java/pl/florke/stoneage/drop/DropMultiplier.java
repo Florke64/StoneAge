@@ -121,7 +121,7 @@ public class DropMultiplier {
         return setDropMultiplier(callerName, callerUniqueId, value, time);
     }
 
-    public boolean setDropMultiplier(String callerName, UUID callerUniqueId, float value, long time) {
+    public boolean setDropMultiplier(String callerName, UUID callerUniqueId, final float value, final long time) {
         final long startTime = System.currentTimeMillis();
 
         return setDropMultiplier(callerName, callerUniqueId, value, new Timestamp(time), new Timestamp(startTime));
@@ -140,9 +140,8 @@ public class DropMultiplier {
                 new DropMultiplierStartEvent(callerName, callerUniqueId, value, startTime.getTime(), timeout);
         plugin.getServer().getPluginManager().callEvent(event);
 
-        if (event.isCancelled()) {
+        if (event.isCancelled())
             return false;
-        }
 
         setCurrentDropMultiplier(value);
         setMultiplierStartTime(startTime.getTime());

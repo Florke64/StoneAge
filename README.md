@@ -2,20 +2,55 @@
 
 ![StoneAge Banner](image/banner.png)
 
-Paper Plugin adding stone generator machines.
+Paper Plugin adding stone generator machines. With custom drops and cool features.
+
+- Can be placed in weird directions
+- Can auto-smelt drops when powered with coal (via hoppers)
+- Can pick up drops with hopper or throw them directly at player
+- Can spawn different resource blocks which drop different items
+- *... and more (, and more coming in the future!)!1*
+
+Custom config, language file, two database connectors, admin "event" command is also there.
 
 ### Latest Release
+
+> **Note:** This plugin is still in its development stage!
 
 The latest release details can be seen [here](https://github.com/FlrQue/StoneAge/releases/latest)
 (what's new and *.jar downloads).
 
-### API
-
-An API usage will be explained later (issue #20).
+API and Configuration is still subject to change.
 
 ### Configuration
 
-Plugin configuration will be explained later (issue #20).
+> See: [General Configuration](docs/CONFIG_GENERAL.md)
+
+Plugin configuration is based on `config.yml`, where you can setup database connection
+and enable some plugin's unique features like auto-smelting etc.
+
+Config also defines Drop Resource to Custom Drops relationship.
+
+You will put [Drop Entries](docs/DROP_ENTRY.md) and Drop Resources in `drops/` and `drops/resources/` directories respectively.
+These define types of blocks to spawn and their custom drops.
+Drop chance weights and other parameters, like resistance to Fortune Enchantment or Silk Touch drop, are defined in respective Drop(/Resource) Entries.
+
+Learn more about [General Configuration](docs/CONFIG_GENERAL.md) from docs.
+
+### Permissions
+
+Currently only `stoneage.admin` & `stoneage.drop` permissions are available.
+
+- `stoneage.admin` permission is required to use `/multiplier` command which highers a drop rate.
+
+- `stoneage.drop` permission is required to use simple `/drop` command for player configuration.
+
+### API
+
+An API usage will be explained later (if even ever needed).
+Most important stuff is that plugin initializes StoneMachine object which contains a lot of useful stuff.
+
+For instance, it is a gateway to `ResourceSpawner`, `DropCalculator`, etc.
+Also, check the `pl.florke.stoneage.event` package.
 
 ### Known issues
 

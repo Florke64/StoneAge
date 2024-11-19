@@ -70,9 +70,7 @@ public class DropMultiplierCommand implements CommandExecutor {
         boolean success = multiplier.setDropMultiplier(sender, multiplierValue, time);
 
         if (success) printMultiplierInfo(sender, multiplier, true);
-        else {
-            new Message(lang.getText("command-error-cmd-usage")).send(sender);
-        }
+        else new Message(lang.getText("command-error-cmd-usage")).send(sender);
 
         return true;
     }
@@ -85,18 +83,16 @@ public class DropMultiplierCommand implements CommandExecutor {
         else
             multiplierMessage.addLines(lang.getText("command-feedback-multiplier-info"));
 
-        if (!multiplier.isActive()) {
-            multiplierMessage.addLines(lang.getText("command-feedback-multiplier-active"));
-
-            multiplierMessage.placeholder(1, multiplier.getCallerName());
-            multiplierMessage.placeholder(2, Float.toString(multiplier.getCurrentDropMultiplier()));
-            multiplierMessage.placeholder(3, Integer.toString(multiplier.getMinutesLeft()));
+        if (multiplier.isActive()) {
+            multiplierMessage.addLines(lang.getText("command-feedback-multiplier-active"))
+                .placeholder(1, multiplier.getCallerName())
+                .placeholder(2, Float.toString(multiplier.getCurrentDropMultiplier()))
+                .placeholder(3, Integer.toString(multiplier.getMinutesLeft()));
         } else {
             multiplierMessage.addLines(lang.getText("command-feedback-multiplier-inactive"));
         }
 
         if (broadcast) multiplierMessage.broadcast();
         else multiplierMessage.send(commandSender);
-
     }
 }
