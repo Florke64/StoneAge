@@ -61,7 +61,7 @@ public class StoneBreakListener implements Listener {
         final Player player = event.getPlayer();
 
         final Block brokenBlock = event.getBlock();
-        if (!plugin.getDropCalculator().isPrimitiveDrop(brokenBlock.getType()))
+        if (!plugin.getDropCalculator().isDropResource(brokenBlock.getType()))
             return;
 
         final DropMultiplier dropMultiplier = plugin.getDropCalculator().getDropMultiplier();
@@ -116,7 +116,7 @@ public class StoneBreakListener implements Listener {
                 if (player.getGameMode().isInvulnerable())
                     return;
 
-                final DropLoot finalDrop = plugin.getDropCalculator().calculateDrop(player, usedTool, machineState, brokenMaterial);
+                final DropLoot finalDrop = plugin.getDropCalculator().calculateCustomDrop(player, usedTool, machineState, brokenMaterial);
 
                 new BukkitRunnable() {
                     @Override
@@ -164,7 +164,7 @@ public class StoneBreakListener implements Listener {
             final PlayerStats stats = this.plugin.getPlayersData().getPlayerStoneMachineStats(player.getUniqueId());
             stats.addMinerExp(drop.getMinerExp());
 
-            if (!plugin.getDropCalculator().isPrimitiveDrop(drop)) {
+            if (!plugin.getDropCalculator().isDropResource(drop)) {
                 new Message(plugin.getLanguage("stone-machine-drop-alert"))
                     .placeholder(1, Message.constNamePrettify(drop.getCustomName()))
                     .placeholder(2, Integer.toString(totalAmount))

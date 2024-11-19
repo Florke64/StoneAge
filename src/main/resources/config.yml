@@ -46,5 +46,5 @@ resources:
     - mending
 
 # resources:
-#   drops/primitives/*
+#   drops/resources/*
 #     - drops/*

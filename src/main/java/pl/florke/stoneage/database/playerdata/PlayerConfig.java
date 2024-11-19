@@ -40,10 +40,10 @@ public class PlayerConfig {
 
         this.uuid = uuid;
         this.playerName = playerName;
-        for (DropEntry drop : plugin.getDropCalculator().getDropEntries())
+        for (DropEntry drop : plugin.getDropCalculator().getCustomDropEntries())
             customDropEntries.put(drop, true);
 
-        for (DropEntry drop : plugin.getDropCalculator().getPrimitiveDropEntries().values())
+        for (DropEntry drop : plugin.getDropCalculator().getDropResourcesEntries().values())
             customDropEntries.put(drop, true);
 
     }

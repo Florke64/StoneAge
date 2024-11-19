@@ -42,7 +42,7 @@ public class DropCalculator {
     private final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
 
     private final LinkedHashMap<NamespacedKey, DropEntry> dropEntries = new LinkedHashMap<>();
-    private final LinkedHashMap<Material, DropEntry> primitiveEntries = new LinkedHashMap<>();
+    private final LinkedHashMap<Material, DropEntry> dropResourcesEntries = new LinkedHashMap<>();
 
     private DropMultiplier dropMultiplier;
 
@@ -62,8 +62,8 @@ public class DropCalculator {
         this.dropMultiplier = dropMultiplier;
     }
 
-    public void addPrimitiveDrop(DropEntry dropEntry) {
-        primitiveEntries.put(dropEntry.getBlockMaterial(), dropEntry);
+    public void addDropResource(DropEntry dropEntry) {
+        dropResourcesEntries.put(dropEntry.getBlockMaterial(), dropEntry);
         calculateTotalWeight();
     }
 
@@ -81,7 +81,7 @@ public class DropCalculator {
 
         new Message("Drop weight: " + dropWeight).log(Level.INFO);
 
-        for (DropEntry drop : primitiveEntries.values())
+        for (DropEntry drop : dropResourcesEntries.values())
             resourcesWeight += drop.getChanceWeight();
 
         totalDropsWeight = dropWeight;
@@ -105,7 +105,7 @@ public class DropCalculator {
  * @return a DropLoot object containing the items and experience to be dropped
  *         or null if no applicable tool was used
  */
-    public DropLoot calculateDrop(Player player, ItemStack tool, @Nullable TileState machineState, Material brokenBlock) {
+    public DropLoot calculateCustomDrop(Player player, ItemStack tool, @Nullable TileState machineState, Material brokenBlock) {
         //No tool was used to break a block
         if (tool == null)
             return null;
@@ -124,20 +124,20 @@ public class DropCalculator {
         //Calculating final drop
         final DropLoot dropLoot = new DropLoot();
 
-        final DropEntry primitiveDrop = getPrimitiveDropEntries().get(brokenBlock);
+        final DropEntry dropResource = getDropResourcesEntries().get(brokenBlock);
 
         final PlayersData playerSetup = plugin.getPlayersData();
         final PlayerConfig dropConfig = playerSetup.getPersonalDropConfig(player.getUniqueId());
         final PlayerStats playerStats = playerSetup.getPlayerStoneMachineStats(player.getUniqueId());
 
         //Checks if cobble wasn't disabled by the player
-        if (dropConfig.isDropping(primitiveDrop)) {
-            ItemStack primitiveItemStack = primitiveDrop.getDrop(hasSilkTouch, fortuneLevel);
-            dropLoot.addLoot(primitiveDrop, primitiveItemStack);
+        if (dropConfig.isDropping(dropResource)) {
+            ItemStack resourceItemStack = dropResource.getDrop(hasSilkTouch, fortuneLevel);
+            dropLoot.addLoot(dropResource, resourceItemStack);
         }
 
         final ResourceSpawner resourceSpawner = plugin.getStoneMachine().getResourceSpawner();
-        for (DropEntry dropEntry : resourceSpawner.getResourceChildren(primitiveDrop)) {
+        for (DropEntry dropEntry : resourceSpawner.getResourceChildren(dropResource)) {
             // Verify requirements for this drop
             if (playerStats.getMinerLvl() < dropEntry.getNeededMinerLevel())
                 continue;
@@ -168,10 +168,10 @@ public class DropCalculator {
         return dropLoot;
     }
 
-    public DropEntry calculatePrimitive() {
-        DropEntry defaultPrimitiveEntry = primitiveEntries.values().stream().findFirst().orElse(null);
+    public DropEntry calculateDropResource() {
+        DropEntry dropResource = dropResourcesEntries.values().stream().findFirst().orElse(null);
 
-        for (DropEntry entry : getPrimitiveDropEntries().values()) {
+        for (DropEntry entry : getDropResourcesEntries().values()) {
             if (!plugin.getStoneMachine().getResourceSpawner().isRegisteredResource(entry))
                 continue;
 
@@ -185,39 +185,39 @@ public class DropCalculator {
                 return entry;
         }
 
-        return defaultPrimitiveEntry;
+        return dropResource;
     }
 
-    public LinkedHashMap<Material, DropEntry> getPrimitiveDropEntries() {
-        return new LinkedHashMap<>(primitiveEntries);
+    public LinkedHashMap<Material, DropEntry> getDropResourcesEntries() {
+        return new LinkedHashMap<>(dropResourcesEntries);
     }
 
     @Nullable
     public DropEntry getDropEntry(@NotNull NamespacedKey key) {
         Optional<DropEntry> dropEntry = Optional.empty();
 
-        if (isPrimitiveDrop(key))
-            dropEntry = primitiveEntries.values().stream().filter(entry -> entry.getKey().equals(key)).findFirst();
+        if (isDropResource(key))
+            dropEntry = dropResourcesEntries.values().stream().filter(entry -> entry.getKey().equals(key)).findFirst();
 
-        if (!isPrimitiveDrop(key) || dropEntry.isEmpty())
+        if (!isDropResource(key) || dropEntry.isEmpty())
             return dropEntries.get(key);
 
         return dropEntry.get();
     }
 
-    public List<DropEntry> getDropEntries() {
+    public List<DropEntry> getCustomDropEntries() {
         return new ArrayList<>(dropEntries.values());
     }
 
-    public boolean isPrimitiveDrop(final NamespacedKey key) {
-        return primitiveEntries.values().stream().anyMatch(primitiveEntry -> primitiveEntry.getKey().equals(key));
+    public boolean isDropResource(final NamespacedKey key) {
+        return dropResourcesEntries.values().stream().anyMatch(dropResourceEntry -> dropResourceEntry.getKey().equals(key));
     }
 
-    public boolean isPrimitiveDrop(final DropEntry entry) {
-        return primitiveEntries.values().stream().anyMatch(primitiveEntry -> primitiveEntry.equals(entry));
+    public boolean isDropResource(final DropEntry entry) {
+        return dropResourcesEntries.values().stream().anyMatch(dropResourceEntry -> dropResourceEntry.equals(entry));
     }
 
-    public boolean isPrimitiveDrop(final Material material) {
-        return primitiveEntries.containsKey(material);
+    public boolean isDropResource(final Material material) {
+        return dropResourcesEntries.containsKey(material);
     }
 }

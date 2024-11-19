@@ -38,17 +38,17 @@ public class MachinesConfigReader {
         this.plugin = plugin;
     }
 
-    public List<DropEntry> getDropEntries() {
+    public List<DropEntry> getCustomDropEntries() {
         final DropEntry.EntryType type = DropEntry.EntryType.CUSTOM_DROP;
-        return readDropEntriesDirectory(type);
+        return readCustomDropEntriesDirectory(type);
     }
 
-    public List<DropEntry> getPrimitiveDropEntries() {
-        final DropEntry.EntryType type = DropEntry.EntryType.PRIMITIVE;
-        return readDropEntriesDirectory(type);
+    public List<DropEntry> getDropResourceEntries() {
+        final DropEntry.EntryType type = DropEntry.EntryType.RESOURCE_DROP;
+        return readCustomDropEntriesDirectory(type);
     }
 
-    private List<DropEntry> readDropEntriesDirectory(DropEntry.EntryType types) {
+    private List<DropEntry> readCustomDropEntriesDirectory(DropEntry.EntryType types) {
         final File dropEntryDirectory = new File(plugin.getDataFolder(), types.getPath());
         final List<DropEntry> drops = new ArrayList<>();
 
@@ -62,10 +62,10 @@ public class MachinesConfigReader {
             return drops;
         }
 
-        return readDropEntriesDirectory(types, dropEntryFiles);
+        return readCustomDropEntriesDirectory(types, dropEntryFiles);
     }
 
-    private List<DropEntry> readDropEntriesDirectory(DropEntry.EntryType types, File[] dropEntryFiles) {
+    private List<DropEntry> readCustomDropEntriesDirectory(DropEntry.EntryType types, File[] dropEntryFiles) {
         final List<DropEntry> drops = new ArrayList<>();
         if (dropEntryFiles == null)
             return drops;
@@ -118,9 +118,9 @@ public class MachinesConfigReader {
 
     public void saveDefaultDrops() {
         final File customDropsDirectory = new File(plugin.getDataFolder(), DropEntry.EntryType.CUSTOM_DROP.getPath());
-        final File primitivesDirectory = new File(plugin.getDataFolder(), DropEntry.EntryType.PRIMITIVE.getPath());
+        final File resourcesDirectory = new File(plugin.getDataFolder(), DropEntry.EntryType.RESOURCE_DROP.getPath());
 
-        if (customDropsDirectory.exists() || primitivesDirectory.exists())
+        if (customDropsDirectory.exists() || resourcesDirectory.exists())
             return;
 
         plugin.saveResource("drops/coal.yml", false);
@@ -131,6 +131,7 @@ public class MachinesConfigReader {
         plugin.saveResource("drops/diamond.yml", false);
         plugin.saveResource("drops/mending.yml", false);
 
-        plugin.saveResource("drops/primitives/stone.yml", false);
+        plugin.saveResource("drops/resources/stone.yml", false);
+        plugin.saveResource("drops/resources/stone_bricks.yml", false);
     }
 }

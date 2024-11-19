@@ -105,8 +105,8 @@ public class DropStatCommand implements CommandExecutor {
         final Message message = new Message(lang.getText("command-feedback-drop-print-stats"));
 
         int summary = 0;
-        for (DropEntry dropEntry : dropCalculator.getDropEntries()) {
-            if (dropEntry.getEntryType().equals(DropEntry.EntryType.PRIMITIVE))
+        for (DropEntry dropEntry : dropCalculator.getCustomDropEntries()) {
+            if (dropEntry.getEntryType().equals(DropEntry.EntryType.RESOURCE_DROP))
                 continue;
 
             summary += playerStats.getStatistic(dropEntry.getKey());

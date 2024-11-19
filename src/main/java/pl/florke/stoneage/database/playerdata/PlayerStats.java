@@ -48,10 +48,10 @@ public class PlayerStats {
         this.minerExp = ExperienceCalculator.INITIAL_XP;
         this.minerLvl = 1;
 
-        for (DropEntry entry : plugin.getDropCalculator().getDropEntries())
+        for (DropEntry entry : plugin.getDropCalculator().getCustomDropEntries())
             statistics.put(entry.getKey(), 0);
 
-        for (DropEntry entry : plugin.getDropCalculator().getPrimitiveDropEntries().values())
+        for (DropEntry entry : plugin.getDropCalculator().getDropResourcesEntries().values())
             statistics.put(entry.getKey(), 0);
     }
 

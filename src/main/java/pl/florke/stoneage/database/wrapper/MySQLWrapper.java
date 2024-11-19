@@ -49,14 +49,14 @@ public class MySQLWrapper extends DatabaseWrapper {
         makePlayerDropConfigTable();
         makeDropMultiplierTable();
 
-        for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getDropEntries()) {
+        for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getCustomDropEntries()) {
             final String dropEntryName = entry.getEntryId();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
 
-        addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, "primitive_drop", "INT", "0");
-        addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, "primitive_drop", "BOOLEAN", "true");
+        addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, "resource_drop", "INT", "0");
+        addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, "resource_drop", "BOOLEAN", "true");
     }
 
     /**
@@ -247,7 +247,7 @@ public class MySQLWrapper extends DatabaseWrapper {
                     else if (columnName.contentEquals("MinerExp") || columnName.contentEquals("MinerLvl"))
                         continue;
 
-                    //expected column name is fully qualified, like: drop_diamond, drop_gold, primitive_stone
+                    //expected column name is fully qualified, like: drop_diamond, drop_gold, resource_stone
                     final NamespacedKey key = new NamespacedKey(StoneAge.getPlugin(StoneAge.class), columnName);
                     stats.setStatistic(key, result.getInt(columnName));
                 }
@@ -295,7 +295,7 @@ public class MySQLWrapper extends DatabaseWrapper {
                     if (columnName.contentEquals("PlayerUUID") || columnName.contentEquals("PlayerName"))
                         continue;
 
-                    //expected column name is fully qualified, like: drop_diamond, drop_gold, primitive_stone
+                    //expected column name is fully qualified, like: drop_diamond, drop_gold, resource_stone
                     final NamespacedKey key = new NamespacedKey(StoneAge.getPlugin(StoneAge.class), columnName);
                     config.setDropEntry(key, result.getBoolean(columnName));
                 }

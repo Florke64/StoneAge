@@ -221,7 +221,7 @@ public class DropEntry {
 
     public enum EntryType {
         CUSTOM_DROP("drops", "drop_"),
-        PRIMITIVE("drops/primitives", "primitive_");
+        RESOURCE_DROP("drops/resources", "resource_");
 
         private final String path;
         private final String prefix;

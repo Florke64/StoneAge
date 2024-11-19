@@ -36,7 +36,7 @@ public class ResourceSpawner {
 
     private long spawnFrequency = 40L;
 
-    // Map <Primitive drop's key; List of allowed custom drop's keys>
+    // Map <Drop Resource's key; List of allowed custom drop's keys>
     private final Map<DropEntry, List<DropEntry>> resourceRelationship = new HashMap<>();
 
     protected ResourceSpawner() {
@@ -81,8 +81,8 @@ public class ResourceSpawner {
      * @see ResourceSpawner#spawnResource(Location, DropEntry, long)
      */
     public void spawnResource(@NotNull final Location location) {
-        DropEntry primitive = plugin.getDropCalculator().calculatePrimitive();
-        spawnResource(location, primitive, spawnFrequency);
+        DropEntry dropResource = plugin.getDropCalculator().calculateDropResource();
+        spawnResource(location, dropResource, spawnFrequency);
     }
 
     /**
@@ -94,7 +94,7 @@ public class ResourceSpawner {
      * @param location where stone block will be placed.
      * @param delay    value in server ticks to wait and place block.
      */
-    private void spawnResource(@NotNull final Location location, @NotNull final DropEntry primitive, final long delay) {
+    private void spawnResource(@NotNull final Location location, @NotNull final DropEntry dropResource, final long delay) {
         final Block block = Objects.requireNonNull(location.getWorld()).getBlockAt(location);
 
         //Returning to the Main thread
@@ -109,8 +109,8 @@ public class ResourceSpawner {
                 if (!block.isEmpty())
                     return;
 
-                block.setType(primitive.getBlockMaterial(), true);
-                block.setBlockData(primitive.getBlockMaterial().createBlockData(), true);
+                block.setType(dropResource.getBlockMaterial(), true);
+                block.setBlockData(dropResource.getBlockMaterial().createBlockData(), true);
                 block.getState().update(true);
             }
         }.runTaskLater(plugin, delay);

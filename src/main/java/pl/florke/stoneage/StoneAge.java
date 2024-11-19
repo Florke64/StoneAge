@@ -119,7 +119,7 @@ public final class StoneAge extends JavaPlugin {
         super.saveDefaultConfig();
 
         //saving resources from directories
-        // "drops/" and "drops/primitives/"
+        // "drops/" and "drops/resources/"
         machinesConfigManager.saveDefaultDrops();
     }
 
@@ -150,10 +150,10 @@ public final class StoneAge extends JavaPlugin {
         getDropCalculator().setDropMultiplier(defaultMultiplier);
 
         //Reading 'DropEntry' configuration
-        for (final DropEntry primitiveDropEntry : machinesConfigManager.getPrimitiveDropEntries())
-            dropCalculator.addPrimitiveDrop(primitiveDropEntry);
+        for (final DropEntry dropResourceEntry : machinesConfigManager.getDropResourceEntries())
+            dropCalculator.addDropResource(dropResourceEntry);
 
-        for (final DropEntry dropEntry : machinesConfigManager.getDropEntries())
+        for (final DropEntry dropEntry : machinesConfigManager.getCustomDropEntries())
             dropCalculator.addCustomDrop(dropEntry);
 
         reloadResourceRelations(generalConfig);
@@ -166,13 +166,13 @@ public final class StoneAge extends JavaPlugin {
         final ResourceSpawner resourceSpawner = stoneMachine.getResourceSpawner();
 
         for (final Map.Entry<String, ArrayList<String>> entry : generalConfig.getResourceRelations().entrySet()) {
-            final String primitiveName = entry.getKey();
+            final String resourceName = entry.getKey();
             final ArrayList<String> dropNames = entry.getValue();
 
             // Getting KEY <String, ...>
-            final String rawPrimitiveKeyName = DropEntry.EntryType.PRIMITIVE.getPrefix() + primitiveName;
-            final NamespacedKey primitiveKey = new NamespacedKey(this, rawPrimitiveKeyName.toLowerCase());
-            final DropEntry primitive = dropCalculator.getDropEntry(primitiveKey);
+            final String rawResourceKeyName = DropEntry.EntryType.RESOURCE_DROP.getPrefix() + resourceName;
+            final NamespacedKey resourceKey = new NamespacedKey(this, rawResourceKeyName.toLowerCase());
+            final DropEntry resource = dropCalculator.getDropEntry(resourceKey);
 
             // Getting VALUES <..., List<String>>
             for (final String dropName : dropNames) {
@@ -181,7 +181,7 @@ public final class StoneAge extends JavaPlugin {
                 final DropEntry drop = dropCalculator.getDropEntry(dropKey);
 
                 //apply relation
-                resourceSpawner.addResourceChild(primitive, drop);
+                resourceSpawner.addResourceChild(resource, drop);
             }
         }
     }

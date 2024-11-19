@@ -59,9 +59,9 @@ public class DropInfoWindow extends Window {
         final PlayerStats stats = plugin.getPlayersData().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
 
         final DropCalculator calculator = plugin.getDropCalculator();
-        int i = drawDropEntries(calculator.getDropEntries(), stats, 0);
+        int i = drawDropEntries(calculator.getCustomDropEntries(), stats, 0);
 
-        final List<DropEntry> dropEntries = calculator.getPrimitiveDropEntries().values().stream().toList();
+        final List<DropEntry> dropEntries = calculator.getDropResourcesEntries().values().stream().toList();
         drawDropEntries(dropEntries, stats, i);
     }
 
@@ -172,14 +172,14 @@ public class DropInfoWindow extends Window {
         final DropCalculator calculator = plugin.getDropCalculator();
         final DropEntry dropEntry;
 
-        final int customDropsAmount = calculator.getDropEntries().size();
-        final int primitivesAmount = calculator.getPrimitiveDropEntries().size();
+        final int customDropsAmount = calculator.getCustomDropEntries().size();
+        final int resourcesAmount = calculator.getDropResourcesEntries().size();
 
         if (clickedSlot < customDropsAmount)
-            dropEntry = calculator.getDropEntries().get(clickedSlot);
+            dropEntry = calculator.getCustomDropEntries().get(clickedSlot);
 
-        else if (clickedSlot >= calculator.getDropEntries().size())
-            dropEntry = List.of(calculator.getPrimitiveDropEntries().sequencedValues())
+        else if (clickedSlot >= calculator.getCustomDropEntries().size())
+            dropEntry = List.of(calculator.getDropResourcesEntries().sequencedValues())
                     .get(clickedSlot - customDropsAmount).getFirst();
 
         else // Clicked on an empty slot, perhaps
