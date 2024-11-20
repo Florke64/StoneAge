@@ -71,6 +71,11 @@ public class StoneMachineBreakListener implements Listener {
         //Closing all active windows
         final WindowManager windowManager = plugin.getWindowManager();
         final Window brokenMachinesWindow = windowManager.getWindow(machineState);
+
+        final ItemStack stoneMachine = plugin.getStoneMachine().createStoneMachineItem();
+        if (gameMode != GameMode.CREATIVE)
+            brokenBlockLocation.getWorld().dropItemNaturally(brokenBlockLocation, stoneMachine);
+
         if (brokenMachinesWindow == null)
             return;
 
@@ -83,10 +88,6 @@ public class StoneMachineBreakListener implements Listener {
                 }
             }
 
-        }
-
-        if (gameMode != GameMode.CREATIVE) {
-            brokenBlockLocation.getWorld().dropItemNaturally(brokenBlockLocation, plugin.getStoneMachine().createStoneMachineItem());
         }
     }
 
