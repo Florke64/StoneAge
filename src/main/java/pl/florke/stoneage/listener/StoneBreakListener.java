@@ -77,19 +77,18 @@ public class StoneBreakListener implements Listener {
         if (stoneMachine == null)
             return;
 
+        event.setCancelled(true);
+
         customizeStoneDrop(player, stoneMachine, brokenBlock);
 
         //Cancelling default drops
         event.setExpToDrop(0);
         event.setDropItems(false);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
+        resourceBlock.setType(Material.AIR);
 
-                resourceBlock.setType(Material.AIR);
-            }
-        }.runTaskLater(plugin, 1L);
+        // Respawn resource
+        plugin.getStoneMachine().getResourceSpawner().spawnResource(brokenBlock.getLocation());
     }
 
     private void customizeStoneDrop(@NotNull Player player, TileState machineState, Block brokenBlock) {
@@ -97,9 +96,6 @@ public class StoneBreakListener implements Listener {
             return;
 
         player.sendBlockChange(brokenBlock.getLocation(), Material.AIR.createBlockData());
-
-        // Respawn resource
-        plugin.getStoneMachine().getResourceSpawner().spawnResource(brokenBlock.getLocation());
 
         final ItemStack usedTool = player.getInventory().getItemInMainHand();
         //Not applicable tool was used, means no drops

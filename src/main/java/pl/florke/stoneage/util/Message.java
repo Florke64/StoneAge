@@ -178,9 +178,9 @@ public class Message {
         return text.replace('&', '\u00a7');
     }
 
-    @NotNull
     public static TextComponent color(String text) {
-        if (text == null || text.isEmpty()) return Component.text("");
+        if (text == null || text.isEmpty())
+            return Component.text("");
 
         // O.G. method
         final String coloredLine = text.replace('&', '\u00a7');
@@ -188,9 +188,9 @@ public class Message {
         return Component.text(coloredLine);
     }
 
-    @NotNull
     public static TextComponent color(TextComponent text) {
-        if (text == null) return Component.text("");
+        if (text == null)
+            return Component.text("");
 
         // O.G. method
         final String coloredLine = text.content().replace('&', '\u00a7');

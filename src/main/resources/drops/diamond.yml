@@ -1,6 +1,5 @@
 version: 1
-minimal_miner_lvl: 5 # minimal mining level needed to drop this item from stone
-minimal_tool_lvl: 1 # minimal tool's material needed to drop this item from stone {0: hand, 1: wooden+, 2: stone+/gold+, 3: iron+, 4: diamond+}
+miner_level: 5 # mining level needed to drop this item from stone
 miner_exp: 4 # how much plugin's mining exp is gained from it
 weight: 1.0 # float value
 minimal_exp: 1 # how much exp drops (at least)

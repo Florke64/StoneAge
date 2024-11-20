@@ -394,7 +394,7 @@ public class StoneMachine {
     }
 
     public boolean isMachineDestroyTool(final ItemStack tool) {
-        return machineDestroyTool.isSimilar(tool.clone());
+        return tool.getType().equals(machineDestroyTool.getType());
     }
 
     public void setMachineDestroyTool(final ItemStack tool) {
