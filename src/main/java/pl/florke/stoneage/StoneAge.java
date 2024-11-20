@@ -48,7 +48,7 @@ import java.util.logging.Level;
 
 public final class StoneAge extends JavaPlugin {
 
-    private PluginListenerRegistry pluginListenerRegistry = new PluginListenerRegistry(this);
+    private final PluginListenerRegistry pluginListenerRegistry = new PluginListenerRegistry(this);
     private final List<Class<? extends Listener>> listeners = new ArrayList<>(List.of(
             // Stone Machines
             StoneMachinePlaceListener.class, StoneMachineBreakListener.class,
@@ -59,7 +59,7 @@ public final class StoneAge extends JavaPlugin {
             StatisticsIncreaseListener.class, MinerLevelUpListener.class
     ));
 
-    private PluginCommandsController commandExecutionController = new PluginCommandsController(this);
+    private final PluginCommandsController commandExecutionController = new PluginCommandsController(this);
     private final Map<String, Class<? extends CommandExecutor>> commandExecutors = new HashMap<>(Map.of(
         "drop", DropCommand.class,
         "drophelp", DropHelpCommand.class,
@@ -77,7 +77,7 @@ public final class StoneAge extends JavaPlugin {
 
     private Language language;
     private DatabaseManager dbManager;
-    private MachinesConfigReader machinesConfigManager = new MachinesConfigReader(this);
+    private final MachinesConfigReader machinesConfigManager = new MachinesConfigReader(this);
 
     @Override
     public void onEnable() {
@@ -105,11 +105,10 @@ public final class StoneAge extends JavaPlugin {
         for (final Map.Entry<String, Class<? extends CommandExecutor>> cmdExec : commandExecutors.entrySet())
             commandExecutionController.registerExecutor(cmdExec.getKey(), cmdExec.getValue());
 
-        //TODO: Add this setting to the config.yml (open issue #17)
-        final long period = 15; // autosave period in minutes
+        //TODO: Add auto-save period setting to the config.yml (open issue #17)
 
         // DBManager is initialized in reloadConfig()
-        getDBManager().initAsyncAutosave(period);
+        getDBManager().initAsyncAutosave(15);
         getDropCalculator().getDropMultiplier().initMultiplierBossBar();
     }
 
@@ -193,12 +192,15 @@ public final class StoneAge extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
 
-        final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(getConfig().getConfigurationSection("database"));
+        final ConfigurationSection databaseSection = getConfig().getConfigurationSection("database");
+        final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(databaseSection);
         databaseConfig.readDatabaseConnectionDetails();
 
+        // Load player statistics (& drop preferences)
         dbManager = new DatabaseManager(databaseConfig);
         dbManager.loadAllPlayers();
 
+        // Read previous Multiplier (before restart)
         dbManager.getSQLWrapper().readPreviousMultiplierFromDatabase(dropCalculator.getDropMultiplier());
     }
 
@@ -254,27 +256,21 @@ public final class StoneAge extends JavaPlugin {
         // Plugin shutdown logic
         new Message("Called plugin's onDisable() method. Bye cruel world!").log(Level.INFO);
 
-        if (getDropCalculator() != null && getDropCalculator().getDropMultiplier() != null && getDropCalculator().getDropMultiplier().getMultiplierBossBar() != null)
+        if (getDropCalculator() != null
+                && getDropCalculator().getDropMultiplier() != null
+                && getDropCalculator().getDropMultiplier().getMultiplierBossBar() != null)
             getDropCalculator().getDropMultiplier().getMultiplierBossBar().removeAll();
 
         new Message("Closing all Window Manager's GUIs... ").log(Level.INFO);
         getWindowManager().closeAllWindows();
 
         new Message("Syncing all unsaved data with the database...").log(Level.INFO);
-        if (playersData != null)
-            playersData.onDisable();
-        else
-            new Message("PlayersData not even initialized!").log(Level.WARNING);
+        if (playersData != null) playersData.onDisable();
+        else new Message("PlayersData not even initialized!").log(Level.WARNING);
 
         new Message("Disconnecting database, closing connection pool...").log(Level.INFO);
-        if (dbManager != null)
-            dbManager.onDisable();
-        else
-            new Message("Database not even initialized!").log(Level.WARNING);
-    }
-
-    public List<Class<? extends Listener>> getRegisteredListeners() {
-        return new ArrayList<>(listeners);
+        if (dbManager != null) dbManager.onDisable();
+        else new Message("Database not even initialized!").log(Level.WARNING);
     }
 
 }

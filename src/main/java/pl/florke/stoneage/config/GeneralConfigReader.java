@@ -49,7 +49,12 @@ public class GeneralConfigReader extends ConfigSectionReader {
 
     public GeneralConfigReader(ConfigurationSection section) {
         super(section);
-        compile();
+
+        try {
+            compile();
+        } catch (RuntimeException ex) {
+            new Message("Invalid configuration!", ex.getMessage()).log(Level.SEVERE);
+        }
     }
 
     private void compile() {

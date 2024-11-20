@@ -88,7 +88,6 @@ public class DropInfoWindow extends Window {
         final float dropChance = getChancePercentage(drop);
 
         final ItemStack icon = drop.getDropEntryIcon();
-        icon.setAmount(1);
 
         final ItemMeta meta = icon.getItemMeta();
 
@@ -176,7 +175,6 @@ public class DropInfoWindow extends Window {
         final DropEntry dropEntry;
 
         final int customDropsAmount = calculator.getCustomDropEntries().size();
-        final int resourcesAmount = calculator.getDropResourcesEntries().size();
 
         if (clickedSlot < customDropsAmount)
             dropEntry = calculator.getCustomDropEntries().get(clickedSlot);

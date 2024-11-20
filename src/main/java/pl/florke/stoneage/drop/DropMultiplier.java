@@ -17,6 +17,7 @@
 
 package pl.florke.stoneage.drop;
 
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
@@ -31,6 +32,8 @@ import pl.florke.stoneage.event.DropMultiplierStartEvent;
 import pl.florke.stoneage.util.Message;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -169,8 +172,10 @@ public class DropMultiplier {
         new Message("Initialized Multiplier visualization via Boss Bar.").log(Level.INFO);
 
         final NamespacedKey bossBarKey = new NamespacedKey(plugin, "multiplier_bossbar");
-        final String bossBarTitle = plugin.getLanguage("stone-multiplier-title-ticker");
-        multiplierBossBar = Bukkit.createBossBar(bossBarKey, Message.colors(bossBarTitle), BarColor.BLUE, BarStyle.SEGMENTED_10);
+        final Message bossBars = new Message(plugin.getLanguage("stone-multiplier-title-ticker"));
+        final List<TextComponent> bossBarTitle = new ArrayList<>(bossBars.asComponents());
+
+        multiplierBossBar = Bukkit.createBossBar(bossBarKey, bossBarTitle.getFirst().content(), BarColor.BLUE, BarStyle.SEGMENTED_10);
         multiplierBossBar.setVisible(false);
 
         final BukkitRunnable multiplierBossBarRunnable = new BukkitRunnable() {
@@ -236,5 +241,4 @@ public class DropMultiplier {
     public BossBar getMultiplierBossBar() {
         return multiplierBossBar;
     }
-
 }
