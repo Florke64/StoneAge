@@ -114,7 +114,7 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         dropEntry.setMinerExp(minerExp);
 
         //Needed level to drop
-        final int neededMinerLevel = rootSection.getInt("minimal_miner_lvl", 1);
+        final int neededMinerLevel = rootSection.getInt("miner_level", 1);
         dropEntry.setNeededMinerLevel(neededMinerLevel);
 
         return dropEntry;
