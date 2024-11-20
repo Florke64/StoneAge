@@ -54,8 +54,4 @@ public class PluginListenerRegistry {
             new Message("Cannot register listener: " + listener.getName(), ex.getMessage()).log(Level.SEVERE);
         }
     }
-
-    public Collection<Listener> getRegisteredListeners() {
-        return List.copyOf(listeners);
-    }
 }

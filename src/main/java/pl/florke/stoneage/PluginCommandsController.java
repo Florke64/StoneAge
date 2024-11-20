@@ -49,14 +49,6 @@ public class PluginCommandsController {
         this.commandCooldownMillis = commandCooldownSeconds * 1000L;
     }
 
-    public int getCommandCooldownSeconds() {
-        return commandCooldownSeconds;
-    }
-
-    public long getCommandCooldownMillis() {
-        return commandCooldownMillis;
-    }
-
     private boolean isCooldown(@NotNull final UUID playerUniqueId) {
         final long currentTime = System.currentTimeMillis();
         final long lastExecution = this.commandExecutionHistory.getOrDefault(playerUniqueId, 0L);
