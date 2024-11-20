@@ -109,8 +109,7 @@ public class ResourceSpawner {
                 if (!block.isEmpty())
                     return;
 
-                block.setType(dropResource.getBlockMaterial(), true);
-                block.setBlockData(dropResource.getBlockMaterial().createBlockData(), true);
+                block.setType(dropResource.getBlockMaterial());
                 block.getState().update(true);
             }
         }.runTaskLater(plugin, delay);

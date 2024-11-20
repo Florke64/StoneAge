@@ -34,6 +34,7 @@ import pl.florke.stoneage.gui.Window;
 import pl.florke.stoneage.util.Message;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DropInfoWindow extends Window {
@@ -180,8 +181,8 @@ public class DropInfoWindow extends Window {
             dropEntry = calculator.getCustomDropEntries().get(clickedSlot);
 
         else if (clickedSlot >= calculator.getCustomDropEntries().size())
-            dropEntry = List.of(calculator.getDropResourcesEntries().sequencedValues())
-                    .get(clickedSlot - customDropsAmount).getFirst();
+            dropEntry = new ArrayList<>(calculator.getDropResourcesEntries().sequencedValues())
+                    .get(clickedSlot - customDropsAmount);
 
         else // Clicked on an empty slot, perhaps
             return;
