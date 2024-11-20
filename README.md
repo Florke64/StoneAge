@@ -12,6 +12,9 @@ Paper Plugin adding stone generator machines. With custom drops and cool feature
 
 Custom config, language file, two database connectors, admin "event" command is also there.
 
+![[Drop Filter]](image/drop_filter.png)
+`drop_filter.png`: drop filter
+
 ### Latest Release
 
 > **Note:** This plugin is still in its development stage!
@@ -19,7 +22,10 @@ Custom config, language file, two database connectors, admin "event" command is 
 The latest release details can be seen [here](https://github.com/FlrQue/StoneAge/releases/latest)
 (what's new and *.jar downloads).
 
-API and Configuration is still subject to change.
+![[Machine]](image/machine_upfacing.png)
+`machine_upfacing.png`: stone machine placed, facing up
+
+~~API and Configuration is still subject to change!~~
 
 ### Configuration
 
@@ -33,6 +39,9 @@ Config also defines Drop Resource to Custom Drops relationship.
 You will put [Drop Entries](docs/DROP_ENTRY.md) and Drop Resources in `drops/` and `drops/resources/` directories respectively.
 These define types of blocks to spawn and their custom drops.
 Drop chance weights and other parameters, like resistance to Fortune Enchantment or Silk Touch drop, are defined in respective Drop(/Resource) Entries.
+
+![[Drop Actions]](image/machine_actions.png)
+`drop_actions.png`: available actions in Machine's GUI
 
 Learn more about [General Configuration](docs/CONFIG_GENERAL.md) from docs.
 
