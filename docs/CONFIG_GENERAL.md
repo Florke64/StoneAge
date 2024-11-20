@@ -74,7 +74,7 @@ Learn more about [Drop Entry](DROP_ENTRY.md) to understand how to spawn own bloc
 Perquisites: `drops/coal.yml`, `drops/gold.yml`, `drops/quartz.yml`, `drops/resources/stone.yml`
 (See: [Drop Entry](DROP_ENTRY.md) documentation).
 
-```
+```yaml
 resources:
   NETHERRACK:
     - coal
