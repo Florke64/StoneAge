@@ -35,7 +35,6 @@ public class PluginCommandsController {
 
     private final JavaPlugin plugin;
 
-    private int commandCooldownSeconds;
     private long commandCooldownMillis;
 
     private final Map<UUID, Long> commandExecutionHistory = new HashMap<>();
@@ -45,7 +44,6 @@ public class PluginCommandsController {
     }
 
     public void setCommandCooldownSeconds(int commandCooldownSeconds) {
-        this.commandCooldownSeconds = commandCooldownSeconds;
         this.commandCooldownMillis = commandCooldownSeconds * 1000L;
     }
 
