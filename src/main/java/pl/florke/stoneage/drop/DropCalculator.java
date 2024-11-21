@@ -79,8 +79,6 @@ public class DropCalculator {
         for (DropEntry drop : dropEntries.values())
             dropWeight += drop.getChanceWeight();
 
-        new Message("Drop weight: " + dropWeight).log(Level.INFO);
-
         for (DropEntry drop : dropResourcesEntries.values())
             resourcesWeight += drop.getChanceWeight();
 

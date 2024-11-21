@@ -49,8 +49,6 @@ public class ResourceSpawner {
             return;
         }
 
-        new Message("Adding " + child.getKey().getKey() + " as a child of " + parent.getKey().getKey()).log(Level.INFO);
-
         if (!resourceRelationship.containsKey(parent))
             resourceRelationship.put(parent, new ArrayList<>());
 
