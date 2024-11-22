@@ -60,7 +60,7 @@ public abstract class DatabaseWrapper {
      * Tries to load player personal drop configuration from database.
      * @return number of loaded configurations.
      */
-    abstract public int loadPersonalDropConfigFromDatabase();
+    abstract public int loadPlayerConfig();
 
     /**
      * Executes an update operation for the specified player's drop configuration in the database.
@@ -68,13 +68,13 @@ public abstract class DatabaseWrapper {
      * @param config the PlayerConfig containing the player's drop settings to be updated
      * @return an integer representing the result of the update operation, indicating success or failure
      */
-    abstract public int runUpdateForPersonalDropConfig(PlayerConfig config);
+    abstract public int updatePlayerConfig(PlayerConfig config);
 
     /**
      * Loads all player stone machine statistics from the database.
      * @return the number of loaded statistics.
      */
-    abstract public int loadPersonalStoneStatsFromDatabase();
+    abstract public int loadPlayerStats();
 
     /**
      * Executes an update operation for the specified player's stone statistics in the database.
@@ -82,7 +82,7 @@ public abstract class DatabaseWrapper {
      * @param stats the PlayerStats containing the player's stone statistics to be updated
      * @return an integer representing the result of the update operation, indicating success or failure
      */
-    abstract public int runUpdateForPersonalStoneStats(PlayerStats stats);
+    abstract public int updatePlayerStats(PlayerStats stats);
 
     /**
      * Inserts a new record into the database to store a drop multiplier.

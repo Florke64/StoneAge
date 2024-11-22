@@ -40,7 +40,7 @@ import java.util.logging.Level;
 public class DatabaseManager {
 
     public static final String TABLE_PLAYER_STATS = "stoneage_stats";
-    public static final String TABLE_PLAYER_DROP_CONFIG = "stoneage_config";
+    public static final String TABLE_PLAYER_CONFIG = "stoneage_config";
     public static final String TABLE_DROP_MULTIPLIER = "stoneage_multiplier";
 
     private final DatabaseConfigReader databaseConfig;
@@ -87,8 +87,8 @@ public class DatabaseManager {
                 final long dbLoadStartTime = System.currentTimeMillis();
 
                 //Loading data of all players from database
-                final int statsCount = getSQLWrapper().loadPersonalStoneStatsFromDatabase();
-                final int configsCount = getSQLWrapper().loadPersonalDropConfigFromDatabase();
+                final int statsCount = getSQLWrapper().loadPlayerStats();
+                final int configsCount = getSQLWrapper().loadPlayerConfig();
 
                 final long dbLoadFinishTime = System.currentTimeMillis();
 

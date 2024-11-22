@@ -50,13 +50,16 @@ public class MySQLWrapper extends DatabaseWrapper {
         makeDropMultiplierTable();
 
         for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getCustomDropEntries()) {
-            final String dropEntryName = entry.getEntryId();
+            final String dropEntryName = entry.getKey().getKey();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
-            addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
+            addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
 
-        addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, "resource_drop", "INT", "0");
-        addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, "resource_drop", "BOOLEAN", "true");
+        for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getDropResourcesEntries().values()) {
+            final String dropEntryName = entry.getKey().getKey();
+            addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
+            addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_CONFIG, dropEntryName, "BOOLEAN", "true");
+        }
     }
 
     /**
@@ -102,7 +105,7 @@ public class MySQLWrapper extends DatabaseWrapper {
         return config;
     }
 
-    public int runUpdateForPersonalDropConfig(@NotNull PlayerConfig config) {
+    public int updatePlayerConfig(@NotNull PlayerConfig config) {
 
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();
@@ -112,7 +115,7 @@ public class MySQLWrapper extends DatabaseWrapper {
         // Init query
         query.append("INSERT INTO ")
                 // "database_name.`table_name` ("
-                .append(getDatabaseName()).append(".`").append(DatabaseManager.TABLE_PLAYER_DROP_CONFIG).append("` (");
+                .append(getDatabaseName()).append(".`").append(DatabaseManager.TABLE_PLAYER_CONFIG).append("` (");
 
         // Obligatory fields
         fields.append("`PlayerUUID`, "); // appends PlayerUUID field
@@ -133,8 +136,8 @@ public class MySQLWrapper extends DatabaseWrapper {
             values.append("'").append(dropSwitchStatus).append("'"); // "'1'"
 
             // defaults
-            keyDuplicate.append("`").append(entry.getEntryId()).append("`=VALUES")
-                    .append("(`").append(entry.getEntryId()).append("`)");
+            keyDuplicate.append("`").append(entry.getKey().getKey()).append("`=VALUES")
+                    .append("(`").append(entry.getKey().getKey()).append("`)");
 
             // appends "," if it's not the last target column
             if (it.hasNext()) {
@@ -158,7 +161,7 @@ public class MySQLWrapper extends DatabaseWrapper {
         return DatabaseManager.queryUpdate(getHikariDataSource(), query.toString());
     }
 
-    public int runUpdateForPersonalStoneStats(@NotNull PlayerStats stats) {
+    public int updatePlayerStats(@NotNull PlayerStats stats) {
 
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();
@@ -212,7 +215,7 @@ public class MySQLWrapper extends DatabaseWrapper {
         return DatabaseManager.queryUpdate(getHikariDataSource(), query.toString());
     }
 
-    public int loadPersonalStoneStatsFromDatabase() {
+    public int loadPlayerStats() {
         final String queryStatement = "SELECT * FROM " + getDatabaseName() + ".`" + DatabaseManager.TABLE_PLAYER_STATS + "`";
 
         final PlayersData playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
@@ -267,8 +270,8 @@ public class MySQLWrapper extends DatabaseWrapper {
         return 0;
     }
 
-    public int loadPersonalDropConfigFromDatabase() {
-        final String queryStatement = "SELECT * FROM " + getDatabaseName() + ".`" + DatabaseManager.TABLE_PLAYER_DROP_CONFIG + "`";
+    public int loadPlayerConfig() {
+        final String queryStatement = "SELECT * FROM " + getDatabaseName() + ".`" + DatabaseManager.TABLE_PLAYER_CONFIG + "`";
 
         final PlayersData playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
 
@@ -380,7 +383,7 @@ public class MySQLWrapper extends DatabaseWrapper {
     }
 
     private void makePlayerDropConfigTable() {
-        String query = "CREATE TABLE IF NOT EXISTS " + getDatabaseName() + "." + DatabaseManager.TABLE_PLAYER_DROP_CONFIG +
+        String query = "CREATE TABLE IF NOT EXISTS " + getDatabaseName() + "." + DatabaseManager.TABLE_PLAYER_CONFIG +
                 " (" +
                 " `PlayerUUID` VARCHAR(36)," +
                 " `PlayerName` VARCHAR(16)," +

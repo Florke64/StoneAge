@@ -92,7 +92,7 @@ public class PlayersData {
     }
 
     public int savePersonalDropConfigInDatabase(PlayerConfig config) {
-        final int response = plugin.getSQLWrapper().runUpdateForPersonalDropConfig(config);
+        final int response = plugin.getSQLWrapper().updatePlayerConfig(config);
 
         if (response > 0)
             config.onDatabaseSave();
@@ -101,7 +101,7 @@ public class PlayersData {
     }
 
     public int savePersonalStoneStatsInDatabase(PlayerStats stats) {
-        final int response = plugin.getSQLWrapper().runUpdateForPersonalStoneStats(stats);
+        final int response = plugin.getSQLWrapper().updatePlayerStats(stats);
 
         if (response > 0)
             stats.onDatabaseSave();

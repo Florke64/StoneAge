@@ -26,6 +26,7 @@ import pl.florke.stoneage.database.DatabaseManager;
 import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.database.playerdata.PlayersData;
+import pl.florke.stoneage.drop.DropCalculator;
 import pl.florke.stoneage.drop.DropEntry;
 import pl.florke.stoneage.drop.DropMultiplier;
 import pl.florke.stoneage.util.Message;
@@ -44,17 +45,22 @@ public class SQLiteWrapper extends DatabaseWrapper {
 
     private void initDatabase() {
         makePlayerStatsTable();
-        makePlayerDropConfigTable();
+        makePlayerConfigTable();
         makeDropMultiplierTable();
 
-        for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getCustomDropEntries()) {
+        final DropCalculator dropCalculator = StoneAge.getPlugin(StoneAge.class).getDropCalculator();
+
+        for (DropEntry entry : dropCalculator.getCustomDropEntries()) {
             final String dropEntryName = entry.getKey().getKey();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
-            addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, dropEntryName, "BOOLEAN", "true");
+            addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
 
-        addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, "resource_drop", "INT", "0");
-        addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_DROP_CONFIG, "resource_drop", "BOOLEAN", "true");
+        for (DropEntry entry : dropCalculator.getDropResourcesEntries().values()) {
+            final String dropEntryName = entry.getKey().getKey();
+            addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
+            addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_CONFIG, dropEntryName, "BOOLEAN", "true");
+        }
     }
 
     protected HikariConfig getHikariConfig(@NotNull DatabaseConfigReader databaseConfig) {
@@ -75,14 +81,14 @@ public class SQLiteWrapper extends DatabaseWrapper {
         return config;
     }
 
-    public int runUpdateForPersonalDropConfig(@NotNull PlayerConfig config) {
+    public int updatePlayerConfig(@NotNull PlayerConfig config) {
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();
         final StringBuilder values = new StringBuilder();
 
         // Initialize query
         query.append("INSERT OR REPLACE INTO ")
-                .append("`").append(DatabaseManager.TABLE_PLAYER_DROP_CONFIG).append("` (");
+                .append("`").append(DatabaseManager.TABLE_PLAYER_CONFIG).append("` (");
 
         // Obligatory fields
         fields.append("`PlayerUUID`, `PlayerName`"); // adds PlayerUUID and PlayerName fields
@@ -113,7 +119,7 @@ public class SQLiteWrapper extends DatabaseWrapper {
         return DatabaseManager.queryUpdate(getHikariDataSource(), query.toString());
     }
 
-    public int runUpdateForPersonalStoneStats(@NotNull PlayerStats stats) {
+    public int updatePlayerStats(@NotNull PlayerStats stats) {
         final StringBuilder query = new StringBuilder();
         final StringBuilder fields = new StringBuilder();
         final StringBuilder values = new StringBuilder();
@@ -134,7 +140,7 @@ public class SQLiteWrapper extends DatabaseWrapper {
         for (final NamespacedKey entry : stats.getStatisticKeys()) {
             if (entry == null) continue;
 
-            fields.append(", `").append(entry).append("`");
+            fields.append(", `").append(entry.getKey()).append("`");
             int dropStatistic = stats.getStatistic(entry);
             values.append(", '").append(dropStatistic).append("'");
         }
@@ -144,10 +150,11 @@ public class SQLiteWrapper extends DatabaseWrapper {
         return DatabaseManager.queryUpdate(getHikariDataSource(), query.toString());
     }
 
-    public int loadPersonalStoneStatsFromDatabase() {
+    public int loadPlayerStats() {
         final String queryStatement = "SELECT * FROM " + "`" + DatabaseManager.TABLE_PLAYER_STATS + "`";
 
-        final PlayersData playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
+        final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
+        final PlayersData playerSetup = plugin.getPlayersData();
 
         try (final Connection conn = getHikariDataSource().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
@@ -180,7 +187,8 @@ public class SQLiteWrapper extends DatabaseWrapper {
                         continue;
 
                     //column name is expected to be fully qualified (with drop_ or resource_ prefix)
-                    final NamespacedKey key = NamespacedKey.fromString(columnName);
+                    final NamespacedKey key = new NamespacedKey(plugin, columnName);
+                    new Message("Set statistic: " + key.getKey() + result.getInt(columnName)).log(Level.INFO);
                     stats.setStatistic(key, result.getInt(columnName));
                 }
 
@@ -199,10 +207,11 @@ public class SQLiteWrapper extends DatabaseWrapper {
         return 0;
     }
 
-    public int loadPersonalDropConfigFromDatabase() {
-        final String queryStatement = "SELECT * FROM " + "`" + DatabaseManager.TABLE_PLAYER_DROP_CONFIG + "`";
+    public int loadPlayerConfig() {
+        final String queryStatement = "SELECT * FROM " + "`" + DatabaseManager.TABLE_PLAYER_CONFIG + "`";
 
-        final PlayersData playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
+        final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
+        final PlayersData playerSetup = plugin.getPlayersData();
 
         try (final Connection conn = getHikariDataSource().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
@@ -228,7 +237,7 @@ public class SQLiteWrapper extends DatabaseWrapper {
                         continue;
 
                     //expected column name is fully qualified, like: drop_diamond, drop_gold, resource_stone
-                    final NamespacedKey key = new NamespacedKey(StoneAge.getPlugin(StoneAge.class), columnName);
+                    final NamespacedKey key = new NamespacedKey(plugin, columnName);
                     config.setDropEntry(key, result.getBoolean(columnName));
                 }
 
@@ -330,8 +339,8 @@ public class SQLiteWrapper extends DatabaseWrapper {
         DatabaseManager.queryUpdate(getHikariDataSource(), query);
     }
 
-    private void makePlayerDropConfigTable() {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.TABLE_PLAYER_DROP_CONFIG +
+    private void makePlayerConfigTable() {
+        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.TABLE_PLAYER_CONFIG +
                 " (" +
                 " `PlayerUUID` TEXT PRIMARY KEY," +
                 " `PlayerName` TEXT" +

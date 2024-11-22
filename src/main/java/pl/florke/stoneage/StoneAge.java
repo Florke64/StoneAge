@@ -56,7 +56,8 @@ public final class StoneAge extends JavaPlugin {
             StoneMachineRedstoneInteractListener.class, StoneBreakListener.class,
             // Windows, Stats, Player Data
             WindowClickListener.class, DropMultiplierCallListener.class,
-            StatisticsIncreaseListener.class, MinerLevelUpListener.class
+            StatisticsIncreaseListener.class, MinerLevelUpListener.class,
+            PlayerSaveDataOnLeaveListener.class
     ));
 
     private final PluginCommandsController commandExecutionController = new PluginCommandsController(this);
