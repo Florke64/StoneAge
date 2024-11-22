@@ -157,7 +157,10 @@ public final class StoneAge extends JavaPlugin {
             dropCalculator.addCustomDrop(dropEntry);
 
         reloadResourceRelations(generalConfig);
-        reloadDatabaseConfig(generalConfig);
+
+        final ConfigurationSection databaseSection = getConfig().getConfigurationSection("database");
+        final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(databaseSection);
+        reloadDatabaseConfig(databaseConfig);
 
         new Message("Config reloaded!").log(Level.INFO);
     }
@@ -186,15 +189,13 @@ public final class StoneAge extends JavaPlugin {
         }
     }
 
-    private void reloadDatabaseConfig(GeneralConfigReader generalConfig) {
+    private void reloadDatabaseConfig(DatabaseConfigReader databaseConfig) {
         if (!getConfig().isConfigurationSection("database")) {
             new Message("Invalid Configuration file (missing the \"database\" section)!",
                     "Skipping, database won't work.").log(Level.SEVERE);
             getServer().getPluginManager().disablePlugin(this);
         }
 
-        final ConfigurationSection databaseSection = getConfig().getConfigurationSection("database");
-        final DatabaseConfigReader databaseConfig = new DatabaseConfigReader(databaseSection);
         databaseConfig.readDatabaseConnectionDetails();
 
         // Load player statistics (& drop preferences)

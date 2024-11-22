@@ -129,7 +129,7 @@ public class MySQLWrapper extends DatabaseWrapper {
             if (entry == null) continue;
 
             // appends EntryName field to target columns list
-            fields.append("`").append(entry.getEntryId()).append("`");
+            fields.append("`").append(entry.getKey().getKey()).append("`");
 
             // appends personal PlayerConfig values
             int dropSwitchStatus = config.isDropping(entry) ? 1 : 0;
