@@ -50,7 +50,7 @@ public class DropStatCommand implements CommandExecutor {
 
         this.playerSetupManager = plugin.getPlayersData();
         this.dropCalculator = plugin.getDropCalculator();
-        this.experienceCalculator = plugin.getExpCalculator();
+        this.experienceCalculator = dropCalculator.getExpCalculator();
     }
 
     @Override
@@ -88,7 +88,7 @@ public class DropStatCommand implements CommandExecutor {
         final Message message = new Message(lang.getText("command-feedback-drop-print-stats"));
 
         int summary = 0;
-        for (DropEntry dropEntry : dropCalculator.getCustomDropEntries()) {
+        for (DropEntry dropEntry : dropCalculator.getDropEntryManager().getCustomDropEntries()) {
             if (dropEntry.getEntryType().equals(DropEntry.EntryType.RESOURCE_DROP))
                 continue;
 

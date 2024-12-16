@@ -15,35 +15,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.florke.stoneage.config;
+package pl.florke.stoneage.drop;
 
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import pl.florke.stoneage.StoneAge;
-import pl.florke.stoneage.drop.DropEntry;
+import pl.florke.stoneage.config.DropEntryConfigReader;
+import pl.florke.stoneage.config.GeneralConfigReader;
+import pl.florke.stoneage.machine.ResourceSpawner;
+import pl.florke.stoneage.machine.StoneMachine;
 import pl.florke.stoneage.util.Message;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
-public class MachinesConfigReader {
+public class DropEntryManager {
 
-    private final JavaPlugin plugin;
+    private final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
 
-    public MachinesConfigReader(JavaPlugin plugin) {
-        this.plugin = plugin;
+    private final LinkedHashMap<NamespacedKey, DropEntry> dropEntries = new LinkedHashMap<>();
+    private final LinkedHashMap<Material, DropEntry> dropResourcesEntries = new LinkedHashMap<>();
+
+    public void addDropResource(DropEntry dropEntry) {
+        dropResourcesEntries.put(dropEntry.getBlockMaterial(), dropEntry);
     }
 
-    public List<DropEntry> getCustomDropEntries() {
+    public void addCustomDrop(DropEntry dropEntry) {
+        dropEntries.put(dropEntry.getKey(), dropEntry);
+    }
+
+    public List<DropEntry> readCustomDropEntries() {
         final DropEntry.EntryType type = DropEntry.EntryType.CUSTOM_DROP;
         return readCustomDropEntriesDirectory(type);
     }
 
-    public List<DropEntry> getDropResourceEntries() {
+    public List<DropEntry> readDropResourceEntries() {
         final DropEntry.EntryType type = DropEntry.EntryType.RESOURCE_DROP;
         return readCustomDropEntriesDirectory(type);
     }
@@ -110,13 +120,71 @@ public class MachinesConfigReader {
         final NamespacedKey key = new NamespacedKey(StoneAge.getPlugin(StoneAge.class), type.getPrefix() + rawKey.toLowerCase());
         final DropEntry dropEntry = customDropEntry.readDropEntry(type, key);
 
-        new Message(dropEntry == null ? "Failed to load a custom drop: $_1" : "Loaded a custom drop: $_1")
-            .placeholder(1, file.getAbsolutePath()).log(Level.INFO);
+//        new Message(dropEntry == null ? "Failed to load a custom drop: $_1" : "Loaded a custom drop: $_1")
+//            .placeholder(1, file.getAbsolutePath()).log(Level.INFO);
 
         return dropEntry;
     }
 
-    public void saveDefaultDrops() {
+    public LinkedHashMap<Material, DropEntry> getDropResourcesEntries() {
+        return new LinkedHashMap<>(dropResourcesEntries);
+    }
+
+    protected void reloadConfig(GeneralConfigReader generalConfig) {
+        final StoneMachine stoneMachine = plugin.getStoneMachine();
+        final ResourceSpawner resourceSpawner = stoneMachine.getResourceSpawner();
+
+        for (final Map.Entry<String, ArrayList<String>> entry : generalConfig.getResourceRelations().entrySet()) {
+            final String resourceName = entry.getKey();
+            final ArrayList<String> dropNames = entry.getValue();
+
+            // Getting KEY <String, ...>
+            final String rawResourceKeyName = DropEntry.EntryType.RESOURCE_DROP.getPrefix() + resourceName;
+            final NamespacedKey resourceKey = new NamespacedKey(plugin, rawResourceKeyName.toLowerCase());
+            final DropEntry resource = getDropEntry(resourceKey);
+
+            // Getting VALUES <..., List<String>>
+            for (final String dropName : dropNames) {
+                final String rawCustomDropKeyName = DropEntry.EntryType.CUSTOM_DROP.getPrefix() + dropName;
+                final NamespacedKey dropKey = new NamespacedKey(plugin, rawCustomDropKeyName.toLowerCase());
+                final DropEntry drop = getDropEntry(dropKey);
+
+                //apply relation
+                resourceSpawner.addResourceChild(resource, drop);
+            }
+        }
+    }
+
+    @Nullable
+    public DropEntry getDropEntry(@NotNull NamespacedKey key) {
+        Optional<DropEntry> dropEntry = Optional.empty();
+
+        if (isDropResource(key))
+            dropEntry = dropResourcesEntries.values().stream().filter(entry -> entry.getKey().equals(key)).findFirst();
+
+        if (!isDropResource(key) || dropEntry.isEmpty())
+            return dropEntries.get(key);
+
+        return dropEntry.get();
+    }
+
+    public List<DropEntry> getCustomDropEntries() {
+        return new ArrayList<>(dropEntries.values());
+    }
+
+    public boolean isDropResource(final NamespacedKey key) {
+        return dropResourcesEntries.values().stream().anyMatch(dropResourceEntry -> dropResourceEntry.getKey().equals(key));
+    }
+
+    public boolean isDropResource(final DropEntry entry) {
+        return dropResourcesEntries.values().stream().anyMatch(dropResourceEntry -> dropResourceEntry.equals(entry));
+    }
+
+    public boolean isDropResource(final Material material) {
+        return dropResourcesEntries.containsKey(material);
+    }
+
+    protected void saveDefaultDrops() {
         final File customDropsDirectory = new File(plugin.getDataFolder(), DropEntry.EntryType.CUSTOM_DROP.getPath());
         final File resourcesDirectory = new File(plugin.getDataFolder(), DropEntry.EntryType.RESOURCE_DROP.getPath());
 

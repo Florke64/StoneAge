@@ -91,7 +91,7 @@ public class Language {
 
         // Read language modules aka ConfigurationSections
         for (final String langModule : yaml.getKeys(false)) {
-            new Message("Loading language module: " + langModule).log(Level.INFO);
+//            new Message("Loading language module: " + langModule).log(Level.INFO);
             readYamlLangModule(yaml, langModule);
         }
 

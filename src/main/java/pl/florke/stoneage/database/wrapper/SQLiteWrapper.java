@@ -28,6 +28,7 @@ import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.database.playerdata.PlayersData;
 import pl.florke.stoneage.drop.DropCalculator;
 import pl.florke.stoneage.drop.DropEntry;
+import pl.florke.stoneage.drop.DropEntryManager;
 import pl.florke.stoneage.drop.DropMultiplier;
 import pl.florke.stoneage.util.Message;
 
@@ -37,6 +38,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 public class SQLiteWrapper extends DatabaseWrapper {
+
+    private final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
 
     public SQLiteWrapper(@NotNull DatabaseConfigReader databaseConfig) {
         super(databaseConfig);
@@ -48,15 +51,15 @@ public class SQLiteWrapper extends DatabaseWrapper {
         makePlayerConfigTable();
         makeDropMultiplierTable();
 
-        final DropCalculator dropCalculator = StoneAge.getPlugin(StoneAge.class).getDropCalculator();
+        final DropEntryManager dropEntryManager = plugin.getDropCalculator().getDropEntryManager();
 
-        for (DropEntry entry : dropCalculator.getCustomDropEntries()) {
+        for (DropEntry entry : dropEntryManager.getCustomDropEntries()) {
             final String dropEntryName = entry.getKey().getKey();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
 
-        for (DropEntry entry : dropCalculator.getDropResourcesEntries().values()) {
+        for (DropEntry entry : dropEntryManager.getDropResourcesEntries().values()) {
             final String dropEntryName = entry.getKey().getKey();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_CONFIG, dropEntryName, "BOOLEAN", "true");
@@ -68,7 +71,9 @@ public class SQLiteWrapper extends DatabaseWrapper {
         config.setPoolName("StoneAgeDatabasePool");
 
         // Saving to plugins/StoneAge/database.sqlite
-        config.setJdbcUrl("jdbc:sqlite:" 
+        config.setJdbcUrl("jdbc:sqlite:"
+//                FIXME: plugin isn't initialized?
+//                + plugin.getDataPath() + "/"
                 + StoneAge.getPlugin(StoneAge.class).getDataPath() + "/"
                 + databaseConfig.getDatabaseName()
                 + ".sqlite");
@@ -153,7 +158,6 @@ public class SQLiteWrapper extends DatabaseWrapper {
     public int loadPlayerStats() {
         final String queryStatement = "SELECT * FROM " + "`" + DatabaseManager.TABLE_PLAYER_STATS + "`";
 
-        final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
         final PlayersData playerSetup = plugin.getPlayersData();
 
         try (final Connection conn = getHikariDataSource().getConnection();
@@ -188,7 +192,7 @@ public class SQLiteWrapper extends DatabaseWrapper {
 
                     //column name is expected to be fully qualified (with drop_ or resource_ prefix)
                     final NamespacedKey key = new NamespacedKey(plugin, columnName);
-                    new Message("Set statistic: " + key.getKey() + result.getInt(columnName)).log(Level.INFO);
+//                    new Message("Set statistic: " + key.getKey() + "=" + result.getInt(columnName)).log(Level.INFO);
                     stats.setStatistic(key, result.getInt(columnName));
                 }
 
@@ -210,7 +214,6 @@ public class SQLiteWrapper extends DatabaseWrapper {
     public int loadPlayerConfig() {
         final String queryStatement = "SELECT * FROM " + "`" + DatabaseManager.TABLE_PLAYER_CONFIG + "`";
 
-        final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
         final PlayersData playerSetup = plugin.getPlayersData();
 
         try (final Connection conn = getHikariDataSource().getConnection();

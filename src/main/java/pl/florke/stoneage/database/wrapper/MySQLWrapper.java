@@ -27,6 +27,7 @@ import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.database.playerdata.PlayersData;
 import pl.florke.stoneage.drop.DropEntry;
+import pl.florke.stoneage.drop.DropEntryManager;
 import pl.florke.stoneage.drop.DropMultiplier;
 import pl.florke.stoneage.util.Message;
 
@@ -39,6 +40,8 @@ import java.util.logging.Level;
 @SuppressWarnings("CallToPrintStackTrace")
 public class MySQLWrapper extends DatabaseWrapper {
 
+    private final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
+
     public MySQLWrapper(@NotNull DatabaseConfigReader databaseConfig) {
         super(databaseConfig);
         initDatabase();
@@ -48,14 +51,16 @@ public class MySQLWrapper extends DatabaseWrapper {
         makePlayerStatsTable();
         makePlayerDropConfigTable();
         makeDropMultiplierTable();
+        
+        final DropEntryManager dropEntryManager = plugin.getDropCalculator().getDropEntryManager();
 
-        for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getCustomDropEntries()) {
+        for (DropEntry entry : dropEntryManager.getCustomDropEntries()) {
             final String dropEntryName = entry.getKey().getKey();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_CONFIG, dropEntryName, "BOOLEAN", "true");
         }
 
-        for (DropEntry entry : StoneAge.getPlugin(StoneAge.class).getDropCalculator().getDropResourcesEntries().values()) {
+        for (DropEntry entry : dropEntryManager.getDropResourcesEntries().values()) {
             final String dropEntryName = entry.getKey().getKey();
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_STATS, dropEntryName, "INT", "0");
             addTableColumnIfNotExist(DatabaseManager.TABLE_PLAYER_CONFIG, dropEntryName, "BOOLEAN", "true");
@@ -218,7 +223,7 @@ public class MySQLWrapper extends DatabaseWrapper {
     public int loadPlayerStats() {
         final String queryStatement = "SELECT * FROM " + getDatabaseName() + ".`" + DatabaseManager.TABLE_PLAYER_STATS + "`";
 
-        final PlayersData playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
+        final PlayersData playerSetup = plugin.getPlayersData();
 
         try (final Connection conn = getHikariDataSource().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
@@ -251,7 +256,7 @@ public class MySQLWrapper extends DatabaseWrapper {
                         continue;
 
                     //expected column name is fully qualified, like: drop_diamond, drop_gold, resource_stone
-                    final NamespacedKey key = new NamespacedKey(StoneAge.getPlugin(StoneAge.class), columnName);
+                    final NamespacedKey key = new NamespacedKey(plugin, columnName);
                     stats.setStatistic(key, result.getInt(columnName));
                 }
 
@@ -273,7 +278,7 @@ public class MySQLWrapper extends DatabaseWrapper {
     public int loadPlayerConfig() {
         final String queryStatement = "SELECT * FROM " + getDatabaseName() + ".`" + DatabaseManager.TABLE_PLAYER_CONFIG + "`";
 
-        final PlayersData playerSetup = StoneAge.getPlugin(StoneAge.class).getPlayersData();
+        final PlayersData playerSetup = plugin.getPlayersData();
 
         try (final Connection conn = getHikariDataSource().getConnection();
              final PreparedStatement ps = conn.prepareStatement(queryStatement);
@@ -299,7 +304,7 @@ public class MySQLWrapper extends DatabaseWrapper {
                         continue;
 
                     //expected column name is fully qualified, like: drop_diamond, drop_gold, resource_stone
-                    final NamespacedKey key = new NamespacedKey(StoneAge.getPlugin(StoneAge.class), columnName);
+                    final NamespacedKey key = new NamespacedKey(plugin, columnName);
                     config.setDropEntry(key, result.getBoolean(columnName));
                 }
 
