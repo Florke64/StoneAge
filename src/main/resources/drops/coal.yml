@@ -1,6 +1,6 @@
 version: 1
 miner_exp: 2
-weight: 11.6
+weight: 0.116
 minimal_exp: 1
 maximal_exp: 5
 multipliable: true

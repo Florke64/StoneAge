@@ -1,6 +1,6 @@
 version: 1
 miner_exp: 2
-weight: 5.1
+weight: 0.051
 ignore_fortune: false
 multipliable: true
 

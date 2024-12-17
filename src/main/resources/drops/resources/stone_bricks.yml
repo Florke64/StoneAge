@@ -1,7 +1,7 @@
 version: 1
 custom_name: 'Stone Bricks'
 miner_exp: 1
-weight: 20
+weight: 0.5
 minimal_exp: 0
 maximal_exp: 5
 ignore_fortune: true
