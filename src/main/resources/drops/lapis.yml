@@ -1,6 +1,6 @@
 version: 2
 miner_exp: 3
-weight: 0.1 # float value
+weight: 0.01 # float value
 minimal_exp: 1
 maximal_exp: 5
 multipliable: true

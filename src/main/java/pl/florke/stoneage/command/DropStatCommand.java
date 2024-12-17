@@ -15,23 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * @Florke64 <Daniel Chojnacki>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package pl.florke.stoneage.command;
 
 import org.bukkit.Bukkit;
@@ -67,7 +50,7 @@ public class DropStatCommand implements CommandExecutor {
 
         this.playerSetupManager = plugin.getPlayersData();
         this.dropCalculator = plugin.getDropCalculator();
-        this.experienceCalculator = plugin.getExpCalculator();
+        this.experienceCalculator = dropCalculator.getExpCalculator();
     }
 
     @Override
@@ -105,7 +88,7 @@ public class DropStatCommand implements CommandExecutor {
         final Message message = new Message(lang.getText("command-feedback-drop-print-stats"));
 
         int summary = 0;
-        for (DropEntry dropEntry : dropCalculator.getCustomDropEntries()) {
+        for (DropEntry dropEntry : dropCalculator.getDropEntryManager().getCustomDropEntries()) {
             if (dropEntry.getEntryType().equals(DropEntry.EntryType.RESOURCE_DROP))
                 continue;
 

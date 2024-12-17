@@ -1,10 +1,13 @@
 version: 1
-miner_level: 5 # mining level needed to drop this item from stone
+miner_level: 5 # minimal mining level needed to drop this item from stone
+minimal_tool_lvl: 1 # minimal tool's material needed to drop this item from stone {0: hand, 1: wooden+, 2: stone+/gold+, 3: iron+, 4: diamond+}
 miner_exp: 4 # how much plugin's mining exp is gained from it
-weight: 1.0 # float value
+weight: 0.01 # float value
 minimal_exp: 1 # how much exp drops (at least)
 maximal_exp: 5 # max amount of exp drops
-multipliable: true #If set to 'true' then accepts current drop multiplication set by server admin
+multipliable: true #If set to 'true' (default) then accepts current drop multiplication set by server admin
+ignore_fortune: false #If set to 'true' then drops won't drop more items with 'fortune' enchantment
+ignore_autosmelting: false #If set to 'true' (default) then drops won't automatically smelt items with that feature in machines
 
 block:
     material: 'DIAMOND_ORE'

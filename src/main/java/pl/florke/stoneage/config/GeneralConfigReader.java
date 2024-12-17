@@ -28,7 +28,7 @@ import java.util.logging.Level;
 
 public class GeneralConfigReader extends ConfigSectionReader {
 
-    private HashMap<String, ArrayList<String>> resourceRelations = new HashMap<>();
+    private final HashMap<String, ArrayList<String>> resourceRelations = new HashMap<>();
 
     //Drop multiplier settings
     private float defaultDropMultiplier, maxDropMultiplier;

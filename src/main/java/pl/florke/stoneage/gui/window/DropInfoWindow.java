@@ -28,6 +28,7 @@ import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.drop.DropCalculator;
 import pl.florke.stoneage.drop.DropEntry;
+import pl.florke.stoneage.drop.DropEntryManager;
 import pl.florke.stoneage.drop.DropMultiplier;
 import pl.florke.stoneage.gui.InventoryPoint;
 import pl.florke.stoneage.gui.Window;
@@ -60,9 +61,9 @@ public class DropInfoWindow extends Window {
         final PlayerStats stats = plugin.getPlayersData().getPlayerStoneMachineStats(windowContentOwner.getUniqueId());
 
         final DropCalculator calculator = plugin.getDropCalculator();
-        int i = drawDropEntries(calculator.getCustomDropEntries(), stats, 0);
+        int i = drawDropEntries(calculator.getDropEntryManager().getCustomDropEntries(), stats, 0);
 
-        final List<DropEntry> dropEntries = calculator.getDropResourcesEntries().values().stream().toList();
+        final List<DropEntry> dropEntries = calculator.getDropEntryManager().getDropResourcesEntries().values().stream().toList();
         drawDropEntries(dropEntries, stats, i);
     }
 
@@ -86,7 +87,7 @@ public class DropInfoWindow extends Window {
     private ItemStack createIconItem(@NotNull DropEntry drop, @NotNull PlayerStats stats) {
         //Preparing data to be placed on the item
         final DropCalculator calculator = plugin.getDropCalculator();
-        final float dropChance = getChancePercentage(drop);
+        final float dropChance = calculator.getChancePercentage(drop.getKey());
 
         final ItemStack icon = drop.getDropEntryIcon();
 
@@ -129,7 +130,7 @@ public class DropInfoWindow extends Window {
         if (calculator.getDropMultiplier().isActive()) {
             lore.addLines(" "); // spacer
 
-            final float realDropChance = getRealChancePercentage(drop);
+            final float realDropChance = calculator.getRealChancePercentage(drop.getKey());
             lore.addLines(plugin.getLanguage("stone-machine-drop-chance"))
                     .placeholder(3, String.valueOf(realDropChance));
         }
@@ -138,22 +139,6 @@ public class DropInfoWindow extends Window {
         icon.setItemMeta(meta);
 
         return icon;
-    }
-
-    private float getChancePercentage(DropEntry drop) {
-        return (100 * drop.getChanceWeight() / plugin.getDropCalculator().getTotalDropsWeight());
-    }
-
-    private float getRealChancePercentage(DropEntry drop) {
-        final DropCalculator calculator = plugin.getDropCalculator();
-        final DropMultiplier dropMultiplier = calculator.getDropMultiplier();
-
-        final float multiplier = (drop.isMultipliable() ? dropMultiplier.getCurrentDropMultiplier() : 1.0f);
-
-        return (((drop.getChanceWeight() * multiplier) / (
-                drop.getEntryType().equals(DropEntry.EntryType.RESOURCE_DROP)?
-                        plugin.getDropCalculator().getTotalResourcesWeight() : plugin.getDropCalculator().getTotalDropsWeight()
-        )) * 100);
     }
 
     @Override
@@ -173,15 +158,17 @@ public class DropInfoWindow extends Window {
         final int clickedSlot = clickedPoint.getSlotNumber();
 
         final DropCalculator calculator = plugin.getDropCalculator();
+        final DropEntryManager dropEntryManager = calculator.getDropEntryManager();
         final DropEntry dropEntry;
 
-        final int customDropsAmount = calculator.getCustomDropEntries().size();
+        final int customDropsAmount = dropEntryManager.getCustomDropEntries().size();
 
         if (clickedSlot < customDropsAmount)
-            dropEntry = calculator.getCustomDropEntries().get(clickedSlot);
+            dropEntry = dropEntryManager.getCustomDropEntries().get(clickedSlot);
 
-        else if (clickedSlot >= calculator.getCustomDropEntries().size())
-            dropEntry = new ArrayList<>(calculator.getDropResourcesEntries().sequencedValues())
+        else if (clickedSlot >= dropEntryManager.getCustomDropEntries().size()
+                && clickedSlot < customDropsAmount + dropEntryManager.getDropResourcesEntries().size())
+            dropEntry = new ArrayList<>(dropEntryManager.getDropResourcesEntries().sequencedValues())
                     .get(clickedSlot - customDropsAmount);
 
         else // Clicked on an empty slot, perhaps

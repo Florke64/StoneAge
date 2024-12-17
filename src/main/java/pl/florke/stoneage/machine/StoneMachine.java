@@ -15,23 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * @Florke64 <Daniel Chojnacki>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package pl.florke.stoneage.machine;
 
 import net.kyori.adventure.text.TextComponent;
@@ -179,13 +162,17 @@ public class StoneMachine {
 
     /**
      * Checks if block given in a parameter is connected to the stone machine.
+     * Only drop resources are checked.
      *
      * @param block to be verified.
-     * @return 'true' if is connected with Stone Machine.
+     * @return 'true' if is connected with Stone Machine; 'false' if block is not connected with Stone Machine
+     * or block is not a drop resource.
      * @see StoneMachine#getConnectedStoneMachine(Block)
      */
     public boolean isConnectedToStoneMachine(@NotNull final Block block) {
-        //TODO: Check block type and return false if it is not a Material.STONE
+        if (!plugin.getDropCalculator().getDropEntryManager().isDropResource(block.getType()))
+            return false;
+
         return getConnectedStoneMachine(block) != null;
     }
 

@@ -20,6 +20,7 @@ package pl.florke.stoneage.database.playerdata;
 import org.bukkit.NamespacedKey;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.drop.DropEntry;
+import pl.florke.stoneage.drop.DropEntryManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,8 @@ import java.util.UUID;
 
 public class PlayerConfig {
 
-    private final StoneAge plugin;
+    private final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
+    private final DropEntryManager dropEntryManager = plugin.getDropCalculator().getDropEntryManager();
 
     private final UUID uuid;
     private final String playerName;
@@ -36,14 +38,12 @@ public class PlayerConfig {
     private boolean unsavedEdits = false;
 
     public PlayerConfig(final UUID uuid, final String playerName) {
-        plugin = StoneAge.getPlugin(StoneAge.class);
-
         this.uuid = uuid;
         this.playerName = playerName;
-        for (DropEntry drop : plugin.getDropCalculator().getCustomDropEntries())
+        for (DropEntry drop : dropEntryManager.getCustomDropEntries())
             customDropEntries.put(drop, true);
 
-        for (DropEntry drop : plugin.getDropCalculator().getDropResourcesEntries().values())
+        for (DropEntry drop : dropEntryManager.getDropResourcesEntries().values())
             customDropEntries.put(drop, true);
 
     }
@@ -53,7 +53,7 @@ public class PlayerConfig {
     }
 
     public void setDropEntry(NamespacedKey key, boolean shouldDrop) {
-        DropEntry dropEntry = plugin.getDropCalculator().getDropEntry(key);
+        DropEntry dropEntry = dropEntryManager.getDropEntry(key);
         setDropEntry(dropEntry, shouldDrop);
     }
 

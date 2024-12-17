@@ -61,7 +61,7 @@ public class StoneBreakListener implements Listener {
         final Player player = event.getPlayer();
 
         final Block brokenBlock = event.getBlock();
-        if (!plugin.getDropCalculator().isDropResource(brokenBlock.getType()))
+        if (!plugin.getDropCalculator().getDropEntryManager().isDropResource(brokenBlock.getType()))
             return;
 
         final DropMultiplier dropMultiplier = plugin.getDropCalculator().getDropMultiplier();
@@ -160,7 +160,7 @@ public class StoneBreakListener implements Listener {
             final PlayerStats stats = this.plugin.getPlayersData().getPlayerStoneMachineStats(player.getUniqueId());
             stats.addMinerExp(drop.getMinerExp());
 
-            if (!plugin.getDropCalculator().isDropResource(drop)) {
+            if (!plugin.getDropCalculator().getDropEntryManager().isDropResource(drop)) {
                 new Message(plugin.getLanguage("stone-machine-drop-alert"))
                     .placeholder(1, Message.constNamePrettify(drop.getCustomName()))
                     .placeholder(2, Integer.toString(totalAmount))

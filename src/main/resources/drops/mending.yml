@@ -13,8 +13,3 @@ drop:
     - '&7Default drop'
   enchantments:
     - 'MENDING 1'
-silk:
-  material: 'GOLD_ORE'
-  display_name: ''
-  lore:
-    - '&7Drop Silktouch'

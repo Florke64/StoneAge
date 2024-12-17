@@ -3,7 +3,7 @@ name: ${project.artifactId}
 version: ${project.version}
 # noinspection PluginYml,YAMLSchemaValidation
 main: ${project.groupId}.StoneAge
-api-version: 1.21
+api-version: 1.21.4
 prefix: ${project.name}
 authors: [ Florke64 ]
 description: ${project.description}
@@ -12,7 +12,7 @@ website: ${project.url}
 commands:
   drop:
     description: Check and configure Stone Machine's drop
-    aliases: [ dropinfo, stone, dropstat ]
+    aliases: [ dropinfo, stone ]
     permission: stoneage.drop
   dropstat:
     description: Miner's drop and grind statistics
@@ -24,7 +24,4 @@ commands:
   dropmultiplier:
     description: Set drop multiplier, admin only
     aliases: [ multiplier, mnoznik ]
-    permission: stoneage.admin
-  dropspamdb:
-    description: Debug command to create random Player Data entries.
     permission: stoneage.admin

@@ -39,12 +39,12 @@ import java.util.logging.Level;
 
 public class DropMultiplier {
 
-    private final StoneAge plugin;
+    private final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
 
-    private final float defaultDropMultiplier;
-    private final float maxDropMultiplier;
-
+    private float baseDropMultiplier;
+    private float maxDropMultiplier;
     private float currentDropMultiplier;
+
     private long multiplierTimeout = 0;
     private long multiplierSetOn = 0;
 
@@ -53,16 +53,14 @@ public class DropMultiplier {
     private String callerName;
     private UUID callerUniqueId;
 
-    public DropMultiplier(float defaultDropMultiplier, float maxDropMultiplier) {
-        plugin = StoneAge.getPlugin(StoneAge.class);
-
-        this.defaultDropMultiplier = defaultDropMultiplier;
-        this.currentDropMultiplier = defaultDropMultiplier;
-        this.maxDropMultiplier = maxDropMultiplier;
+    public DropMultiplier() {
+        this.baseDropMultiplier = 1.0f;
+        this.currentDropMultiplier = 1.0f;
+        this.maxDropMultiplier = 2.0f;
     }
 
-    public float getDefaultDropMultiplier() {
-        return defaultDropMultiplier;
+    public float getBaseDropMultiplier() {
+        return baseDropMultiplier;
     }
 
     @SuppressWarnings("unused")
@@ -88,6 +86,14 @@ public class DropMultiplier {
 
     public long getMultiplierStartTime() {
         return multiplierSetOn;
+    }
+
+    public void setBaseDropMultiplier(float baseDropMultiplier) {
+        this.baseDropMultiplier = baseDropMultiplier;
+    }
+
+    public void setMaxDropMultiplier(float maxDropMultiplier) {
+        this.maxDropMultiplier = maxDropMultiplier;
     }
 
     private void setMultiplierStartTime(long multiplierSetOn) {
@@ -131,7 +137,7 @@ public class DropMultiplier {
     }
 
     public boolean setDropMultiplier(String callerName, UUID callerUniqueId, float value, Timestamp timeoutTime, Timestamp startTime) {
-        if (value <= defaultDropMultiplier || value > maxDropMultiplier)
+        if (value <= baseDropMultiplier || value > maxDropMultiplier)
             return false;
 
         if (timeoutTime.getTime() < (60 * 1000) || timeoutTime.getTime() > (24 * 60 * 60 * 1000))
@@ -164,7 +170,7 @@ public class DropMultiplier {
         if (getMultiplierTimeout() < System.currentTimeMillis())
             return false;
 
-        return defaultDropMultiplier != currentDropMultiplier;
+        return baseDropMultiplier != currentDropMultiplier;
     }
 
     public void initMultiplierBossBar() {

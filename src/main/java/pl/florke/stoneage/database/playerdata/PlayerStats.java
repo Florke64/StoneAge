@@ -20,6 +20,7 @@ package pl.florke.stoneage.database.playerdata;
 import org.bukkit.NamespacedKey;
 import pl.florke.stoneage.StoneAge;
 import pl.florke.stoneage.drop.DropEntry;
+import pl.florke.stoneage.drop.DropEntryManager;
 import pl.florke.stoneage.drop.ExperienceCalculator;
 import pl.florke.stoneage.event.MinerLevelUpEvent;
 
@@ -30,7 +31,7 @@ import java.util.UUID;
 
 public class PlayerStats {
 
-    private final StoneAge plugin;
+    private final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
 
     private final UUID uuid;
     private final String playerName;
@@ -40,7 +41,7 @@ public class PlayerStats {
     private int minerLvl;
 
     public PlayerStats(final UUID uuid, final String playerName) {
-        plugin = StoneAge.getPlugin(StoneAge.class);
+        final DropEntryManager dropEntryManager = plugin.getDropCalculator().getDropEntryManager();
 
         this.uuid = uuid;
         this.playerName = playerName;
@@ -48,10 +49,10 @@ public class PlayerStats {
         this.minerExp = ExperienceCalculator.INITIAL_XP;
         this.minerLvl = 1;
 
-        for (DropEntry entry : plugin.getDropCalculator().getCustomDropEntries())
+        for (DropEntry entry : dropEntryManager.getCustomDropEntries())
             statistics.put(entry.getKey(), 0);
 
-        for (DropEntry entry : plugin.getDropCalculator().getDropResourcesEntries().values())
+        for (DropEntry entry : dropEntryManager.getDropResourcesEntries().values())
             statistics.put(entry.getKey(), 0);
     }
 
@@ -101,7 +102,7 @@ public class PlayerStats {
     }
 
     public void setMinerExp(final long minerExp, final boolean updateLevel) {
-        final int updatedLevel = plugin.getExpCalculator().expToLevel(minerExp);
+        final int updatedLevel = plugin.getDropCalculator().getExpCalculator().expToLevel(minerExp);
 
         if (updateLevel && updatedLevel > this.minerLvl) {
             setMinerLvl(updatedLevel, true);

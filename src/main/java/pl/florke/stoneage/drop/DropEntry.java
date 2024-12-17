@@ -34,12 +34,12 @@ public class DropEntry {
 
     private final ItemStack defaultDrop;
     private ItemStack silkDrop;
-    //TODO: Store type of item to reduce ItemStack#getType() calls count
 
     private final NamespacedKey entryKey;
     private final float chanceWeight;
 
     private boolean ignoreFortune = false;
+    private boolean ignoreAutoSmelting = false;
     private boolean multipliable = true;
 
     private String customName;
@@ -125,6 +125,14 @@ public class DropEntry {
 
     public void setIgnoreFortune(boolean ignoreFortune) {
         this.ignoreFortune = ignoreFortune;
+    }
+
+    public boolean isIgnoreAutoSmelting() {
+        return ignoreAutoSmelting;
+    }
+
+    public void setIgnoreAutoSmelting(boolean ignoreAutoSmelting) {
+        this.ignoreAutoSmelting = ignoreAutoSmelting;
     }
 
     public int getMinAmount() {

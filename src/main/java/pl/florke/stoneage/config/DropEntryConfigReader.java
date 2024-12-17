@@ -84,7 +84,6 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         if (silkDrop != null)
             dropEntry.setSilkDrop(silkDrop);
 
-        // TODO: Only use "set[...something...]();" methods if section exists
         //Getting DropEntry custom name for its display in menus
         final String customEntryName = rootSection.getString("custom_name", dropEntry.getBlockMaterial().name());
         dropEntry.setCustomName(customEntryName);
@@ -92,6 +91,10 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         //Fortune Enchant ignoring
         final boolean ignoreFortune = rootSection.getBoolean("ignore_fortune", true);
         dropEntry.setIgnoreFortune(ignoreFortune);
+
+        //AutoSmelting feature ignoring
+        final boolean ignoreAutoSmelting = rootSection.getBoolean("ignore_autosmelting", true);
+        dropEntry.setIgnoreAutoSmelting(ignoreAutoSmelting);
 
         //Accepts drop multiplication set by server admin
         final boolean multipliable = rootSection.getBoolean("multipliable", true);

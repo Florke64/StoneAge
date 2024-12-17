@@ -23,17 +23,15 @@ import org.bukkit.block.TileState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pl.florke.stoneage.StoneAge;
+import pl.florke.stoneage.config.GeneralConfigReader;
 import pl.florke.stoneage.database.playerdata.PlayerConfig;
 import pl.florke.stoneage.database.playerdata.PlayerStats;
 import pl.florke.stoneage.database.playerdata.PlayersData;
 import pl.florke.stoneage.machine.ResourceSpawner;
-import pl.florke.stoneage.util.Message;
 
 import java.util.*;
-import java.util.logging.Level;
 
 public class DropCalculator {
 
@@ -41,59 +39,18 @@ public class DropCalculator {
 
     private final StoneAge plugin = StoneAge.getPlugin(StoneAge.class);
 
-    private final LinkedHashMap<NamespacedKey, DropEntry> dropEntries = new LinkedHashMap<>();
-    private final LinkedHashMap<Material, DropEntry> dropResourcesEntries = new LinkedHashMap<>();
+    private final DropMultiplier dropMultiplier = new DropMultiplier();
+    private final DropEntryManager dropEntryManager = new DropEntryManager();
+    private final ExperienceCalculator expCalculator = new ExperienceCalculator();
 
-    private DropMultiplier dropMultiplier;
-
-    private float totalDropsWeight = 0;
-    private float totalResourcesWeight = 0;
-
-    public DropCalculator() {
-        calculateTotalWeight();
-    }
+    public DropCalculator() {}
 
     public DropMultiplier getDropMultiplier() {
-        return dropMultiplier != null?
-                this.dropMultiplier : new DropMultiplier(1.0f, 2.0f);
+        return this.dropMultiplier;
     }
 
-    public void setDropMultiplier(DropMultiplier dropMultiplier) {
-        this.dropMultiplier = dropMultiplier;
-    }
-
-    public void addDropResource(DropEntry dropEntry) {
-        dropResourcesEntries.put(dropEntry.getBlockMaterial(), dropEntry);
-        calculateTotalWeight();
-    }
-
-    public void addCustomDrop(DropEntry dropEntry) {
-        dropEntries.put(dropEntry.getKey(), dropEntry);
-        calculateTotalWeight();
-    }
-
-    private void calculateTotalWeight() {
-        float dropWeight = 0.0f;
-        float resourcesWeight = 0.0f;
-
-        for (DropEntry drop : dropEntries.values())
-            dropWeight += drop.getChanceWeight();
-
-        new Message("Drop weight: " + dropWeight).log(Level.INFO);
-
-        for (DropEntry drop : dropResourcesEntries.values())
-            resourcesWeight += drop.getChanceWeight();
-
-        totalDropsWeight = dropWeight;
-        totalResourcesWeight = resourcesWeight;
-    }
-
-    public float getTotalDropsWeight() {
-        return totalDropsWeight;
-    }
-
-    public float getTotalResourcesWeight() {
-        return totalResourcesWeight;
+    public ExperienceCalculator getExpCalculator() {
+        return this.expCalculator;
     }
 
 /**
@@ -124,7 +81,7 @@ public class DropCalculator {
         //Calculating final drop
         final DropLoot dropLoot = new DropLoot();
 
-        final DropEntry dropResource = getDropResourcesEntries().get(brokenBlock);
+        final DropEntry dropResource = dropEntryManager.getDropResourcesEntries().get(brokenBlock);
 
         final PlayersData playerSetup = plugin.getPlayersData();
         final PlayerConfig dropConfig = playerSetup.getPersonalDropConfig(player.getUniqueId());
@@ -149,13 +106,12 @@ public class DropCalculator {
             if (!dropConfig.isDropping(dropEntry))
                 continue;
 
-            final float luck = random.nextFloat() * getTotalDropsWeight();
 
-            final float itemChanceWeight = dropEntry.getChanceWeight() / getTotalDropsWeight();
-            final float currentDropMultiplier = dropEntry.isMultipliable() && getDropMultiplier().isActive()?
-                    getDropMultiplier().getCurrentDropMultiplier() : getDropMultiplier().getDefaultDropMultiplier();
+            float itemChanceWeight = dropEntry.getChanceWeight();
+            if (dropEntry.isMultipliable())
+                itemChanceWeight *= dropMultiplier.getCurrentDropMultiplier();
 
-            if (luck < itemChanceWeight * currentDropMultiplier) {
+            if (random.nextFloat() < itemChanceWeight) {
                 ItemStack itemDrop = dropEntry.getDrop(hasSilkTouch, fortuneLevel);
                 dropLoot.addLoot(dropEntry, itemDrop.clone());
             }
@@ -169,55 +125,65 @@ public class DropCalculator {
     }
 
     public DropEntry calculateDropResource() {
-        DropEntry dropResource = dropResourcesEntries.values().stream().findFirst().orElse(null);
+        DropEntry dropResource = dropEntryManager.getDropResourcesEntries().values().stream().findFirst().orElse(null);
 
-        for (DropEntry entry : getDropResourcesEntries().values()) {
+        for (DropEntry entry : dropEntryManager.getDropResourcesEntries().values()) {
             if (!plugin.getStoneMachine().getResourceSpawner().isRegisteredResource(entry))
                 continue;
 
-            final float luck = random.nextFloat() * getTotalResourcesWeight();
-            final float itemChanceWeight = entry.getChanceWeight() / getTotalResourcesWeight();
-
             final float dropMultiplierValue = entry.isMultipliable() && getDropMultiplier().isActive()?
-                    getDropMultiplier().getCurrentDropMultiplier() : getDropMultiplier().getDefaultDropMultiplier();
+                    getDropMultiplier().getCurrentDropMultiplier() : getDropMultiplier().getBaseDropMultiplier();
 
-            if (luck < itemChanceWeight * dropMultiplierValue)
+            float chanceWeight = entry.getChanceWeight();
+            if (entry.isMultipliable())
+                chanceWeight *= dropMultiplierValue;
+
+            if (random.nextFloat() < chanceWeight)
                 return entry;
         }
 
         return dropResource;
     }
 
-    public LinkedHashMap<Material, DropEntry> getDropResourcesEntries() {
-        return new LinkedHashMap<>(dropResourcesEntries);
+    public float getChancePercentage(NamespacedKey drop) {
+        final DropEntry dropEntry = dropEntryManager.getDropEntry(drop);
+        if (dropEntry == null)
+            return 0;
+
+        return 100 * dropEntry.getChanceWeight();
     }
 
-    @Nullable
-    public DropEntry getDropEntry(@NotNull NamespacedKey key) {
-        Optional<DropEntry> dropEntry = Optional.empty();
+    public float getRealChancePercentage(NamespacedKey drop) {
+        final DropCalculator calculator = plugin.getDropCalculator();
+        final DropEntry dropEntry = dropEntryManager.getDropEntry(drop);
+        final DropMultiplier dropMultiplier = calculator.getDropMultiplier();
 
-        if (isDropResource(key))
-            dropEntry = dropResourcesEntries.values().stream().filter(entry -> entry.getKey().equals(key)).findFirst();
+        if (dropEntry == null)
+            return 0;
 
-        if (!isDropResource(key) || dropEntry.isEmpty())
-            return dropEntries.get(key);
+        float chanceWeight = dropEntry.getChanceWeight();
+        if (dropEntry.isMultipliable())
+            chanceWeight *= dropMultiplier.getCurrentDropMultiplier();
 
-        return dropEntry.get();
+        return (chanceWeight * 100);
     }
 
-    public List<DropEntry> getCustomDropEntries() {
-        return new ArrayList<>(dropEntries.values());
+    public void reloadConfig(GeneralConfigReader generalConfig) {
+        dropEntryManager.saveDefaultDrops();
+
+        expCalculator.setMaximumMinerLevel(generalConfig.getMaxMinerLevel());
+
+        //Reading 'DropEntry' configuration
+        for (final DropEntry dropResourceEntry : dropEntryManager.readDropResourceEntries())
+            dropEntryManager.addDropResource(dropResourceEntry);
+
+        for (final DropEntry dropEntry : dropEntryManager.readCustomDropEntries())
+            dropEntryManager.addCustomDrop(dropEntry);
+
+        dropEntryManager.reloadConfig(generalConfig);
     }
 
-    public boolean isDropResource(final NamespacedKey key) {
-        return dropResourcesEntries.values().stream().anyMatch(dropResourceEntry -> dropResourceEntry.getKey().equals(key));
-    }
-
-    public boolean isDropResource(final DropEntry entry) {
-        return dropResourcesEntries.values().stream().anyMatch(dropResourceEntry -> dropResourceEntry.equals(entry));
-    }
-
-    public boolean isDropResource(final Material material) {
-        return dropResourcesEntries.containsKey(material);
+    public DropEntryManager getDropEntryManager() {
+        return dropEntryManager;
     }
 }
