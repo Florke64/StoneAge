@@ -84,7 +84,6 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         if (silkDrop != null)
             dropEntry.setSilkDrop(silkDrop);
 
-        // TODO: Only use "set[...something...]();" methods if section exists
         //Getting DropEntry custom name for its display in menus
         final String customEntryName = rootSection.getString("custom_name", dropEntry.getBlockMaterial().name());
         dropEntry.setCustomName(customEntryName);

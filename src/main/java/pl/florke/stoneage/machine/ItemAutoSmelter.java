@@ -87,9 +87,6 @@ public class ItemAutoSmelter {
                     }
                 }.runTask(plugin);
 
-                // TODO: This may return ItemStack[] because smelting can sometimes produce more stacks
-                // For example if not enough fuel is available to smelt full stack.
-                // This may also mean that (usage of) #takeAutoSmeltingUse() is bugged, but I don't want to check it now.
                 return smeltedItemStack;
             }
         }

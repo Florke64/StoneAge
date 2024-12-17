@@ -34,7 +34,6 @@ public class DropEntry {
 
     private final ItemStack defaultDrop;
     private ItemStack silkDrop;
-    //TODO: Store type of item to reduce ItemStack#getType() calls count
 
     private final NamespacedKey entryKey;
     private final float chanceWeight;
