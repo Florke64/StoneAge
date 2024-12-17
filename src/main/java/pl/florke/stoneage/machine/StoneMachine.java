@@ -162,13 +162,17 @@ public class StoneMachine {
 
     /**
      * Checks if block given in a parameter is connected to the stone machine.
+     * Only drop resources are checked.
      *
      * @param block to be verified.
-     * @return 'true' if is connected with Stone Machine.
+     * @return 'true' if is connected with Stone Machine; 'false' if block is not connected with Stone Machine
+     * or block is not a drop resource.
      * @see StoneMachine#getConnectedStoneMachine(Block)
      */
     public boolean isConnectedToStoneMachine(@NotNull final Block block) {
-        //TODO: Check block type and return false if it is not a Material.STONE
+        if (!plugin.getDropCalculator().getDropEntryManager().isDropResource(block.getType()))
+            return false;
+
         return getConnectedStoneMachine(block) != null;
     }
 
