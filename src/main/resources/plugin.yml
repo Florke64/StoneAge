@@ -25,6 +25,3 @@ commands:
     description: Set drop multiplier, admin only
     aliases: [ multiplier, mnoznik ]
     permission: stoneage.admin
-  dropspamdb:
-    description: Debug command to create random Player Data entries.
-    permission: stoneage.admin

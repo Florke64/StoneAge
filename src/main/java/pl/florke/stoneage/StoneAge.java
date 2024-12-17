@@ -60,8 +60,7 @@ public final class StoneAge extends JavaPlugin {
         "drop", DropCommand.class,
         "drophelp", DropHelpCommand.class,
         "dropstat", DropStatCommand.class,
-        "multiplier", DropMultiplierCommand.class,
-        "dropspamdb", DropSpamDBCommand.class
+        "multiplier", DropMultiplierCommand.class
     ));
 
     private StoneMachine stoneMachine;
