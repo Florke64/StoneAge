@@ -166,7 +166,8 @@ public class DropInfoWindow extends Window {
         if (clickedSlot < customDropsAmount)
             dropEntry = dropEntryManager.getCustomDropEntries().get(clickedSlot);
 
-        else if (clickedSlot >= dropEntryManager.getCustomDropEntries().size())
+        else if (clickedSlot >= dropEntryManager.getCustomDropEntries().size()
+                && clickedSlot < customDropsAmount + dropEntryManager.getDropResourcesEntries().size())
             dropEntry = new ArrayList<>(dropEntryManager.getDropResourcesEntries().sequencedValues())
                     .get(clickedSlot - customDropsAmount);
 
