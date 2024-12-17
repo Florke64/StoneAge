@@ -12,7 +12,7 @@ website: ${project.url}
 commands:
   drop:
     description: Check and configure Stone Machine's drop
-    aliases: [ dropinfo, stone, dropstat ]
+    aliases: [ dropinfo, stone ]
     permission: stoneage.drop
   dropstat:
     description: Miner's drop and grind statistics
