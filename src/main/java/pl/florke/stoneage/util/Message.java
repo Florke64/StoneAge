@@ -199,13 +199,23 @@ public class Message {
     }
 
     /**
-     * Returns a new string with the first character of {@code text} upper-cased.
+     * Returns a new string with the first character of each word in {@code text} upper-cased.
      * If the string is empty, it is returned as is.
      */
     public static String capitalize(String text) {
         if (text == null || text.isEmpty()) return text;
 
-        return text.substring(0, 1).toUpperCase() + text.substring(1);
+        if (text.length() == 1)
+            return text.toUpperCase();
+
+        text = text.toLowerCase();
+        String[] words = text.split(" "); // Split into words
+
+        for (int i = 0; i < words.length; i++) {
+            words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1);
+        }
+
+        return String.join(" ", words);
     }
 
     public static String replaceUnderlines(String text) {
