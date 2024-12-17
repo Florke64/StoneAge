@@ -69,7 +69,6 @@ public class ItemAutoSmelter {
                 .placeholder(1, Integer.toString(index)).log(Level.INFO);
     }
 
-    // TODO: config to exclude certain drops from auto smelting
     public synchronized ItemStack getSmelted(@NotNull final TileState machineState, @NotNull final ItemStack itemToSmelt) {
         for (final FurnaceRecipe recipe : this.smeltingRecipeList) {
             final RecipeChoice input = recipe.getInputChoice();
