@@ -93,6 +93,10 @@ public class DropEntryConfigReader extends ConfigSectionReader {
         final boolean ignoreFortune = rootSection.getBoolean("ignore_fortune", true);
         dropEntry.setIgnoreFortune(ignoreFortune);
 
+        //AutoSmelting feature ignoring
+        final boolean ignoreAutoSmelting = rootSection.getBoolean("ignore_autosmelting", true);
+        dropEntry.setIgnoreAutoSmelting(ignoreAutoSmelting);
+
         //Accepts drop multiplication set by server admin
         final boolean multipliable = rootSection.getBoolean("multipliable", true);
         dropEntry.setMultipliable(multipliable);

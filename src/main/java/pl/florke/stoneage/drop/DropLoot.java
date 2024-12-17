@@ -63,6 +63,12 @@ public class DropLoot {
 
     public void applyAutoSmeltingFeature(TileState machineState) {
         for (Map.Entry<DropEntry, ItemStack> entry : loots.entrySet()) {
+            if (entry.getValue() == null || entry.getKey() == null)
+                continue;
+
+            if (entry.getKey().isIgnoreAutoSmelting())
+                continue;
+
             final ItemStack itemDrop = entry.getValue();
 
             //AUTO-SMELTING FEATURE

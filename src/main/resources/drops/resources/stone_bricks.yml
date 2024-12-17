@@ -5,6 +5,7 @@ weight: 0.5
 minimal_exp: 0
 maximal_exp: 5
 ignore_fortune: true
+ignore_autosmelting: true
 multipliable: false
 
 block:
