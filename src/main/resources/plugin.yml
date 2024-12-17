@@ -3,7 +3,7 @@ name: ${project.artifactId}
 version: ${project.version}
 # noinspection PluginYml,YAMLSchemaValidation
 main: ${project.groupId}.StoneAge
-api-version: 1.21
+api-version: 1.21.4
 prefix: ${project.name}
 authors: [ Florke64 ]
 description: ${project.description}
