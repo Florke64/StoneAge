@@ -19,7 +19,7 @@ Table of contents:
 You can set `custom_name` for custom drop title to be displayed in GUI and in chat.
 Mining level required for drop is defined by `miner_level` entry. But exp from drop is defined by `miner_exp`.
 
-Percentage chance for drop is represented by `weight`. It is a float number, not limited to 0-1 range.
+Percentage chance for drop is represented by `weight`. It is a float number, limited to 0-1 range.
 
 Respectively, `minimal_exp` and `maximal_exp` define minimum and maximum exp orb drops.
 
